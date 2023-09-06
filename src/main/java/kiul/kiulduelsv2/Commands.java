@@ -1,11 +1,17 @@
 package kiul.kiulduelsv2;
 
 import kiul.kiulduelsv2.config.Arenadata;
+import kiul.kiulduelsv2.config.Userdata;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.io.IOException;
+
+import static kiul.kiulduelsv2.inventory.KitMethods.*;
+import static kiul.kiulduelsv2.config.Userdata.*;
 
 public class Commands implements CommandExecutor {
 
@@ -13,6 +19,27 @@ public class Commands implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command cmd, String label, String[] args) {
         Player p = (Player) commandSender;
         switch (label) {
+            case "kit":
+                switch (args[0]) {
+                    case "save":
+                        saveInventorytoSelectedKitSlot(p);
+                        break;
+                    case "load":
+                        try {loadSelectedKitSlot(p);}
+                        catch (IOException error) {error.printStackTrace();}
+                        break;
+                    case "delete":
+                        if (args[1].equalsIgnoreCase("confirm")) {
+                            Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p), null);
+                        } else {
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7Are you sure? Type &6/kit delete confirm &7to permanently delete the contents of your selected kit slot"));
+                        }
+                        break;
+                    case "slot":
+                        kitSlot.put(p,Integer.parseInt(args[1]));
+                        break;
+                }
+                break;
             case "arena":
                 switch (args[0]) {
                     case "create":
@@ -44,7 +71,6 @@ public class Commands implements CommandExecutor {
                                 p.sendMessage("arena: " + args[1] + " size from center set to: " + args[3]);
                                 break;
                         }
-                        break;
                 }
         }
     return false;

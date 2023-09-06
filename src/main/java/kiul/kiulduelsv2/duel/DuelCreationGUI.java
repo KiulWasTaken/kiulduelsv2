@@ -160,10 +160,9 @@ public class DuelCreationGUI implements Listener {
         p.openInventory(inv);
     }
 
-    public void openKitSelector (Player p) {
+    public void openKitSelector (Player p, int slot) {
         Inventory inv = Bukkit.createInventory(null, 27,"Kit Selector");
-        
-        int slot = 1;
+
 
         ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta fillerMeta = filler.getItemMeta();
