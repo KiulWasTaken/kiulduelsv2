@@ -53,7 +53,7 @@ public class Commands implements CommandExecutor {
                         p.sendMessage(ChatColor.GRAY + "Arena: " + ChatColor.GOLD + args[1] + ChatColor.RED + " Deleted " + ChatColor.GRAY + " successfully!");
                         break;
                     case "edit":
-                        switch (args[2]) {
+                        switch (args[1]) {
                             case "team_one":
                                 Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
                                 p.sendMessage("team one spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
@@ -67,8 +67,12 @@ public class Commands implements CommandExecutor {
                                 p.sendMessage("team three spawn/center location set to: " + p.getLocation() + " for arena: " + args[1]);
                                 break;
                             case "size":
-                                Arenadata.get().set("arenas." + args[1] + ".size", args[3]);
-                                p.sendMessage("arena: " + args[1] + " size from center set to: " + args[3]);
+                                Arenadata.get().set("arenas." + args[1] + ".size", args[2]);
+                                p.sendMessage("arena: " + args[1] + " size from center set to: " + args[2]);
+                                break;
+                            case "icon":
+                                Arenadata.get().set("arenas." + args[1] + ".size", args[2]);
+                                p.sendMessage(ChatColor.GRAY + "icon set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
                                 break;
                         }
                 }

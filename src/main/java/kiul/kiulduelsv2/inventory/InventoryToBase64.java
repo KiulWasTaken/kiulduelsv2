@@ -24,6 +24,7 @@ public class InventoryToBase64 {
             for (int i = 0; i < inventory.getSize(); i++) {
                 dataOutput.writeObject(inventory.getItem(i));
             }
+
        
             // Serialize that array
             dataOutput.close();
@@ -31,6 +32,27 @@ public class InventoryToBase64 {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to save item stacks.", e);
         }    
+    }
+
+    public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+
+            // Write the size of the inventory
+            dataOutput.writeInt(items.length);
+
+            // Save every element in the list
+            for (int i = 0; i < items.length; i++) {
+                dataOutput.writeObject(items[i]);
+            }
+
+            // Serialize that array
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to save item stacks.", e);
+        }
     }
 
     public static Inventory fromBase64(String data) throws IOException {
