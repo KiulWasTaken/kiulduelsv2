@@ -1,8 +1,10 @@
 package kiul.kiulduelsv2;
 
+import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -76,6 +78,9 @@ public class Commands implements CommandExecutor {
                                 break;
                         }
                 }
+                break;
+            case "testgeneration":
+                TerrainArena.generateTerrain(p.getWorld(),new Location(p.getWorld(),Integer.parseInt(args[0]),Integer.parseInt(args[1]),Integer.parseInt(args[2])),new Location(p.getWorld(),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5])),5);
         }
     return false;
     }
