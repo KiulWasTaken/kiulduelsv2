@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.duel;
 
+import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,148 +21,14 @@ public class DuelCreationGUI implements Listener {
     @EventHandler
     public void cancelClick (InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getView().getTitle().equalsIgnoreCase("Main Menu") || e.getView().getTitle().equalsIgnoreCase("Team Manager")) {
+        if (e.getView().getTitle().equalsIgnoreCase("Kit Slot Selector") || e.getView().getTitle().equalsIgnoreCase("Team Manager")) {
             e.setCancelled(true);
         }
     }
 
-    public void openMainMenu (Player p) {
 
-        Inventory inv = Bukkit.createInventory(null, 9,"Main Menu");
-
-
-        // items.add(xyz);
-
-        ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-        ItemMeta fillerMeta = filler.getItemMeta();
-        fillerMeta.setDisplayName("");
-        filler.setItemMeta(fillerMeta);
-
-        ItemStack empty = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-        ItemMeta emptyMeta = empty.getItemMeta();
-        emptyMeta.setDisplayName("");
-        empty.setItemMeta(emptyMeta);
-
-        ItemStack maps = new ItemStack(Material.DEAD_BUSH);
-        ItemMeta mapsMeta = maps.getItemMeta();
-        mapsMeta.setDisplayName(ChatColor.GOLD + "Select Map");
-        maps.setItemMeta(mapsMeta);
-
-        ItemStack kits = new ItemStack(Material.GOLDEN_CARROT);
-        ItemMeta kitsMeta = kits.getItemMeta();
-        kitsMeta.setDisplayName(ChatColor.YELLOW + "Select Kit");
-        kits.setItemMeta(kitsMeta);
-
-        ItemStack teams = new ItemStack(Material.PLAYER_HEAD);
-        ItemMeta teamsMeta = teams.getItemMeta();
-        teamsMeta.setDisplayName(ChatColor.RED + "Manage Teams");
-        teams.setItemMeta(teamsMeta);
-
-
-        List<ItemStack> itemStackList = new ArrayList<>(Arrays.asList(filler,filler,maps,empty,kits,empty,teams,filler,filler));
-        ItemStack[] itemStacks = itemStackList.toArray(new ItemStack[0]);
-        inv.setContents(itemStacks);
-      //  ItemStack[] items = filler,filler,maps,empty,kits,empty,teams,filler,filler;
-        p.openInventory(inv);
-    }
-    
-    boolean team3Enabled = false;
-
-    public void openTeamManager (Player p) {
-
-        Inventory inv = Bukkit.createInventory(null, 27,"Team Manager");
-
-        ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-        ItemMeta fillerMeta = filler.getItemMeta();
-        fillerMeta.setDisplayName("");
-        filler.setItemMeta(fillerMeta);
-
-        ItemStack empty = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-        ItemMeta emptyMeta = empty.getItemMeta();
-        emptyMeta.setDisplayName("");
-        empty.setItemMeta(emptyMeta);
-
-        ItemStack redTeam = new ItemStack(Material.RED_WOOL);
-        ItemMeta redTeamMeta = redTeam.getItemMeta();
-        redTeamMeta.setDisplayName(ChatColor.RED +"Red Team Size:");
-        redTeam.setItemMeta(redTeamMeta);
-
-        ItemStack blueTeam = new ItemStack(Material.BLUE_WOOL);
-        ItemMeta blueTeamMeta = blueTeam.getItemMeta();
-        blueTeamMeta.setDisplayName(ChatColor.BLUE + "Blue Team Size:");
-        blueTeam.setItemMeta(blueTeamMeta);
-
-        ItemStack purpleTeam = new ItemStack(Material.PURPLE_WOOL);
-        ItemMeta purpleTeamMeta = purpleTeam.getItemMeta();
-        purpleTeamMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Purple Team Size:");
-        purpleTeam.setItemMeta(purpleTeamMeta);
-
-        ItemStack enableTeam3 = new ItemStack(Material.GRAY_WOOL);
-        ItemMeta enableTeam3Meta = enableTeam3.getItemMeta();
-        enableTeam3Meta.setDisplayName(ChatColor.GOLD + "Enable Team 3");
-        enableTeam3.setItemMeta(enableTeam3Meta);
-
-        ItemStack add1blue = new ItemStack(Material.LIME_TERRACOTTA);
-        ItemMeta add1blueMeta = add1blue.getItemMeta();
-        add1blueMeta.setDisplayName(ChatColor.GREEN + "+1");
-        add1blueMeta.setLocalizedName("ADD1BLUE");
-        add1blue.setItemMeta(add1blueMeta);
-
-        ItemStack add1red = new ItemStack(Material.LIME_TERRACOTTA);
-        ItemMeta add1redMeta = add1red.getItemMeta();
-        add1redMeta.setDisplayName(ChatColor.GREEN + "+1");
-        add1redMeta.setLocalizedName("ADD1RED");
-        add1red.setItemMeta(add1redMeta);
-
-        ItemStack remove1blue = new ItemStack(Material.RED_TERRACOTTA);
-        ItemMeta remove1blueMeta = remove1blue.getItemMeta();
-        remove1blueMeta.setDisplayName(ChatColor.RED + "-1");
-        remove1blueMeta.setLocalizedName("REMOVE1BLUE");
-        remove1blue.setItemMeta(remove1blueMeta);
-
-        ItemStack remove1red = new ItemStack(Material.RED_TERRACOTTA);
-        ItemMeta remove1redMeta = remove1red.getItemMeta();
-        remove1redMeta.setDisplayName(ChatColor.RED + "-1");
-        remove1redMeta.setLocalizedName("REMOVE1RED");
-        remove1red.setItemMeta(remove1redMeta);
-
-        ItemStack add1purple = new ItemStack(Material.LIME_TERRACOTTA);
-        ItemMeta add1purpleMeta = add1purple.getItemMeta();
-        add1purpleMeta.setDisplayName(ChatColor.GREEN + "+1");
-        add1purpleMeta.setLocalizedName("ADD1PURPLE");
-        add1purple.setItemMeta(add1purpleMeta);
-
-        ItemStack remove1purple = new ItemStack(Material.PURPLE_TERRACOTTA);
-        ItemMeta remove1purpleMeta = remove1purple.getItemMeta();
-        remove1purpleMeta.setDisplayName(ChatColor.RED + "-1");
-        remove1purpleMeta.setLocalizedName("REMOVE1PURPLE");
-        remove1purple.setItemMeta(remove1purpleMeta);
-        
-        
-        
-        if (team3Enabled) {
-            List<ItemStack> itemStackList = new ArrayList<>(Arrays.asList(
-                    filler,empty,add1blue,empty,add1red,empty,add1purple,empty,filler,
-                    filler,empty,blueTeam,empty,redTeam,empty,purpleTeam,empty,filler,
-                    filler,empty,remove1blue,empty,remove1red,remove1purple,empty,empty,filler
-            ));
-            ItemStack[] itemStacks = itemStackList.toArray(new ItemStack[0]);
-            inv.setContents(itemStacks);
-        } else {
-            List<ItemStack> itemStackList = new ArrayList<>(Arrays.asList(
-                    filler,empty,add1blue,empty,add1red,empty,empty,empty,filler,
-                    filler,empty,blueTeam,empty,redTeam,empty,enableTeam3,empty,filler,
-                    filler,empty,remove1blue,empty,remove1red,empty,empty,empty,filler
-            ));
-            ItemStack[] itemStacks = itemStackList.toArray(new ItemStack[0]);
-            inv.setContents(itemStacks);
-        }
-
-        p.openInventory(inv);
-    }
-
-    public void openKitSelector (Player p, int slot) {
-        Inventory inv = Bukkit.createInventory(null, 27,"Kit Selector");
+    public void openKitSelector (Player p) {
+        Inventory inv = Bukkit.createInventory(null, 27,"Kit Slot Selector");
 
 
         ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -219,7 +86,7 @@ public class DuelCreationGUI implements Listener {
         kitSlot9Meta.setDisplayName("");
         kitSlot9.setItemMeta(kitSlot9Meta);
 
-        switch (slot) {
+        switch (KitMethods.kitSlot.get(p)) {
             case 1:
                 kitSlot1.setType(Material.LIME_TERRACOTTA);
                 break;

@@ -7,6 +7,7 @@ import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.DuelMethods.*;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class UtilMethods {
 
     public static void teleportLobby (Player p) {
         p.teleport(p.getWorld().getSpawnLocation());
+        p.setDisplayName(ChatColor.WHITE + p.getName());
         try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
     }
 

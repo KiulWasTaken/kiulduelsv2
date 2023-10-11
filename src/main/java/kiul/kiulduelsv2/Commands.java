@@ -1,8 +1,11 @@
 package kiul.kiulduelsv2;
 
+import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -24,7 +27,7 @@ public class Commands implements CommandExecutor {
             case "kit":
                 switch (args[0]) {
                     case "save":
-                        saveInventorytoSelectedKitSlot(p);
+                        saveInventoryToSelectedKitSlot(p);
                         break;
                     case "load":
                         try {loadSelectedKitSlot(p);}
@@ -34,11 +37,16 @@ public class Commands implements CommandExecutor {
                         if (args[1].equalsIgnoreCase("confirm")) {
                             Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p), null);
                         } else {
-                            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&7Are you sure? Type &6/kit delete confirm &7to permanently delete the contents of your selected kit slot"));
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cAre you sure? &7Type &6/kit delete confirm &7to permanently delete the contents of your selected kit slot"));
                         }
                         break;
                     case "slot":
                         kitSlot.put(p,Integer.parseInt(args[1]));
+                        break;
+                    case "global":
+                        Userdata.get().set("kits.global." + args[1] + ".inventory", InventoryToBase64.toBase64(p.getInventory()));
+                        Userdata.get().set("kits.global." + args[1] + ".armour",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+                        p.sendMessage("global kit: " + ChatColor.GOLD + args[1] + ChatColor.WHITE + " saved to database");
                         break;
                 }
                 break;
@@ -48,6 +56,8 @@ public class Commands implements CommandExecutor {
                         Arenadata.get().set("arenas." + args[1] + ".center", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
+                        Arenadata.get().set("arenas." + args[1] + ".chunkCorner1", p.getLocation());
+                        Arenadata.get().set("arenas." + args[1] + ".chunkCorner2", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".size", 40);
                         break;
                     case "delete":
@@ -55,7 +65,7 @@ public class Commands implements CommandExecutor {
                         p.sendMessage(ChatColor.GRAY + "Arena: " + ChatColor.GOLD + args[1] + ChatColor.RED + " Deleted " + ChatColor.GRAY + " successfully!");
                         break;
                     case "edit":
-                        switch (args[1]) {
+                        switch (args[2]) {
                             case "team_one":
                                 Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
                                 p.sendMessage("team one spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
@@ -64,16 +74,27 @@ public class Commands implements CommandExecutor {
                                 Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
                                 p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
                                 break;
+                            case "corner2":
+                                Arenadata.get().set("arenas." + args[1] + ".corner2", p.getLocation());
+                                p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                break;
+                            case "corner1":
+                                Arenadata.get().set("arenas." + args[1] + ".corner1", p.getLocation());
+                                p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                break;
                             case "center":
-                                Arenadata.get().set("arenas." + args[1] + ".center", p.getLocation());
-                                p.sendMessage("team three spawn/center location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                double pX = p.getLocation().getX();
+                                double pZ = p.getLocation().getZ();
+                                Location center = new Location(p.getWorld(),pX,0,pZ);
+                                Arenadata.get().set("arenas." + args[1] + ".center", center);
+                                p.sendMessage("center location set to: " + pX + "," + pZ + " for arena: " + args[1]);
                                 break;
                             case "size":
-                                Arenadata.get().set("arenas." + args[1] + ".size", args[2]);
+                                Arenadata.get().set("arenas." + args[1] + ".size", args[3]);
                                 p.sendMessage("arena: " + args[1] + " size from center set to: " + args[2]);
                                 break;
                             case "icon":
-                                Arenadata.get().set("arenas." + args[1] + ".size", args[2]);
+                                Arenadata.get().set("arenas." + args[1] + ".icon", args[2]);
                                 p.sendMessage(ChatColor.GRAY + "icon set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
                                 break;
                         }
@@ -81,6 +102,16 @@ public class Commands implements CommandExecutor {
                 break;
             case "testgeneration":
                 TerrainArena.generateTerrain(p.getWorld(),new Location(p.getWorld(),Integer.parseInt(args[0]),Integer.parseInt(args[1]),Integer.parseInt(args[2])),new Location(p.getWorld(),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5])),5);
+                break;
+            case "reroll":
+                if (args[0].equalsIgnoreCase("yes")) {
+                    DuelMethods.reRollYes.get(ArenaMethods.findPlayerArena(p)).add(true);
+                    DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                } else {
+                    DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
+                    DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                }
+                break;
         }
     return false;
     }

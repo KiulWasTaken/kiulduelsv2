@@ -6,10 +6,14 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 public class TerrainArena extends ChunkGenerator {
@@ -43,6 +47,7 @@ public class TerrainArena extends ChunkGenerator {
 
             World world = Bukkit.getWorld(worldName);
             Location retrievalLocation = returnRetrievalLocation(world);
+
             @Override
             public void run() {
                 if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome())) {
@@ -74,21 +79,27 @@ public class TerrainArena extends ChunkGenerator {
                     }
 
 
-                    for (int i = 0; i < targetChunks.size(); ++i) {
-                        for (int x = 0; x < 16; ++x) {
-                            for (int z = 0; z < 16; ++z) {
-                                for (int y = 0; y < 255; ++y) {
-                                    targetChunks.get(i).getBlock(x,y,z).setType(retrieveChunks.get(i).getBlock(x,y,z).getType());
+                    new BukkitRunnable() {
+                        int tick = 0;
+
+                        @Override
+                        public void run() {
+                            if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
+                                cancel();
+                                return;
+                            }
+                            for (int x = 0; x < 16; ++x) {
+                                for (int z = 0; z < 16; ++z) {
+                                    for (int y = 0; y < 199; ++y) {
+                                        targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlock(x, y, z).getType());
+                                    }
                                 }
                             }
                         }
-                    }
-                    cancel();
-                    }
+                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 5L);
                 }
-            } .runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 1L);
-
-
+            }
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 1L);
     }
 
     public static Location returnRetrievalLocation (World world) {

@@ -22,8 +22,11 @@ public class ArenaMethods {
 
     public static String findPlayerArena (Player p) {
         Set<String> arenas = getArenas();
+        double pX = p.getLocation().getX();
+        double pZ = p.getLocation().getZ();
+        Location playerLocation = new Location(p.getWorld(),pX,0,pZ);
         for (String arenaName : arenas) {
-            if (p.getLocation().distance((Location) Arenadata.get().get("arena." + arenaName + ".center")) <= (double) Arenadata.get().get("arena." + arenaName + ".size")) {
+            if (playerLocation.distance((Location) Arenadata.get().get("arena." + arenaName + ".center")) <= (double) Arenadata.get().get("arena." + arenaName + ".size")) {
                 return arenaName;
             }
         }

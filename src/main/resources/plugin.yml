@@ -9,3 +9,5 @@ commands:
     description: kits
   testgeneration:
     description: tests generation
+  reroll:
+    description: for re-rolling the map in the pregame phase of a realistic duel.
