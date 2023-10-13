@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -12,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 
@@ -43,10 +45,18 @@ public class Commands implements CommandExecutor {
                     case "slot":
                         kitSlot.put(p,Integer.parseInt(args[1]));
                         break;
-                    case "global":
+                    case "saveglobal":
                         Userdata.get().set("kits.global." + args[1] + ".inventory", InventoryToBase64.toBase64(p.getInventory()));
                         Userdata.get().set("kits.global." + args[1] + ".armour",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
                         p.sendMessage("global kit: " + ChatColor.GOLD + args[1] + ChatColor.WHITE + " saved to database");
+                        break;
+                    case "loadglobal":
+                        try {
+                            ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global." + args[1] + ".inventory")).getContents();
+                            ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global." + args[1] + ".armour")).getContents();
+                            p.getInventory().setContents(kitContents);
+                            p.getInventory().setArmorContents(armourContents);
+                        } catch (IOException error) {error.printStackTrace();}
                         break;
                 }
                 break;
@@ -111,6 +121,9 @@ public class Commands implements CommandExecutor {
                     DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
                     DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
                 }
+                break;
+            case "test":
+                QueueInventory.queueInventory(p);
                 break;
         }
     return false;

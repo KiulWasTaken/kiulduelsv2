@@ -14,6 +14,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
         getCommand("kit").setExecutor(new Commands());
+        getCommand("test").setExecutor(new Commands());
         getCommand("arena").setExecutor(new Commands());
         getCommand("testgeneration").setExecutor(new Commands());
     }
