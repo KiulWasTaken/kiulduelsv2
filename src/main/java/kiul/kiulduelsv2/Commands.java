@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import org.bukkit.ChatColor;
@@ -124,6 +125,10 @@ public class Commands implements CommandExecutor {
                 break;
             case "test":
                 QueueInventory.queueInventory(p);
+                //ItemInventory.itemInventory(p);
+                break;
+            case "t":
+                ItemInventory.itemInventory(p);
                 break;
         }
     return false;

@@ -13,3 +13,4 @@ commands:
     description: for re-rolling the map in the pregame phase of a realistic duel.
   test:
     description: tests what im testing
+  t:

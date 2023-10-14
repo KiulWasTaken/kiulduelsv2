@@ -17,6 +17,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("test").setExecutor(new Commands());
         getCommand("arena").setExecutor(new Commands());
         getCommand("testgeneration").setExecutor(new Commands());
+        getCommand("t").setExecutor(new Commands());
     }
 
     @Override

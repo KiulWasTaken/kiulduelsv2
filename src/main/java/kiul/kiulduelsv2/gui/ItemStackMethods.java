@@ -1,18 +1,24 @@
 package kiul.kiulduelsv2.gui;
 
+import kiul.kiulduelsv2.C;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -25,9 +31,13 @@ public class ItemStackMethods {
     public static ItemStack createItemStack (String itemname, Material material, int amount, List<String> lore) {
             ItemStack i = new ItemStack(material);
             ItemMeta iM = i.getItemMeta();
-            iM.setLore(lore);
+            List<String> adjustedLore = new ArrayList<>();
+            for (String oldLore : lore) {
+                adjustedLore.add(C.t(oldLore));
+            }
+            iM.setLore(adjustedLore);
             i.setAmount(amount);
-            iM.setDisplayName(itemname);
+            iM.setDisplayName(C.t(itemname));
             i.setItemMeta(iM);
             return i;
     }
@@ -41,6 +51,15 @@ public class ItemStackMethods {
         sm.setDisplayName(displayName);
         playerHead.setItemMeta(sm);
         return playerHead;
+    }
+
+    public static ItemStack createPotion(String displayName, Material mat, PotionType potionType, boolean extended, boolean upgraded) {
+        ItemStack itemStack = new ItemStack(mat);
+        PotionMeta potionMeta = (PotionMeta) itemStack;
+        potionMeta.setBasePotionData(new PotionData(potionType, extended, upgraded));
+        potionMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        itemStack.setItemMeta(potionMeta);
+        return itemStack;
     }
 
     public static String translateHexColorCodes(String startTag, String endTag, String message)
