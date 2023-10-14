@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Skull;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,7 +29,7 @@ import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
 
 public class ItemStackMethods {
 
-    public static ItemStack createItemStack (String itemname, Material material, int amount, List<String> lore) {
+    public static ItemStack createItemStack (String itemname, Material material, int amount, List<String> lore, Enchantment enchantment, Integer enchantLvl) {
             ItemStack i = new ItemStack(material);
             ItemMeta iM = i.getItemMeta();
             List<String> adjustedLore = new ArrayList<>();
@@ -38,6 +39,9 @@ public class ItemStackMethods {
             iM.setLore(adjustedLore);
             i.setAmount(amount);
             iM.setDisplayName(C.t(itemname));
+            if (enchantment != null) {
+                iM.addEnchant(enchantment, enchantLvl, true);
+            }
             i.setItemMeta(iM);
             return i;
     }
@@ -53,10 +57,11 @@ public class ItemStackMethods {
         return playerHead;
     }
 
-    public static ItemStack createPotion(String displayName, Material mat, PotionType potionType, boolean extended, boolean upgraded) {
+    public static ItemStack createPotion(String displayName, Material mat, int amount, PotionData potionData) {
         ItemStack itemStack = new ItemStack(mat);
-        PotionMeta potionMeta = (PotionMeta) itemStack;
-        potionMeta.setBasePotionData(new PotionData(potionType, extended, upgraded));
+        itemStack.setAmount(amount);
+        PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
+        potionMeta.setBasePotionData(potionData);
         potionMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
         itemStack.setItemMeta(potionMeta);
         return itemStack;

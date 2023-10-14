@@ -14,3 +14,4 @@ commands:
   test:
     description: tests what im testing
   t:
+  e:

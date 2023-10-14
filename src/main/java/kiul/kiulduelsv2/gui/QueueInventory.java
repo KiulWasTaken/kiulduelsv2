@@ -22,7 +22,7 @@ public class QueueInventory {
         Inventory inventory = Bukkit.createInventory(p, 45, "Queue");
 
         for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i,ItemStackMethods.createItemStack("",Material.BLACK_STAINED_GLASS_PANE,1,null));
+            inventory.setItem(i,ItemStackMethods.createItemStack("",Material.BLACK_STAINED_GLASS_PANE,1,null, null, null));
 
         }
 
@@ -37,7 +37,7 @@ public class QueueInventory {
                 if (item.getSkullValue() != null) {
                     inventory.setItem(item.getInventorySlot(),ItemStackMethods.createPlayerHead(item.getSkullValue(),itemName));
                 } else {
-                    inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore));
+                    inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null));
                 }
         }
 

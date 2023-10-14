@@ -5,6 +5,8 @@ import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.gui.EnchantInventory;
+import kiul.kiulduelsv2.gui.ItemEnum;
 import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
@@ -129,6 +131,9 @@ public class Commands implements CommandExecutor {
                 break;
             case "t":
                 ItemInventory.itemInventory(p);
+                break;
+            case "e":
+                EnchantInventory.itemEnchantInventory(p);
                 break;
         }
     return false;
