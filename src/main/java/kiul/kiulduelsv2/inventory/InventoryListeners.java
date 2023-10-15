@@ -136,8 +136,12 @@ public class InventoryListeners implements Listener {
                     }
                 }
             } else if (e.getView().getTitle().equalsIgnoreCase(EnchantInventory.itemEnchantInvTitle)) {
-                if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory()) {
+                if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory() || e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
                     e.setCancelled(true);
+                    if (e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
+                        e.getCursor().setAmount(0);
+                        return;
+                    }
                     if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(EnchantEnum.iteminventory.getDisplayName()))) {
                         ItemInventory.itemInventory(p);
                         return;
