@@ -17,9 +17,9 @@ public class EnchantInventory {
 
         Inventory inventory = Bukkit.createInventory(p, 45, itemEnchantInvTitle);
 
-        for (int i = 0; i < 45; i++) {
-            inventory.setItem(i, ItemStackMethods.createItemStack(" ", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, List.of(""), null, null));
-        }
+        //for (int i = 0; i < 45; i++) {
+        //    inventory.setItem(i, ItemStackMethods.createItemStack(" ", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, List.of(""), null, null));
+        //}
 
         for (EnchantEnum item : EnchantEnum.values()) {
             List<String> lore = new ArrayList<>();

@@ -7,14 +7,15 @@ import org.bukkit.enchantments.Enchantment;
 public enum EnchantEnum {
     /** Items */
     netheritesword(C.t("&6Sword enchantments"), Material.NETHERITE_SWORD, 1, null, null),
-    bow(C.t("&6Bow enchantments"), Material.BOW, 1, null, null),
-    netheritepickaxe(C.t("&6Pickaxe enchantments"), Material.NETHERITE_PICKAXE, 10, null, null),
-    trident(C.t("&6Trident enchantments"), Material.TRIDENT, 19, null, null),
-    crossbow(C.t("&6Crossbow enchantments"), Material.CROSSBOW, 28, null, null),
+    bow(C.t("&6Bow enchantments"), Material.BOW, 10, null, null),
+    netheritepickaxe(C.t("&6Pickaxe enchantments"), Material.NETHERITE_PICKAXE, 19, null, null),
+    trident(C.t("&6Trident enchantments"), Material.TRIDENT, 28, null, null),
+    crossbow(C.t("&6Crossbow enchantments"), Material.CROSSBOW, 37, null, null),
     netheritehelm(C.t("&6Helmet enchantments"), Material.NETHERITE_HELMET, 24, null, null),
     netheriteleggings(C.t("&6Legging enchantments"), Material.NETHERITE_LEGGINGS, 25, null, null),
     netheriteboots(C.t("&6Boot enchantments"), Material.NETHERITE_BOOTS, 26, null, null),
     resetenchants(C.t("&4Remove all enchants"), Material.BARRIER, 41, null, null),
+    iteminventory(C.t(ItemInventory.itemInvTitle), Material.KNOWLEDGE_BOOK, 32, null, null),
     /** Enchantment books */
     sharp(C.t(""), Material.ENCHANTED_BOOK, 2, Enchantment.DAMAGE_ALL, 5),
     fireaspect(C.t(""), Material.ENCHANTED_BOOK, 3, Enchantment.FIRE_ASPECT, 2),

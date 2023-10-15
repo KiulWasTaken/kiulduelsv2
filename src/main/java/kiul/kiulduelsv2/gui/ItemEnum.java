@@ -11,7 +11,8 @@ import java.util.List;
 
 public enum ItemEnum {
     itemamount(C.t("&6Adjust Item Size"), Material.SPECTRAL_ARROW, null, null, null, null),
-    backtomain(C.t("&4Back to main"), Material.RED_STAINED_GLASS_PANE, null, null, null, null),
+    backtomain(C.t("&cBack to main"), Material.RED_STAINED_GLASS_PANE, null, null, null, null),
+    clearinventory(C.t("&4Clear inventory"), Material.BARRIER, null, null, null, null),
     /** Blocks */
     netherrack(C.t(  ""), Material.NETHERRACK,  1, "blocks", null, null),
     cobblestone(C.t( ""), Material.COBBLESTONE, 2, "blocks", null, null),
@@ -117,7 +118,8 @@ public enum ItemEnum {
     potions(C.t("&#9c8e8e&lP&#bdacac&lo&#decaca&lt&#ffe8e8&li&#decaca&lo&#bdacac&ln&#9c8e8e&ls"), Material.SPLASH_POTION, 13, "potions", 54, null),
     food(C.t("&#9c8e8e&lF&#decaca&lo&#decaca&lo&#9c8e8e&ld"), Material.GOLDEN_CARROT, 14, "food", 18, null),
     weapons(C.t("&#9c8e8e&lW&#bdacac&le&#decaca&la&#ffe8e8&lp&#decaca&lo&#bdacac&ln&#9c8e8e&ls"), Material.STONE_AXE, 15, "weapons", 27, null),
-    utilities(C.t("&#9c8e8e&lU&#b5a5a5&lt&#cebbbb&li&#e6d2d2&ll&#ffe8e8&li&#e6d2d2&lt&#cebbbb&li&#b5a5a5&le&#9c8e8e&ls"), Material.TRIDENT, 16, "utilities", 36, null);
+    utilities(C.t("&#9c8e8e&lU&#b5a5a5&lt&#cebbbb&li&#e6d2d2&ll&#ffe8e8&li&#e6d2d2&lt&#cebbbb&li&#b5a5a5&le&#9c8e8e&ls"), Material.TRIDENT, 16, "utilities", 36, null),
+    enchantmenu(C.t(EnchantInventory.itemEnchantInvTitle), Material.ENCHANTED_BOOK, 23, null, 9, null);
 
     private String displayName;
     private Material material;

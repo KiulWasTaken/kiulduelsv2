@@ -31,7 +31,13 @@ public class InventoryListeners implements Listener {
 
         if (e.getWhoClicked() instanceof Player p) {
             if (e.getView().getTitle().equalsIgnoreCase(ItemInventory.itemInvTitle)) {
-                e.setCancelled(true);
+                if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory() || e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
+                    e.setCancelled(true);
+                    if (e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
+                        e.getCursor().setAmount(0);
+                        return;
+                    }
+                }
                 for (ItemEnum item : ItemEnum.values()) {
                     if (e.getCurrentItem() == null)
                         break;
@@ -39,6 +45,18 @@ public class InventoryListeners implements Listener {
                         if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
                             ItemInventory.itemInventory(p);
                             break;
+                        }
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.clearinventory.getDisplayName()))) {
+                            for (ItemStack items : p.getInventory().getContents()) {
+                                if (items != null && items.getType() != Material.AIR) {
+                                    items.setAmount(0);
+                                }
+                            }
+                            return;
+                        }
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.enchantmenu.getDisplayName()))) {
+                            EnchantInventory.itemEnchantInventory(p);
+                            return;
                         }
                         if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemamount.getDisplayName()))) {
                             int amount = 0;
@@ -120,6 +138,14 @@ public class InventoryListeners implements Listener {
             } else if (e.getView().getTitle().equalsIgnoreCase(EnchantInventory.itemEnchantInvTitle)) {
                 if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory()) {
                     e.setCancelled(true);
+                    if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(EnchantEnum.iteminventory.getDisplayName()))) {
+                        ItemInventory.itemInventory(p);
+                        return;
+                    }
+                    if (e.getCursor() != null && e.getCursor().getType() != Material.AIR && e.getCurrentItem().getType() != Material.AIR) {
+                        e.getCursor().setAmount(0);
+                        return;
+                    }
                     if (e.getCurrentItem() != null && e.getCurrentItem().getType() == EnchantEnum.resetenchants.getMaterial()) {
                         if (p.getInventory().getItemInMainHand() != null && p.getInventory().getItemInMainHand().getType() != Material.AIR) {
                             if (p.getInventory().getItemInMainHand().getEnchantments().size() > 0) {
