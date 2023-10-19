@@ -31,7 +31,7 @@ public class EnchantInventory {
                 displayName = C.t(item.getEnchantment().getKey().toString() + " " + item.getEnchantLvl()).toLowerCase().replaceFirst("minecraft:", "").replaceAll("_", " ");
                 displayName = "&r&l" + displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
             }
-            inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), 1, lore, item.getEnchantment(), item.getEnchantLvl()));
+            inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), 1, lore, item.getEnchantment(), item.getEnchantLvl(),null));
         }
 
         p.openInventory(inventory);

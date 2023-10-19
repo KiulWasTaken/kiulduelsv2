@@ -24,7 +24,7 @@ public class ItemInventory {
                 List<String> lore = new ArrayList<>();
                 lore.add(C.t("&6⏵ &7Click to expand"));
 
-                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(item.getDisplayName(), item.getMaterial(), 1, lore, null, null));
+                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(item.getDisplayName(), item.getMaterial(), 1, lore, null, null,null));
             }
         }
 
@@ -37,14 +37,14 @@ public class ItemInventory {
         Inventory inventory = Bukkit.createInventory(p, invSize, itemInvTitle);
 
         for (int i = 1; i <= 9; i++) {
-            inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null));
+            inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
         }
 
-        inventory.setItem(invSize - 5, ItemStackMethods.createItemStack(ItemEnum.itemamount.getDisplayName(), ItemEnum.itemamount.getMaterial(), itemAmount, List.of(new String[]{"&7Left click &6⏵&8 to cycle item amount up", "&7Right click &6⏵&8 to cycle item amount down"}), null, null));
+        inventory.setItem(invSize - 5, ItemStackMethods.createItemStack(ItemEnum.itemamount.getDisplayName(), ItemEnum.itemamount.getMaterial(), itemAmount, List.of(new String[]{"&7Left click &6⏵&8 to cycle item amount up", "&7Right click &6⏵&8 to cycle item amount down"}), null, null,null));
 
-        inventory.setItem(invSize - 9, ItemStackMethods.createItemStack(ItemEnum.backtomain.getDisplayName(), ItemEnum.backtomain.getMaterial(), 1, List.of(new String[]{""}), null, null));
+        inventory.setItem(invSize - 9, ItemStackMethods.createItemStack(ItemEnum.backtomain.getDisplayName(), ItemEnum.backtomain.getMaterial(), 1, List.of(new String[]{""}), null, null,null));
 
-        inventory.setItem(invSize - 1, ItemStackMethods.createItemStack(ItemEnum.clearinventory.getDisplayName(), ItemEnum.clearinventory.getMaterial(), 1, List.of(new String[]{"&6⏵ &7Wipe your inventory of all its contents"}), null, null));
+        inventory.setItem(invSize - 1, ItemStackMethods.createItemStack(ItemEnum.clearinventory.getDisplayName(), ItemEnum.clearinventory.getMaterial(), 1, List.of(new String[]{"&6⏵ &7Wipe your inventory of all its contents"}), null, null,null));
 
         for (ItemEnum item : ItemEnum.values()) {
             if (item.getInventorySize() == null) {
@@ -64,7 +64,7 @@ public class ItemInventory {
                     displayName = "&r&l" + displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
 
                     if (potion == false) {
-                        inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), amount, lore, null, null));
+                        inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), amount, lore, null, null,null));
                     } else {
                         inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, item.getMaterial(), amount, item.getPotionData()));
                     }

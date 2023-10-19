@@ -29,7 +29,7 @@ import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
 
 public class ItemStackMethods {
 
-    public static ItemStack createItemStack (String itemname, Material material, int amount, List<String> lore, Enchantment enchantment, Integer enchantLvl) {
+    public static ItemStack createItemStack (String itemname, Material material, int amount, List<String> lore, Enchantment enchantment, Integer enchantLvl,String localizedName) {
             ItemStack i = new ItemStack(material);
             ItemMeta iM = i.getItemMeta();
             List<String> adjustedLore = new ArrayList<>();
@@ -37,6 +37,9 @@ public class ItemStackMethods {
                 adjustedLore.add(C.t(oldLore));
             }
             iM.setLore(adjustedLore);
+            if (localizedName != null) {
+                iM.setLocalizedName(localizedName);
+            }
             i.setAmount(amount);
             iM.setDisplayName(C.t(itemname));
             if (enchantment != null) {
