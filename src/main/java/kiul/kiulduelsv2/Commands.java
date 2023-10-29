@@ -48,11 +48,6 @@ public class Commands implements CommandExecutor {
                     case "slot":
                         kitSlot.put(p,Integer.parseInt(args[1]));
                         break;
-                    case "saveglobal":
-                        Userdata.get().set("kits.global." + args[1] + ".inventory", InventoryToBase64.toBase64(p.getInventory()));
-                        Userdata.get().set("kits.global." + args[1] + ".armour",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
-                        p.sendMessage("global kit: " + ChatColor.GOLD + args[1] + ChatColor.WHITE + " saved to database");
-                        break;
                     case "loadglobal":
                         try {
                             ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global." + args[1] + ".inventory")).getContents();
@@ -68,14 +63,19 @@ public class Commands implements CommandExecutor {
                     case "create":
                         Arenadata.get().set("arenas." + args[1] + ".center", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
+                        Arenadata.get().set("arenas." + args[1] + ".type", "DEFAULT");
                         Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".chunkCorner1", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".chunkCorner2", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".size", 40);
+                        p.sendMessage("Created map: " + args[1]);
                         break;
                     case "delete":
                         Arenadata.get().set("arenas." + args[1], null);
                         p.sendMessage(ChatColor.GRAY + "Arena: " + ChatColor.GOLD + args[1] + ChatColor.RED + " Deleted " + ChatColor.GRAY + " successfully!");
+                        break;
+                    case "info":
+
                         break;
                     case "edit":
                         switch (args[2]) {
@@ -109,6 +109,14 @@ public class Commands implements CommandExecutor {
                             case "icon":
                                 Arenadata.get().set("arenas." + args[1] + ".icon", args[2]);
                                 p.sendMessage(ChatColor.GRAY + "icon set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
+                                break;
+                            case "type":
+                                if (ArenaMethods.validMapTypes.contains((args[2]))) {
+                                    Arenadata.get().set("arenas." + args[1] + ".type", args[2]);
+                                    p.sendMessage(ChatColor.GRAY + "map type set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
+                                } else {
+                                    p.sendMessage(ChatColor.RED + "Please enter a valid map type: " + ChatColor.YELLOW + ArenaMethods.validMapTypes.toString());
+                                }
                                 break;
                         }
                 }

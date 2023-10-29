@@ -114,7 +114,7 @@ public class DuelMethods {
         }
     }
 
-    public static void startDuel(ArrayList<Player> players, boolean arcade, boolean crystal, String arenaName) {
+    public static void startDuel(List<Player> players, boolean arcade, boolean crystal, String arenaName) {
         Random random = new Random();
                 List<Player> team1 = players.subList(0, (players.size() / 2));
                 List<Player> team2 = players.subList(players.size() / 2, players.size());

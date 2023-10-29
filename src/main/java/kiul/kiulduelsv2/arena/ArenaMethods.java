@@ -15,10 +15,28 @@ public class ArenaMethods {
 
     static HashMap<Block, Material> regenMarkedMaterial = new HashMap<>();
     static HashMap<Block,Location> regenMarkedLocation = new HashMap<>();
+    public static ArrayList<String> validMapTypes = new ArrayList<>() { {
+        add("SMP-CLASSIC");
+        add("SMP-REALISTIC");
+        add("CRYSTAL-CLASSIC");
+        add("CRYSTAL-REALISTIC");
+        add("DEFAULT");
+    }};
 
     public static Set<String> getArenas () {
         Set<String> keys = Arenadata.get().getConfigurationSection("arena").getKeys(false);
         return keys;}
+
+    public static ArrayList<String> getArenasOfType (String type) {
+        Set<String> arenaList = getArenas();
+        ArrayList<String> arenasOfType = new ArrayList<>();
+        for (String arenas : arenaList) {
+            if (Arenadata.get().getString("arena."+arenas+".type").equalsIgnoreCase(type)) {
+                arenasOfType.add((Arenadata.get().getString("arena."+arenas+".type")));
+            }
+        }
+
+    return arenasOfType;}
 
     public static String findPlayerArena (Player p) {
         Set<String> arenas = getArenas();
