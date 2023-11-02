@@ -12,7 +12,7 @@ public class QueueMethods {
 
 
 
-    public static void queueAddCheck (ArrayList<Player> queue,Player p,String type) {
+    public static void queueAddCheck (ArrayList<Player> queue,Player p,String type,boolean arcade,String kit) {
         Random random = new Random();
         if (!queue.contains(p)) {
             queue.add(p);
@@ -20,7 +20,7 @@ public class QueueMethods {
                 List<Player> players = queue.subList(0,1);
                 queue.remove(players);
                 List<String> smpArcadeMaps = ArenaMethods.getArenasOfType(type);
-                DuelMethods.startDuel(players,true,false,smpArcadeMaps.get(random.nextInt(0,smpArcadeMaps.size())));
+                DuelMethods.startDuel(players,arcade,kit,smpArcadeMaps.get(random.nextInt(0,smpArcadeMaps.size())));
             }
         }
     }

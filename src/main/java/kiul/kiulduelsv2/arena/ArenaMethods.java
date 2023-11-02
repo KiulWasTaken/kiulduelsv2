@@ -52,12 +52,18 @@ public class ArenaMethods {
     }
 
     public static void regenerateArena (String arenaName) {
+        if (Arenadata.get().getString("arena." + arenaName + ".type").contains("REALISTIC")) {
+            Location corner1 = (Location)Arenadata.get().get("arena."+arenaName+".corner1");
+            Location corner2 = (Location)Arenadata.get().get("arena."+arenaName+".corner2");
+            TerrainArena.generateTerrain(corner2.getWorld(),corner1,corner2,5);
+        } else {
         for (int i = 0; i < regenMarkedMaterial.size(); i++) {
             if (regenMarkedLocation.get(i).distance((Location)Arenadata.get().get("arena." + arenaName + ".center")) < (double)Arenadata.get().get("arena." + arenaName + ".size")) {
-            if (regenMarkedMaterial.get(i) != regenMarkedLocation.get(1).getBlock().getType()) {
-                regenMarkedLocation.get(i).getBlock().setType(regenMarkedMaterial.get(i));
-                regenMarkedLocation.remove(i);
-                regenMarkedMaterial.remove(i);
+                if (regenMarkedMaterial.get(i) != regenMarkedLocation.get(1).getBlock().getType()) {
+                    regenMarkedLocation.get(i).getBlock().setType(regenMarkedMaterial.get(i));
+                    regenMarkedLocation.remove(i);
+                    regenMarkedMaterial.remove(i);
+                }
             }
             }
         }

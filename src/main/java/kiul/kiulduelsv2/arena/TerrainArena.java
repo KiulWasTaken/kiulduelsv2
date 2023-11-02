@@ -41,7 +41,7 @@ public class TerrainArena extends ChunkGenerator {
             WorldCreator worldCreator = new WorldCreator(worldName);
             worldCreator = worldCreator.environment(World.Environment.NORMAL); // Adjust the environment if needed
             worldCreator = worldCreator.generateStructures(true); // Enable or disable structures as needed
-            world = worldCreator.createWorld();
+            worldCreator.createWorld();
         }
         new BukkitRunnable() {
 

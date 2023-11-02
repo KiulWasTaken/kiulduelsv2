@@ -86,16 +86,18 @@ public class DuelListeners {
                             @Override
                             public void run() {
                                 UtilMethods.teleportLobby(team1Members);
-                                int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                                for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
-                                    if (nearbyEntities instanceof Player spectators) {
-                                        UtilMethods.becomeNotSpectator(spectators);
-                                        UtilMethods.teleportLobby(spectators);
-                                    }
-                                }
                             }
                         }, 20L);
                     }
+                    int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
+                    for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
+                        if (nearbyEntities instanceof Player spectators) {
+                            UtilMethods.becomeNotSpectator(spectators);
+                            UtilMethods.teleportLobby(spectators);
+                        }
+                    }
+                    ArenaMethods.regenerateArena(arenaName);
+
                 } else if (team1.size() == 0 && team2.size() == 0) {
                     // team 3 wins
                     for (Player team3Members : team3) {
@@ -106,16 +108,18 @@ public class DuelListeners {
                             @Override
                             public void run() {
                                 UtilMethods.teleportLobby(team3Members);
-                                int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                                for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
-                                    if (nearbyEntities instanceof Player spectators) {
-                                        UtilMethods.becomeNotSpectator(spectators);
-                                        UtilMethods.teleportLobby(spectators);
-                                    }
-                                }
                             }
                         }, 20L);
                     }
+                    int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
+                    for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
+                        if (nearbyEntities instanceof Player spectators) {
+                            UtilMethods.becomeNotSpectator(spectators);
+                            UtilMethods.teleportLobby(spectators);
+                        }
+                    }
+                    ArenaMethods.regenerateArena(arenaName);
+
                 } else if (team1.size() == 0 && team3.size() == 0) {
                     // team 2 wins
                     for (Player team2Members : team1) {
@@ -126,16 +130,17 @@ public class DuelListeners {
                             @Override
                             public void run() {
                                 UtilMethods.teleportLobby(team2Members);
-                                int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                                for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
-                                    if (nearbyEntities instanceof Player spectators) {
-                                        UtilMethods.becomeNotSpectator(spectators);
-                                        UtilMethods.teleportLobby(spectators);
-                                    }
-                                }
                             }
                         }, 20L);
                     }
+                    int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
+                    for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
+                        if (nearbyEntities instanceof Player spectators) {
+                            UtilMethods.becomeNotSpectator(spectators);
+                            UtilMethods.teleportLobby(spectators);
+                        }
+                    }
+                    ArenaMethods.regenerateArena(arenaName);
                 }
             }
         }

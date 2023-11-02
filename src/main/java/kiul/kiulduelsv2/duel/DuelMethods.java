@@ -114,7 +114,7 @@ public class DuelMethods {
         }
     }
 
-    public static void startDuel(List<Player> players, boolean arcade, boolean crystal, String arenaName) {
+    public static void startDuel(List<Player> players, boolean arcade, String kit, String arenaName) {
         Random random = new Random();
                 List<Player> team1 = players.subList(0, (players.size() / 2));
                 List<Player> team2 = players.subList(players.size() / 2, players.size());
@@ -147,16 +147,19 @@ public class DuelMethods {
             for (Player p : players) {
                 if (arcade) {
                     try {
-                        if (crystal) {
-                            ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.crystal.inventory")).getContents();
-                            ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.crystal.armour")).getContents();
-                            p.getInventory().setContents(kitContents);
-                            p.getInventory().setArmorContents(armourContents);
-                        } else {
-                            ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.smpcarrots.inventory")).getContents();
-                            ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.smpcarrots.armour")).getContents();
-                            p.getInventory().setContents(kitContents);
-                            p.getInventory().setArmorContents(armourContents);
+                        switch (kit) {
+                            case "crystal":
+                                ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.crystal.inventory")).getContents();
+                                ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.crystal.armour")).getContents();
+                                p.getInventory().setContents(kitContents);
+                                p.getInventory().setArmorContents(armourContents);
+                                break;
+                            case "smp":
+                                ItemStack[] kitContents2 = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.smpcarrots.inventory")).getContents();
+                                ItemStack[] armourContents2 = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.smpcarrots.armour")).getContents();
+                                p.getInventory().setContents(kitContents2);
+                                p.getInventory().setArmorContents(armourContents2);
+                                break;
                         }
                         preDuel.add(p);
                         preDuelCountdown(p);
