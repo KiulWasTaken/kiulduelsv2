@@ -19,15 +19,18 @@ public class QueueInventory {
 
         p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.2F, 0.5F);
 
-        Inventory inventory = Bukkit.createInventory(p, 45, "Queue");
+        Inventory inventory = Bukkit.createInventory(p, 27, "Queue");
+        List<String> emptylore = new ArrayList<>();
+        emptylore.add("");
 
         for (int i = 0; i < inventory.getSize(); i++) {
-            if (i <= 9) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, null, null, null,null));
-            } else if (i <= 18) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS, 1, null, null, null,null));
+
+            if (i <= 8) {
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,"glass"));
+            } else if (i <= 17) {
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null,"glass"));
             } else {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, null, null, null,null));
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,"glass"));
             }
         }
 

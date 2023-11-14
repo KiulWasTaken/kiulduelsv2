@@ -36,8 +36,7 @@ public class KitMethods {
 
     public static void loadGlobalKit (Player p, String kitName) throws IOException {
         ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global."+kitName+".inventory")).getContents();
-        ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global."+kitName+".armour")).getContents();
         p.getInventory().setContents(kitContents);
-        p.getInventory().setArmorContents(armourContents);
+        p.getInventory().setArmorContents(null);
     }
 }

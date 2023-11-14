@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.gui.clickmethods.QueueMethods;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,7 +37,7 @@ public class QueueClickEvent implements Listener {
     public void queueGuiClick (InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
         if (e.getView().getTitle().equalsIgnoreCase("queue")) {
-
+            e.setCancelled(true);
             // if (KitMethods.kitMatchesCriteria(kit, playerKitSlot) {
             // proceed
             // } else {
@@ -44,7 +45,10 @@ public class QueueClickEvent implements Listener {
             // }
 
             // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
-                try {loadGlobalKit(p,"queue");} catch (IOException err) {err.printStackTrace();}
+                try {loadGlobalKit(p, "queue");
+                } catch (IOException err) {
+
+                }
                 switch (e.getCurrentItem().getItemMeta().getLocalizedName()) {
                     case "arcadeSMP":
                         QueueMethods.queueAddCheck(SMPArcadeQueue,p,"SMP-CLASSIC",true,"smp");
@@ -67,9 +71,9 @@ public class QueueClickEvent implements Listener {
                     case "axe":
                         QueueMethods.queueAddCheck(AxeQueue,p,"DEFAULT",true,"axe");
                         break;
-
-
-
+                    case "glass":
+                    default:
+                        p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING,0.1f,0.7f);
             }
         }
     }
