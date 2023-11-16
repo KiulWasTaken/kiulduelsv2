@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -21,17 +22,15 @@ import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
 
 public class QueueClickEvent implements Listener {
 
-    public static ArrayList<Player> SMPArcadeQueue = new ArrayList<>();
-    public static ArrayList<Player> SMPRealistic1v1Queue = new ArrayList<>();
-    public static ArrayList<Player> SMPRealistic2v2Queue = new ArrayList<>();
-
-    public static ArrayList<Player> CrystalArcadeQueue = new ArrayList<>();
-    public static ArrayList<Player> CrystalRealistic1v1Queue = new ArrayList<>();
-    public static ArrayList<Player> CrystalRealistic2v2Queue = new ArrayList<>();
-
-    public static ArrayList<Player> AxeQueue = new ArrayList<>();
-    public static ArrayList<Player> DiamondPotQueue = new ArrayList<>();
-    public static ArrayList<Player> KoHiQueue = new ArrayList<>();
+    public static HashMap<String,ArrayList<Player>> queue = new HashMap<>() {{
+        put("SMP-CLASSIC",new ArrayList<>());
+        put("SMP-REALISTIC",new ArrayList<>());
+        put("SMP-REALISTIC-DUOS",new ArrayList<>());
+        put("CRYSTAL-CLASSIC",new ArrayList<>());
+        put("CRYSTAL-REALISTIC",new ArrayList<>());
+        put("CRYSTAL-REALISTIC-DUOS",new ArrayList<>());
+        put("AXE-CLASSIC",new ArrayList<>());
+    }};
 
     @EventHandler
     public void queueGuiClick (InventoryClickEvent e) {
@@ -45,35 +44,20 @@ public class QueueClickEvent implements Listener {
             // }
 
             // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
-                try {loadGlobalKit(p, "queue");
-                } catch (IOException err) {
 
+
+            if (e.getCurrentItem().getItemMeta().getLocalizedName() != null) {
+                String localName = e.getCurrentItem().getItemMeta().getLocalizedName();
+                QueueMethods.queueAddCheck(queue.get(localName),p,localName);
+                p.playSound(p,Sound.BLOCK_NOTE_BLOCK_PLING,1f,0.4f);
+                try {
+                    loadGlobalKit(p, "queue");
+                } catch (IOException err) {
+                    err.printStackTrace();
                 }
-                switch (e.getCurrentItem().getItemMeta().getLocalizedName()) {
-                    case "arcadeSMP":
-                        QueueMethods.queueAddCheck(SMPArcadeQueue,p,"SMP-CLASSIC",true,"smp");
-                        break;
-                    case "realSMP1":
-                        QueueMethods.queueAddCheck(SMPRealistic1v1Queue,p,"SMP-REALISTIC",false,null);
-                        break;
-                    case "realSMP2":
-                        QueueMethods.queueAddCheck(SMPRealistic2v2Queue,p,"SMP-REALISTIC",false,null);
-                        break;
-                    case "arcadeCrystal":
-                        QueueMethods.queueAddCheck(CrystalArcadeQueue,p,"CRYSTAL-CLASSIC",true,"crystal");
-                        break;
-                    case "realCrystal1":
-                        QueueMethods.queueAddCheck(CrystalRealistic1v1Queue,p,"CRYSTAL-REALISTIC",false,null);
-                        break;
-                    case "realCrystal2":
-                        QueueMethods.queueAddCheck(CrystalRealistic2v2Queue,p,"CRYSTAL-REALISTIC",false,null);
-                        break;
-                    case "axe":
-                        QueueMethods.queueAddCheck(AxeQueue,p,"DEFAULT",true,"axe");
-                        break;
-                    case "glass":
-                    default:
-                        p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING,0.1f,0.7f);
+
+            } else {
+                p.playSound(p,Sound.BLOCK_NOTE_BLOCK_PLING,0.3f,0.4f);
             }
         }
     }

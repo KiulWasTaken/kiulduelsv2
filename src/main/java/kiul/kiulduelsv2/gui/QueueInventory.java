@@ -26,11 +26,11 @@ public class QueueInventory {
         for (int i = 0; i < inventory.getSize(); i++) {
 
             if (i <= 8) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,"glass"));
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
             } else if (i <= 17) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null,"glass"));
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
             } else {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,"glass"));
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
             }
         }
 
@@ -46,6 +46,7 @@ public class QueueInventory {
                     inventory.setItem(item.getInventorySlot(),ItemStackMethods.createPlayerHead(item.getSkullValue(),itemName));
                 } else {
                     inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null,item.getlocalName()));
+
                 }
         }
 

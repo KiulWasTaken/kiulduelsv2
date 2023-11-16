@@ -26,158 +26,39 @@ public class DuelMethods {
     public static HashMap<String,List<Boolean>> reRollNo = new HashMap<>();
 
     public static HashMap<String, List<Player>> playersInMap = new HashMap<>();
-    static HashMap<String, List<Player>> mapTeams = new HashMap<>();
+    static HashMap<String, List<List<Player>>> mapTeams = new HashMap<>();
 
     static ArrayList<Player> preDuel = new ArrayList<>();
 
-    public static void startPartyDuel(ArrayList<Player> players, Player duelOwner, boolean useSameKit, boolean teams, boolean randomTeams, boolean threeTeams, String arenaName) {
-        Random random = new Random();
-        if (teams) {
-            if (randomTeams) {
-                Collections.shuffle(players);
-            }
-            if (threeTeams) {
-                List<Player> team1 = players.subList(0, (players.size() / 3));
-                List<Player> team2 = players.subList(players.size() / 3, (players.size() / 3) * 2);
-                List<Player> team3 = players.subList((players.size() / 3) * 2, players.size());
-                for (Player p : team1) {
-                    p.setDisplayName(ChatColor.RED + p.getName());
-                    p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".team1").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                    mapTeams.put(arenaName, team1);
-                }
-                for (Player p : team2) {
-                    p.setDisplayName(ChatColor.BLUE + p.getName());
-                    p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".team2").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                    mapTeams.put(arenaName, team2);
-                }
-                for (Player p : team3) {
-                    p.setDisplayName(ChatColor.GREEN + p.getName());
-                    p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".center").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                    mapTeams.put(arenaName, team3);
-                }
-            } else {
-                List<Player> team1 = players.subList(0, (players.size() / 2));
-                List<Player> team2 = players.subList(players.size() / 2, players.size());
-                for (Player p : team1) {
-                    p.setDisplayName(ChatColor.RED + p.getName());
-                    p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".team1").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                }
-                for (Player p : team2) {
-                    p.setDisplayName(ChatColor.BLUE + p.getName());
-                    p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".team2").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                }
-            }
-            List<Player> toBePutInMap = new ArrayList<>();
+    // haha now you need to redo it idiot
+    public static void startArcadeDuel (String arenaName,String kitName,ArrayList<Player> players) {
+        playersInMap.put(arenaName,players);
+        List<Player> teamOne = players.subList(0,players.size()/2);
+       List<Player> teamTwo = players.subList(players.size()/2,players.size());
+       List<List<Player>> arenaTeams = new ArrayList<>() {{
+           add(teamOne);
+           add(teamTwo);
+        }};
+       mapTeams.put(arenaName,arenaTeams);
 
-            for (Player p : players) {
-                if (useSameKit) {
-                    try {
-                        KitMethods.loadSelectedKitSlot(duelOwner);
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                } else {
-                    try {
-                        KitMethods.loadSelectedKitSlot(p);
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                }
-                preDuel.add(p);
-                preDuelCountdown(p);
-                toBePutInMap.add(p);
+       for (Player p : teamOne) {
+           p.setDisplayName(ChatColor.RED+p.getDisplayName());
+           p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team1"));
+       }
+        for (Player p : teamTwo) {
+            p.setDisplayName(ChatColor.BLUE+p.getDisplayName());
+            p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team2"));
+        }
+        for (Player p : players) {
+            try {
+                KitMethods.loadGlobalKit(p, kitName);
+            } catch (IOException err) {
+                err.printStackTrace();
             }
-            playersInMap.put(arenaName,toBePutInMap);
-
-        } else {
-            List<Player> toBePutInMap = new ArrayList<>();
-            for (Player p : players) {
-                p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".center").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                if (useSameKit) {
-                    try {
-                        KitMethods.loadSelectedKitSlot(duelOwner);
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                } else {
-                    try {
-                        KitMethods.loadSelectedKitSlot(p);
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                }
-                preDuel.add(p);
-                preDuelCountdown(p);
-                toBePutInMap.add(p);
-            }
-            playersInMap.put(arenaName,toBePutInMap);
+            preDuel.add(p);
+            preDuelCountdown(p);
         }
     }
-
-    public static void startDuel(List<Player> players, boolean arcade, String kit, String arenaName) {
-        Random random = new Random();
-                List<Player> team1 = players.subList(0, (players.size() / 2));
-                List<Player> team2 = players.subList(players.size() / 2, players.size());
-
-                for (Player p : team1) {
-                    p.setDisplayName(ChatColor.RED + p.getName());
-                    if (arcade) {
-                        p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".team1").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                    } else {
-                        Location center = Arenadata.get().getLocation("arena." + arenaName + ".center");
-                        int y = center.getBlockY();
-                        p.teleport(center.add(0,201-y,0));
-                    }
-                }
-                for (Player p : team2) {
-                    p.setDisplayName(ChatColor.BLUE + p.getName());
-                    if (arcade) {
-                        p.teleport(Arenadata.get().getLocation("arena." + arenaName + ".team2").add(random.nextDouble(0, 2), 0, random.nextDouble(0, 2)));
-                    } else {
-                        Location center = Arenadata.get().getLocation("arena." + arenaName + ".center");
-                        int y = center.getBlockY();
-                        p.teleport(center.add(0,201-y,0));
-                    }
-                }
-                if (!arcade) {
-                    TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".corner1"),Arenadata.get().getLocation("arena." + arenaName + ".corner2"),7);
-                }
-            List<Player> toBePutInMap = new ArrayList<>();
-
-            for (Player p : players) {
-                if (arcade) {
-                    try {
-                        switch (kit) {
-                            case "crystal":
-                                ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.crystal.inventory")).getContents();
-                                ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.crystal.armour")).getContents();
-                                p.getInventory().setContents(kitContents);
-                                p.getInventory().setArmorContents(armourContents);
-                                break;
-                            case "smp":
-                                ItemStack[] kitContents2 = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.smpcarrots.inventory")).getContents();
-                                ItemStack[] armourContents2 = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.smpcarrots.armour")).getContents();
-                                p.getInventory().setContents(kitContents2);
-                                p.getInventory().setArmorContents(armourContents2);
-                                break;
-                        }
-                        preDuel.add(p);
-                        preDuelCountdown(p);
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                } else {
-                    try {
-                        KitMethods.loadSelectedKitSlot(p);
-                    } catch (IOException error) {
-                        error.printStackTrace();
-                    }
-                }
-                toBePutInMap.add(p);
-            }
-            playersInMap.put(arenaName,toBePutInMap);
-    }
-
 
     public static void preDuelCountdown (Player p) {
         Bukkit.getScheduler().runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), new Runnable() {
@@ -203,6 +84,8 @@ public class DuelMethods {
     public void endDuel (String arenaName) {
         List<Player> players = playersInMap.get(arenaName);
         playersInMap.remove(arenaName);
+        mapTeams.remove(arenaName);
+
 
     }
 

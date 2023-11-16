@@ -7,14 +7,14 @@ public enum QueueEnum {
     /**
      * Queue
      */
-    arcadeSMP("&#FF5555SMP &#FFFFFF| &#AAAAAAClassic", Material.NETHERITE_AXE, new String[]{""}, 21,"arcadeSMP",null),
-    realisticSMP1v1("&#FF5555SMP &#FFFFFF| &#555555Realistic &#AAAAAA{1v1&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 12,"realSMP1",null),
-    realisticSMP2v2("&#FF5555SMP &#FFFFFF| &#555555Realistic &#AAAAAA{2v2&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 3,"realSMP2",null),
-    arcadeCrystal("&#FF55FFCrystal &#FFFFFF| &#AAAAAAClassic", Material.END_CRYSTAL, new String[]{""}, 25,"arcCrystal",null),
-    realisticCrystal1v1("&#FF55FFCrystal &#FFFFFF| &#555555Realistic &#AAAAAA{1v1&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 16,"realCrystal1",null),
-    realisticCrystal2v2("&#FF55FFCrystal &#FFFFFF| &#555555Realistic &#AAAAAA{2v2&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 7,"realCrystal2",null),
-    SMPBoxing("&#00AAAANetherite Boxing &#FFFFFF| &#AAAAAAClassic", Material.NETHERITE_SWORD, new String[]{""}, 23,"boxing",null),
-    axe("&#00AAAAAxe &#FFFFFF| &#AAAAAAClassic", Material.DIAMOND_AXE, new String[]{""}, 27,"axe",null),
+    arcadeSMP("&#FF5555SMP &#FFFFFF| &#AAAAAAClassic", Material.NETHERITE_AXE, new String[]{""}, 21,"SMP-CLASSIC",null),
+    realisticSMP1v1("&#FF5555SMP &#FFFFFF| &#555555Realistic &#AAAAAA{1v1&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 12,"SMP-REALISTIC",null),
+    realisticSMP2v2("&#FF5555SMP &#FFFFFF| &#555555Realistic &#AAAAAA{2v2&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 3,"SMP-REALISTIC-DUOS",null),
+    arcadeCrystal("&#FF55FFCrystal &#FFFFFF| &#AAAAAAClassic", Material.END_CRYSTAL, new String[]{""}, 25,"CRYSTAL-ARCADE",null),
+    realisticCrystal1v1("&#FF55FFCrystal &#FFFFFF| &#555555Realistic &#AAAAAA{1v1&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 16,"CRYSTAL-REALISTIC",null),
+    realisticCrystal2v2("&#FF55FFCrystal &#FFFFFF| &#555555Realistic &#AAAAAA{2v2&#AAAAAA}", Material.GRAY_DYE, new String[]{""}, 7,"CRYSTAL-REALISTIC-DUOS",null),
+    SMPBoxing("&#00AAAANetherite Boxing &#FFFFFF| &#AAAAAAClassic", Material.NETHERITE_SWORD, new String[]{""}, 23,"BOXING-CLASSIC",null),
+    axe("&#00AAAAAxe &#FFFFFF| &#AAAAAAClassic", Material.DIAMOND_AXE, new String[]{""}, 27,"AXE-CLASSIC",null),
     infoBoard("&#00AAAAAxe &#FFFFFF| &#AAAAAAClassic", Material.OAK_HANGING_SIGN, new String[]{""}, 5,"info",null);
 
     private String displayName;
