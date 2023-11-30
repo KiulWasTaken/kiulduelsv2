@@ -1,25 +1,23 @@
 package kiul.kiulduelsv2.arena;
 
 import kiul.kiulduelsv2.config.Arenadata;
+import kiul.kiulduelsv2.duel.DuelMethods;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 public class ArenaMethods {
 
     static HashMap<Block, Material> regenMarkedMaterial = new HashMap<>();
     static HashMap<Block,Location> regenMarkedLocation = new HashMap<>();
     public static ArrayList<String> validMapTypes = new ArrayList<>() { {
-        add("SMP-CLASSIC");
-        add("SMP-REALISTIC");
-        add("CRYSTAL-CLASSIC");
-        add("CRYSTAL-REALISTIC");
+        add("SMP");
+        add("REALISTIC");
+        add("CRYSTAL");
         add("DEFAULT");
     }};
 
@@ -27,16 +25,22 @@ public class ArenaMethods {
         Set<String> keys = Arenadata.get().getConfigurationSection("arena").getKeys(false);
         return keys;}
 
-    public static ArrayList<String> getArenasOfType (String type) {
+    public static String getArenaOfType (String type) {
         Set<String> arenaList = getArenas();
         ArrayList<String> arenasOfType = new ArrayList<>();
         for (String arenas : arenaList) {
-            if (Arenadata.get().getString("arena."+arenas+".type").equalsIgnoreCase(type)) {
-                arenasOfType.add((Arenadata.get().getString("arena."+arenas+".type")));
+            if (Arenadata.get().getString("arena." + arenas + ".type").equalsIgnoreCase(type)) {
+                arenasOfType.add((Arenadata.get().getString("arena." + arenas + ".type")));
             }
         }
+        for (String arena : arenasOfType) {
+            if (DuelMethods.playersInMap.get(arena) == null) {
+                return arena;
+            }
+        }
+    return null;}
 
-    return arenasOfType;}
+
 
     public static String findPlayerArena (Player p) {
         Set<String> arenas = getArenas();

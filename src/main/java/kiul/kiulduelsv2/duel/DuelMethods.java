@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.duel;
 
 import kiul.kiulduelsv2.Kiulduelsv2;
+import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
@@ -18,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.util.*;
 
+
 public class DuelMethods {
 
     public static HashMap<String,List<Player>> allowedToReRoll = new HashMap<>();
@@ -26,12 +28,45 @@ public class DuelMethods {
     public static HashMap<String,List<Boolean>> reRollNo = new HashMap<>();
 
     public static HashMap<String, List<Player>> playersInMap = new HashMap<>();
-    static HashMap<String, List<List<Player>>> mapTeams = new HashMap<>();
+    public static HashMap<String, List<List<Player>>> mapTeams = new HashMap<>();
 
     static ArrayList<Player> preDuel = new ArrayList<>();
 
     // haha now you need to redo it idiot
+
+    public static void beginDuel (String arenaName,List<Player> players) {
+        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+"team1");
+        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+"team2");
+        playersInMap.put(arenaName,players);
+        List<Player> teamOne = players.subList(0,players.size()/2);
+        List<Player> teamTwo = players.subList(players.size()/2,players.size());
+        List<List<Player>> arenaTeams = new ArrayList<>() {{
+            add(teamOne);
+            add(teamTwo);
+        }};
+        mapTeams.put(arenaName,arenaTeams);
+        for (Player p : teamOne) {
+            p.setDisplayName(ChatColor.RED+p.getDisplayName());
+            p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(),teamOneSpawn.getBlockZ()).getLocation());
+        }
+        for (Player p : teamTwo) {
+            p.setDisplayName(ChatColor.BLUE+p.getDisplayName());
+            p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(),teamTwoSpawn.getBlockZ()).getLocation());
+        }
+        for (Player p : players) {
+            try {
+                KitMethods.loadSelectedKitSlot(p);
+            } catch (IOException err) {
+                err.printStackTrace();
+            }
+            preDuel.add(p);
+            preDuelCountdown(p);
+        }
+
+    }
+
     public static void startArcadeDuel (String arenaName,String kitName,ArrayList<Player> players) {
+
         playersInMap.put(arenaName,players);
         List<Player> teamOne = players.subList(0,players.size()/2);
        List<Player> teamTwo = players.subList(players.size()/2,players.size());
@@ -41,10 +76,10 @@ public class DuelMethods {
         }};
        mapTeams.put(arenaName,arenaTeams);
 
-       for (Player p : teamOne) {
-           p.setDisplayName(ChatColor.RED+p.getDisplayName());
-           p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team1"));
-       }
+        for (Player p : teamOne) {
+            p.setDisplayName(ChatColor.RED+p.getDisplayName());
+            p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team1"));
+        }
         for (Player p : teamTwo) {
             p.setDisplayName(ChatColor.BLUE+p.getDisplayName());
             p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team2"));
@@ -89,7 +124,12 @@ public class DuelMethods {
 
     }
 
-    public static void promptReRoll (List<Player> players, String arenaName) {
+    public static void startRealisticDuel (List<Player> players, String arenaName) {
+        Location duelCentre = Arenadata.get().getLocation("arenas."+arenaName+"center");
+        Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),200,duelCentre.getZ());
+        for (Player p : players) {
+            p.teleport(teleportTo);
+        }
         // Create a clickable message with two components
         ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
                 .color(net.md_5.bungee.api.ChatColor.YELLOW);
@@ -129,11 +169,18 @@ public class DuelMethods {
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
                         TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".corner1"),Arenadata.get().getLocation("arena." + arenaName + ".corner2"),7);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                beginDuel(arenaName,players);
+                            }
+                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),80);
                     } else {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.YELLOW + "Voting Complete! Game Starting!");
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
+                            beginDuel(arenaName,players);
                         }
                     }
                     cancel();
@@ -152,12 +199,19 @@ public class DuelMethods {
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
                         TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".corner1"),Arenadata.get().getLocation("arena." + arenaName + ".corner2"),7);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                beginDuel(arenaName,players);
+                            }
+                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),80);
                     } else {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.YELLOW + "Voting Complete! Game Starting!");
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
+                        beginDuel(arenaName,players);
                     }
                     cancel();
                     return;

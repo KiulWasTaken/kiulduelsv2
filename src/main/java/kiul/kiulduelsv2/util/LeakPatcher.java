@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.List;
+
 public class LeakPatcher implements Listener {
 
 
@@ -17,6 +19,11 @@ public class LeakPatcher implements Listener {
             String arenaName = ArenaMethods.findPlayerArena(p);
             if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
                 DuelMethods.playersInMap.remove(p);
+                for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
+                    if (team.contains(p)) {
+                        team.remove(p);
+                    }
+                }
             }
         }
     }

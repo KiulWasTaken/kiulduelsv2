@@ -1,5 +1,7 @@
 package kiul.kiulduelsv2.gui.clickmethods;
 
+import kiul.kiulduelsv2.arena.ArenaMethods;
+import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.entity.Player;
 import java.io.IOException;
@@ -25,13 +27,13 @@ public class QueueMethods {
                     queue.remove(playersInQueue);
                 }
 
-                if (type.contains("ARCADE")) {
+                if (type.contains("CLASSIC")) {
                     String[] strings = type.split("-");
                     String kit = strings[0];
                     // startArcadeDuel(map,kit,players);
 
                 } else {
-
+                    DuelMethods.startRealisticDuel(players, ArenaMethods.getArenaOfType("REALISTIC"));
                     // startRealisticDuel(map,type,players);
                 }
 
