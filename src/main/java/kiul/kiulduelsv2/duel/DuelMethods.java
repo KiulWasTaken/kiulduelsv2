@@ -125,7 +125,8 @@ public class DuelMethods {
     }
 
     public static void startRealisticDuel (List<Player> players, String arenaName) {
-        Location duelCentre = Arenadata.get().getLocation("arenas."+arenaName+"center");
+
+        Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
         Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),200,duelCentre.getZ());
         for (Player p : players) {
             p.teleport(teleportTo);

@@ -65,14 +65,16 @@ public class Commands implements CommandExecutor {
                         Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".type", "DEFAULT");
                         Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".chunkCorner1", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".chunkCorner2", p.getLocation());
+                        Arenadata.get().set("arenas." + args[1] + ".corner1", p.getLocation());
+                        Arenadata.get().set("arenas." + args[1] + ".corner2", p.getLocation());
                         Arenadata.get().set("arenas." + args[1] + ".size", 40);
+                        Arenadata.save();
                         p.sendMessage("Created map: " + args[1]);
                         break;
                     case "delete":
                         Arenadata.get().set("arenas." + args[1], null);
                         p.sendMessage(ChatColor.GRAY + "Arena: " + ChatColor.GOLD + args[1] + ChatColor.RED + " Deleted " + ChatColor.GRAY + " successfully!");
+                        Arenadata.save();
                         break;
                     case "info":
 
@@ -82,18 +84,22 @@ public class Commands implements CommandExecutor {
                             case "team_one":
                                 Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
                                 p.sendMessage("team one spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                Arenadata.save();
                                 break;
                             case "team_two":
                                 Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
                                 p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                Arenadata.save();
                                 break;
                             case "corner2":
                                 Arenadata.get().set("arenas." + args[1] + ".corner2", p.getLocation());
-                                p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                p.sendMessage("corner two location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                Arenadata.save();
                                 break;
                             case "corner1":
                                 Arenadata.get().set("arenas." + args[1] + ".corner1", p.getLocation());
-                                p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                p.sendMessage("corner one location set to: " + p.getLocation() + " for arena: " + args[1]);
+                                Arenadata.save();
                                 break;
                             case "center":
                                 double pX = p.getLocation().getX();
@@ -101,19 +107,23 @@ public class Commands implements CommandExecutor {
                                 Location center = new Location(p.getWorld(),pX,0,pZ);
                                 Arenadata.get().set("arenas." + args[1] + ".center", center);
                                 p.sendMessage("center location set to: " + pX + "," + pZ + " for arena: " + args[1]);
+                                Arenadata.save();
                                 break;
                             case "size":
                                 Arenadata.get().set("arenas." + args[1] + ".size", args[3]);
-                                p.sendMessage("arena: " + args[1] + " size from center set to: " + args[2]);
+                                p.sendMessage("arena: " + args[1] + " size from center set to: " + args[3]);
+                                Arenadata.save();
                                 break;
                             case "icon":
                                 Arenadata.get().set("arenas." + args[1] + ".icon", args[2]);
                                 p.sendMessage(ChatColor.GRAY + "icon set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
+                                Arenadata.save();
                                 break;
                             case "type":
-                                if (ArenaMethods.validMapTypes.contains((args[2]))) {
-                                    Arenadata.get().set("arenas." + args[1] + ".type", args[2]);
-                                    p.sendMessage(ChatColor.GRAY + "map type set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
+                                if (ArenaMethods.validMapTypes.toString().contains(args[3])) {
+                                    Arenadata.get().set("arenas." + args[1] + ".type", args[3]);
+                                    p.sendMessage(ChatColor.GRAY + "map type set to: " + ChatColor.GOLD + args[3] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
+                                    Arenadata.save();
                                 } else {
                                     p.sendMessage(ChatColor.RED + "Please enter a valid map type: " + ChatColor.YELLOW + ArenaMethods.validMapTypes.toString());
                                 }

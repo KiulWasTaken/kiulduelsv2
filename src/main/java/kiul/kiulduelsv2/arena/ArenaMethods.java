@@ -22,19 +22,21 @@ public class ArenaMethods {
     }};
 
     public static Set<String> getArenas () {
-        Set<String> keys = Arenadata.get().getConfigurationSection("arena").getKeys(false);
+        Set<String> keys = Arenadata.get().getConfigurationSection("arenas").getKeys(false);
         return keys;}
 
     public static String getArenaOfType (String type) {
         Set<String> arenaList = getArenas();
         ArrayList<String> arenasOfType = new ArrayList<>();
         for (String arenas : arenaList) {
-            if (Arenadata.get().getString("arena." + arenas + ".type").equalsIgnoreCase(type)) {
-                arenasOfType.add((Arenadata.get().getString("arena." + arenas + ".type")));
+            if (Arenadata.get().getString("arenas." + arenas + ".type").equalsIgnoreCase(type)) {
+                arenasOfType.add(arenas);
             }
         }
-        for (String arena : arenasOfType) {
+        for (String arena : arenaList) {
             if (DuelMethods.playersInMap.get(arena) == null) {
+                return arena;
+            } else if (DuelMethods.playersInMap.get(arena).size() == 0) {
                 return arena;
             }
         }
@@ -48,7 +50,7 @@ public class ArenaMethods {
         double pZ = p.getLocation().getZ();
         Location playerLocation = new Location(p.getWorld(),pX,0,pZ);
         for (String arenaName : arenas) {
-            if (playerLocation.distance((Location) Arenadata.get().get("arena." + arenaName + ".center")) <= (double) Arenadata.get().get("arena." + arenaName + ".size")) {
+            if (playerLocation.distance((Location) Arenadata.get().get("arenas." + arenaName + ".center")) <= (double) Arenadata.get().get("arenas." + arenaName + ".size")) {
                 return arenaName;
             }
         }
@@ -56,13 +58,13 @@ public class ArenaMethods {
     }
 
     public static void regenerateArena (String arenaName) {
-        if (Arenadata.get().getString("arena." + arenaName + ".type").contains("REALISTIC")) {
-            Location corner1 = (Location)Arenadata.get().get("arena."+arenaName+".corner1");
-            Location corner2 = (Location)Arenadata.get().get("arena."+arenaName+".corner2");
+        if (Arenadata.get().getString("arenas." + arenaName + ".type").contains("REALISTIC")) {
+            Location corner1 = (Location)Arenadata.get().get("arenas."+arenaName+".corner1");
+            Location corner2 = (Location)Arenadata.get().get("arenas."+arenaName+".corner2");
             TerrainArena.generateTerrain(corner2.getWorld(),corner1,corner2,5);
         } else {
         for (int i = 0; i < regenMarkedMaterial.size(); i++) {
-            if (regenMarkedLocation.get(i).distance((Location)Arenadata.get().get("arena." + arenaName + ".center")) < (double)Arenadata.get().get("arena." + arenaName + ".size")) {
+            if (regenMarkedLocation.get(i).distance((Location)Arenadata.get().get("arenas." + arenaName + ".center")) < (double)Arenadata.get().get("arenas." + arenaName + ".size")) {
                 if (regenMarkedMaterial.get(i) != regenMarkedLocation.get(1).getBlock().getType()) {
                     regenMarkedLocation.get(i).getBlock().setType(regenMarkedMaterial.get(i));
                     regenMarkedLocation.remove(i);
@@ -80,8 +82,8 @@ public class ArenaMethods {
 
     public static ArrayList<Location> getArenaLocations (String arenaName) {
         ArrayList<Location> arenaLocations = new ArrayList<>();
-        arenaLocations.add((Location)Arenadata.get().get("arena." + arenaName + ".team1"));
-        arenaLocations.add((Location)Arenadata.get().get("arena." + arenaName + ".team2"));
-        arenaLocations.add((Location)Arenadata.get().get("arena." + arenaName + ".center"));
+        arenaLocations.add((Location)Arenadata.get().get("arenas." + arenaName + ".team1"));
+        arenaLocations.add((Location)Arenadata.get().get("arenas." + arenaName + ".team2"));
+        arenaLocations.add((Location)Arenadata.get().get("arenas." + arenaName + ".center"));
     return arenaLocations;}
 }

@@ -21,7 +21,10 @@ public class QueueMethods {
         if (!queue.contains(p)) {
             queue.add(p);
             if (queue.size() >= 2) {
-                List<Player> players = queue.subList(0,1);
+                List<Player> players = new ArrayList<>() {{
+                    add(queue.get(0));
+                    add(queue.get(1));
+                }};
 
                 for (Player playersInQueue : players) {
                     queue.remove(playersInQueue);
@@ -31,6 +34,7 @@ public class QueueMethods {
                     String[] strings = type.split("-");
                     String kit = strings[0];
                     // startArcadeDuel(map,kit,players);
+
 
                 } else {
                     DuelMethods.startRealisticDuel(players, ArenaMethods.getArenaOfType("REALISTIC"));
