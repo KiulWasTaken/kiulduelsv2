@@ -67,16 +67,30 @@ public class TerrainArena extends ChunkGenerator {
                             targetChunks.add(chunk);
                         }
                     }
-
                     ArrayList<Chunk> retrieveChunks = new ArrayList<>();
-                    int cornerX = retrievalCorner1.getBlockX();
-                    int cornerZ = retrievalCorner1.getBlockZ();
-                    for (int x = cornerX; x < cornerX + size; x++) {
-                        for (int z = cornerZ; z < cornerZ + size; z++) {
-                            Chunk chunk = world.getChunkAt(x, z);
-                            retrieveChunks.add(chunk);
+                    new BukkitRunnable() {
+                        int cornerX = retrievalCorner1.getBlockX();
+                        int cornerZ = retrievalCorner1.getBlockZ();
+                        int x = cornerX;
+                        @Override
+                        public void run() {
+                            //for (int x = cornerX; x < cornerX + size; x++) {
+                            if (x >= cornerX + size) {
+                                cancel();
+                                return;
+                            } else {
+                                x++;
+                                for (int z = cornerZ; z < cornerZ + size; z++) {
+                                    Chunk chunk = world.getChunkAt(x, z);
+                                    retrieveChunks.add(chunk);
+                                }
+                            }
+                            //}
                         }
-                    }
+                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),0,1);
+
+
+
 
 
                     new BukkitRunnable() {
@@ -88,6 +102,7 @@ public class TerrainArena extends ChunkGenerator {
                                 cancel();
                                 return;
                             }
+                            tick++;
                             for (int x = 0; x < 16; ++x) {
                                 for (int z = 0; z < 16; ++z) {
                                     for (int y = 0; y < 199; ++y) {
@@ -96,7 +111,8 @@ public class TerrainArena extends ChunkGenerator {
                                 }
                             }
                         }
-                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 5L);
+                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), size+2, 5L);
+                    cancel();
                 }
             }
         }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 1L);
@@ -106,7 +122,7 @@ public class TerrainArena extends ChunkGenerator {
         Random random = new Random();
         int x = random.nextInt(-7900,7900);
         int z = random.nextInt(-7900,7900);
-        int y = world.getHighestBlockYAt(x,z);
+        int y = world.getHighestBlockAt(x,z).getY();
         Location retrievalLocation = new Location(world,x,y,z);
         return retrievalLocation;}
 }

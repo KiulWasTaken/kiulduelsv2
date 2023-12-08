@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +36,8 @@ public class DuelMethods {
     // haha now you need to redo it idiot
 
     public static void beginDuel (String arenaName,List<Player> players) {
-        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+"team1");
-        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+"team2");
+        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".team1");
+        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".team2");
         playersInMap.put(arenaName,players);
         List<Player> teamOne = players.subList(0,players.size()/2);
         List<Player> teamTwo = players.subList(players.size()/2,players.size());
@@ -46,11 +47,9 @@ public class DuelMethods {
         }};
         mapTeams.put(arenaName,arenaTeams);
         for (Player p : teamOne) {
-            p.setDisplayName(ChatColor.RED+p.getDisplayName());
             p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(),teamOneSpawn.getBlockZ()).getLocation());
         }
         for (Player p : teamTwo) {
-            p.setDisplayName(ChatColor.BLUE+p.getDisplayName());
             p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(),teamTwoSpawn.getBlockZ()).getLocation());
         }
         for (Player p : players) {
@@ -65,7 +64,7 @@ public class DuelMethods {
 
     }
 
-    public static void startArcadeDuel (String arenaName,String kitName,ArrayList<Player> players) {
+    public static void startClassicDuel (String arenaName,String kitName,ArrayList<Player> players) {
 
         playersInMap.put(arenaName,players);
         List<Player> teamOne = players.subList(0,players.size()/2);
@@ -127,9 +126,10 @@ public class DuelMethods {
     public static void startRealisticDuel (List<Player> players, String arenaName) {
 
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
-        Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),200,duelCentre.getZ());
+        Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),100,duelCentre.getZ());
         for (Player p : players) {
             p.teleport(teleportTo);
+            p.setGameMode(GameMode.SPECTATOR);
         }
         // Create a clickable message with two components
         ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
