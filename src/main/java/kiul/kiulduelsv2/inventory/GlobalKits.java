@@ -23,6 +23,7 @@ public class GlobalKits {
         lobbyKit.setItem(5, ItemStackMethods.createItemStack("Settings", Material.PAPER,1,lore,null,null,"settings"));
         Userdata.get().set("kits.global.lobby.inventory", InventoryToBase64.itemStackArrayToBase64(lobbyKit.getContents()));
 
+
         Inventory queueKit = Bukkit.createInventory(null,36,"queue");
         queueKit.setItem(8,ItemStackMethods.createItemStack("Leave Queue",Material.RED_DYE,1,lore,null,null,"leavequeue"));
         Userdata.get().set("kits.global.queue.inventory", InventoryToBase64.itemStackArrayToBase64(queueKit.getContents()));

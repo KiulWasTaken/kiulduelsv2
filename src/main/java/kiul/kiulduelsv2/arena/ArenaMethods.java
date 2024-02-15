@@ -12,27 +12,13 @@ import java.util.*;
 
 public class ArenaMethods {
 
-    static HashMap<Block, Material> regenMarkedMaterial = new HashMap<>();
-    static HashMap<Block,Location> regenMarkedLocation = new HashMap<>();
-    public static ArrayList<String> validMapTypes = new ArrayList<>() { {
-        add("SMP");
-        add("REALISTIC");
-        add("CRYSTAL");
-        add("DEFAULT");
-    }};
-
     public static Set<String> getArenas () {
         Set<String> keys = Arenadata.get().getConfigurationSection("arenas").getKeys(false);
         return keys;}
 
-    public static String getArenaOfType (String type) {
+    public static String getSuitableArena () {
         Set<String> arenaList = getArenas();
-        ArrayList<String> arenasOfType = new ArrayList<>();
-        for (String arenas : arenaList) {
-            if (Arenadata.get().getString("arenas." + arenas + ".type").equalsIgnoreCase(type)) {
-                arenasOfType.add(arenas);
-            }
-        }
+
         for (String arena : arenaList) {
             if (DuelMethods.playersInMap.get(arena) == null) {
                 return arena;
@@ -49,8 +35,15 @@ public class ArenaMethods {
         double pX = p.getLocation().getX();
         double pZ = p.getLocation().getZ();
         Location playerLocation = new Location(p.getWorld(),pX,0,pZ);
+
+
         for (String arenaName : arenas) {
-            if (playerLocation.distance((Location) Arenadata.get().get("arenas." + arenaName + ".center")) <= (double) Arenadata.get().get("arenas." + arenaName + ".size")) {
+            double aX = Arenadata.get().getLocation("arenas." + arenaName + ".center").getX();
+            double aZ = Arenadata.get().getLocation("arenas." + arenaName + ".center").getZ();
+            Location arenaLocation = new Location(p.getWorld(),aX,0,aZ);
+            double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size")*2-1)*16),2);
+            double maxDistance = (Math.sqrt(sideLength*2)/2)+2;
+            if (playerLocation.distance(arenaLocation) <= maxDistance) {
                 return arenaName;
             }
         }
@@ -58,21 +51,10 @@ public class ArenaMethods {
     }
 
     public static void regenerateArena (String arenaName) {
-        if (Arenadata.get().getString("arenas." + arenaName + ".type").contains("REALISTIC")) {
-            Location corner1 = (Location)Arenadata.get().get("arenas."+arenaName+".corner1");
-            Location corner2 = (Location)Arenadata.get().get("arenas."+arenaName+".corner2");
-            TerrainArena.generateTerrain(corner2.getWorld(),corner1,corner2,5);
-        } else {
-        for (int i = 0; i < regenMarkedMaterial.size(); i++) {
-            if (regenMarkedLocation.get(i).distance((Location)Arenadata.get().get("arenas." + arenaName + ".center")) < (double)Arenadata.get().get("arenas." + arenaName + ".size")) {
-                if (regenMarkedMaterial.get(i) != regenMarkedLocation.get(1).getBlock().getType()) {
-                    regenMarkedLocation.get(i).getBlock().setType(regenMarkedMaterial.get(i));
-                    regenMarkedLocation.remove(i);
-                    regenMarkedMaterial.remove(i);
-                }
-            }
-            }
-        }
+            Location center = Arenadata.get().getLocation("arenas." + arenaName + ".center");
+            TerrainArena.generateTerrain(center.getWorld(),center,4,null,null);
+
+
 
     }
 

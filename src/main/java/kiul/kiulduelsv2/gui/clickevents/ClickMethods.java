@@ -1,4 +1,4 @@
-package kiul.kiulduelsv2.gui.clickmethods;
+package kiul.kiulduelsv2.gui.clickevents;
 
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.duel.DuelMethods;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueueMethods {
+public class ClickMethods {
 
 
 
@@ -37,11 +37,15 @@ public class QueueMethods {
 
 
                 } else {
-                    DuelMethods.startRealisticDuel(players, ArenaMethods.getArenaOfType("REALISTIC"));
+                    DuelMethods.startRealisticDuel(players, ArenaMethods.getSuitableArena());
                     // startRealisticDuel(map,type,players);
                 }
 
             }
         }
+    }
+
+    public static void enterKitEditor (Player p) {
+
     }
 }

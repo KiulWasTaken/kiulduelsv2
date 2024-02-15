@@ -1,25 +1,26 @@
 package kiul.kiulduelsv2.gui;
 
+import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class QueueInventory {
+public class KitInventory {
 
 
 
-    public static void queueInventory(Player p) {
+    public static void kitInventory(Player p) {
 
         p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.2F, 0.5F);
 
-        Inventory inventory = Bukkit.createInventory(p, 9, "Queue");
+        Inventory inventory = Bukkit.createInventory(p, 9, "Kit Selector");
         List<String> emptylore = new ArrayList<>();
         emptylore.add("");
 
@@ -35,18 +36,18 @@ public class QueueInventory {
         }
 
 
-        for (QueueEnum item : QueueEnum.values()) {
+        for (KitEnum item : KitEnum.values()) {
                 List<String> lore = new ArrayList<>();
                 for (String itemLore : item.getLore()) {
                     lore.add((itemLore));
                 }
                 String itemName = ItemStackMethods.translateHexColorCodes("&#","",item.getDisplayName());
-
-                if (item.getSkullValue() != null) {
-                    inventory.setItem(item.getInventorySlot(),ItemStackMethods.createPlayerHead(item.getSkullValue(),itemName));
+                if (item.getlocalName().contains(KitMethods.kitSlot.get(p).toString())) {
+                    lore.add(ChatColor.GOLD + "⏵ " + ChatColor.GRAY+"Click to Edit");
+                    inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(ChatColor.GREEN+KitMethods.kitSlot.get(p).toString(), Material.LIME_TERRACOTTA, 1, lore, null, null, item.getlocalName()));
                 } else {
-                    inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null,item.getlocalName()));
-
+                    inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null, item.getlocalName()));
+                    lore.add(ChatColor.GOLD + "⏵ " + ChatColor.GRAY+"Click to Select");
                 }
         }
 

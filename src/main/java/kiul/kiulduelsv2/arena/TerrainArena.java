@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.arena;
 
 import kiul.kiulduelsv2.Kiulduelsv2;
+import kiul.kiulduelsv2.duel.DuelMethods;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -11,10 +12,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class TerrainArena extends ChunkGenerator {
 
@@ -30,11 +28,22 @@ public class TerrainArena extends ChunkGenerator {
 
     }};
 
-    public static void generateTerrain (World targetWorld, Location corner1, Location corner2, int size) {
+    public static void generateTerrain (World targetWorld, Location targetLocation, int size,Player p,List<Player> waitingForArena) {
+        long timeMillis = System.currentTimeMillis();
+
         String worldName = "arenaTerrain";
 
 // Check if the world is already loaded
+        if (p!=null) {
+            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "instantiating world object..");
+        }
+        if (waitingForArena != null) {
+            for (Player waiter : waitingForArena) {
+                waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "instantiating world object..");
+            }
+        }
         World world = Bukkit.getWorld(worldName);
+
 
 // If the world is not loaded, load it
         if (world == null) {
@@ -43,7 +52,27 @@ public class TerrainArena extends ChunkGenerator {
             worldCreator = worldCreator.generateStructures(true); // Enable or disable structures as needed
             worldCreator.createWorld();
         }
+        if (p!=null) {
+            long finalTime = System.currentTimeMillis()-timeMillis;
+            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+        }
+        if (waitingForArena != null) {
+            long finalTime = System.currentTimeMillis()-timeMillis;
+            for (Player waiter : waitingForArena) {
+                waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+            }
+        }
+        if (p!=null) {
+            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "re-rolling biome..");
+        }
+        if (waitingForArena != null) {
+            for (Player waiter : waitingForArena) {
+                waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "re-rolling biome..");
+            }
+        }
+
         new BukkitRunnable() {
+            int tick = 1;
 
             World world = Bukkit.getWorld(worldName);
             Location retrievalLocation = returnRetrievalLocation(world);
@@ -52,46 +81,60 @@ public class TerrainArena extends ChunkGenerator {
             public void run() {
                 if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome())) {
                     retrievalLocation = returnRetrievalLocation(world);
-                } else {
-                    Location retrievalCorner1 = retrievalLocation;
-                    // Loop through the chunks within the square
-                    ArrayList<Chunk> targetChunks = new ArrayList<>();
-                    int minX = Math.min(corner1.getBlockX(), corner2.getBlockX()) >> 4;
-                    int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX()) >> 4;
-                    int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ()) >> 4;
-                    int maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ()) >> 4;
 
-                    for (int x = minX; x <= maxX; x++) {
-                        for (int z = minZ; z <= maxZ; z++) {
-                            Chunk chunk = targetWorld.getChunkAt(x, z);
-                            targetChunks.add(chunk);
+                    if (p!=null) {
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + tick + ")");
+                    }
+                    if (waitingForArena != null) {
+                        for (Player waiter : waitingForArena) {
+                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + tick + ")");
                         }
                     }
-                    ArrayList<Chunk> retrieveChunks = new ArrayList<>();
-                    new BukkitRunnable() {
-                        int cornerX = retrievalCorner1.getBlockX();
-                        int cornerZ = retrievalCorner1.getBlockZ();
-                        int x = cornerX;
-                        @Override
-                        public void run() {
-                            //for (int x = cornerX; x < cornerX + size; x++) {
-                            if (x >= cornerX + size) {
-                                cancel();
-                                return;
-                            } else {
-                                x++;
-                                for (int z = cornerZ; z < cornerZ + size; z++) {
-                                    Chunk chunk = world.getChunkAt(x, z);
-                                    retrieveChunks.add(chunk);
-                                }
-                            }
-                            //}
+
+                } else {
+
+                    if (p!=null) {
+                        long finalTime = System.currentTimeMillis()-timeMillis;
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                    }
+                    if (waitingForArena != null) {
+                        long finalTime = System.currentTimeMillis()-timeMillis;
+                        for (Player waiter : waitingForArena) {
+                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
                         }
-                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),0,1);
+                    }
 
+                    if (p!=null) {
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
+                    }
+                    if (waitingForArena != null) {
+                        for (Player waiter : waitingForArena) {
+                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
+                        }
+                    }
 
+                    ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),4);
+                    ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),4);
 
+                    if (p!=null) {
+                        long finalTime = System.currentTimeMillis()-timeMillis;
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                    }
+                    if (waitingForArena != null) {
+                        long finalTime = System.currentTimeMillis()-timeMillis;
+                        for (Player waiter : waitingForArena) {
+                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                        }
+                    }
 
+                    if (p!=null) {
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                    }
+                    if (waitingForArena != null) {
+                        for (Player waiter : waitingForArena) {
+                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                        }
+                    }
 
                     new BukkitRunnable() {
                         int tick = 0;
@@ -100,22 +143,37 @@ public class TerrainArena extends ChunkGenerator {
                         public void run() {
                             if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
                                 cancel();
+
+                                if (p!=null) {
+                                    long finalTime = System.currentTimeMillis()-timeMillis;
+                                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                }
+                                if (waitingForArena != null) {
+                                    long finalTime = System.currentTimeMillis()-timeMillis;
+                                    for (Player waiter : waitingForArena) {
+                                        waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                    }
+                                    DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)),waitingForArena);
+                                }
+
                                 return;
                             }
-                            tick++;
                             for (int x = 0; x < 16; ++x) {
                                 for (int z = 0; z < 16; ++z) {
                                     for (int y = 0; y < 199; ++y) {
                                         targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlock(x, y, z).getType());
+
                                     }
                                 }
                             }
+                            tick++;
                         }
-                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), size+2, 5L);
+                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
                     cancel();
                 }
             }
-        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 1L);
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
+
     }
 
     public static Location returnRetrievalLocation (World world) {
@@ -125,4 +183,33 @@ public class TerrainArena extends ChunkGenerator {
         int y = world.getHighestBlockAt(x,z).getY();
         Location retrievalLocation = new Location(world,x,y,z);
         return retrievalLocation;}
+
+    public static ArrayList<Chunk> getChunksAround(Chunk origin, int radius) {
+        World world = origin.getWorld();
+
+        int length = (radius * 2) + 1;
+        ArrayList<Chunk> chunks = new ArrayList<>(length * length);
+
+        int cX = origin.getX();
+        int cZ = origin.getZ();
+
+        new BukkitRunnable() {
+            int xTick = -radius;
+            int zTick = -radius;
+
+            @Override
+            public void run() {
+                if (xTick <= radius) {
+                    chunks.add(world.getChunkAt(cX + xTick, cZ + zTick));
+                xTick++;
+                } else if (zTick <= radius) {
+                    xTick = -radius;
+                    zTick++;
+                } else {
+                    cancel();
+                }
+            }
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),0,8);
+        return chunks;
+    }
 }

@@ -11,7 +11,9 @@ import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,89 +52,77 @@ public class Commands implements CommandExecutor {
                         break;
                     case "loadglobal":
                         try {
-                            ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global." + args[1] + ".inventory")).getContents();
-                            ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global." + args[1] + ".armour")).getContents();
+                            ItemStack[] armourContents;
+                            ItemStack[] kitContents = InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".inventory")).getContents();
+
+                            if (InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".armour")).getContents() != null) {
+                                armourContents = InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".armour")).getContents();
+                                p.getInventory().setArmorContents(armourContents);
+                            }
                             p.getInventory().setContents(kitContents);
-                            p.getInventory().setArmorContents(armourContents);
+
                         } catch (IOException error) {error.printStackTrace();}
+                        p.sendMessage(ChatColor.GREEN + "global kit " + ChatColor.YELLOW + args[1] + ChatColor.GREEN +   " load success");
                         break;
                 }
                 break;
             case "arena":
                 switch (args[0]) {
                     case "create":
-                        Arenadata.get().set("arenas." + args[1] + ".center", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".type", "DEFAULT");
-                        Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".corner1", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".corner2", p.getLocation());
-                        Arenadata.get().set("arenas." + args[1] + ".size", 40);
-                        Arenadata.save();
-                        p.sendMessage("Created map: " + args[1]);
+                        if (args[1] != null) {
+                            p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "creating arena..");
+                            long timeMillis = System.currentTimeMillis();
+
+                            int size = 4;
+                            World world = p.getWorld();
+                            Chunk c = p.getLocation().getChunk();
+                            Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
+
+                            Chunk SEChunk = world.getChunkAt(center.add(size*16,0,size*16));
+                            Chunk NWChunk = world.getChunkAt(center.add(-size*16,0,-size*16));
+
+                            Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
+                            Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
+
+                            // set data
+                            Arenadata.get().set("arenas." + args[1] + ".center", center);
+                            Arenadata.get().set("arenas." + args[1] + ".size", size);
+                            Arenadata.get().set("arenas." + args[1] + ".southeast", southeast);
+                            Arenadata.get().set("arenas." + args[1] + ".northwest", northwest);
+                            Arenadata.save();
+                            long finalTime = System.currentTimeMillis()-timeMillis;
+                            p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "arena " + "'" + ChatColor.WHITE + args[1] + ChatColor.GRAY +  "'" + " created (" + finalTime + ")");
+                        } else {
+                            p.sendMessage(ChatColor.RED + "arena requires a name!");
+                        }
                         break;
                     case "delete":
+                        p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "deleting arena..");
+                        long timeMillis = System.currentTimeMillis();
+
                         Arenadata.get().set("arenas." + args[1], null);
-                        p.sendMessage(ChatColor.GRAY + "Arena: " + ChatColor.GOLD + args[1] + ChatColor.RED + " Deleted " + ChatColor.GRAY + " successfully!");
                         Arenadata.save();
+
+                        long finalTime = System.currentTimeMillis()-timeMillis;
+                        p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "arena " + "'" + ChatColor.WHITE + args[1] + ChatColor.GRAY +  "'" + " deleted (" + finalTime + ")");
                         break;
                     case "info":
+                        p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "printing debug info..");
+                        long timeMillis2 = System.currentTimeMillis();
+
+                        p.sendMessage("center location: " + Arenadata.get().getLocation("arenas." + args[1] + ".center").toString());
+                        p.sendMessage("size: " + Arenadata.get().getInt("arenas." + args[1] + ".size"));
+                        p.sendMessage("southeast corner: " + Arenadata.get().getLocation("arenas." + args[1] + ".southeast").toString());
+                        p.sendMessage("northwest corner:" + Arenadata.get().getLocation("arenas." + args[1] + ".northwest").toString());
+
+                        long finalTime2 = System.currentTimeMillis()-timeMillis2;
+                        p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "finished printing (" + finalTime2 + ")");
 
                         break;
-                    case "edit":
-                        switch (args[2]) {
-                            case "team_one":
-                                Arenadata.get().set("arenas." + args[1] + ".team1", p.getLocation());
-                                p.sendMessage("team one spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
-                                Arenadata.save();
-                                break;
-                            case "team_two":
-                                Arenadata.get().set("arenas." + args[1] + ".team2", p.getLocation());
-                                p.sendMessage("team two spawn location set to: " + p.getLocation() + " for arena: " + args[1]);
-                                Arenadata.save();
-                                break;
-                            case "corner2":
-                                Arenadata.get().set("arenas." + args[1] + ".corner2", p.getLocation());
-                                p.sendMessage("corner two location set to: " + p.getLocation() + " for arena: " + args[1]);
-                                Arenadata.save();
-                                break;
-                            case "corner1":
-                                Arenadata.get().set("arenas." + args[1] + ".corner1", p.getLocation());
-                                p.sendMessage("corner one location set to: " + p.getLocation() + " for arena: " + args[1]);
-                                Arenadata.save();
-                                break;
-                            case "center":
-                                double pX = p.getLocation().getX();
-                                double pZ = p.getLocation().getZ();
-                                Location center = new Location(p.getWorld(),pX,0,pZ);
-                                Arenadata.get().set("arenas." + args[1] + ".center", center);
-                                p.sendMessage("center location set to: " + pX + "," + pZ + " for arena: " + args[1]);
-                                Arenadata.save();
-                                break;
-                            case "size":
-                                Arenadata.get().set("arenas." + args[1] + ".size", args[3]);
-                                p.sendMessage("arena: " + args[1] + " size from center set to: " + args[3]);
-                                Arenadata.save();
-                                break;
-                            case "icon":
-                                Arenadata.get().set("arenas." + args[1] + ".icon", args[2]);
-                                p.sendMessage(ChatColor.GRAY + "icon set to: " + ChatColor.GOLD + args[2] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
-                                Arenadata.save();
-                                break;
-                            case "type":
-                                if (ArenaMethods.validMapTypes.toString().contains(args[3])) {
-                                    Arenadata.get().set("arenas." + args[1] + ".type", args[3]);
-                                    p.sendMessage(ChatColor.GRAY + "map type set to: " + ChatColor.GOLD + args[3] + ChatColor.GRAY + " for arena: " + ChatColor.GOLD + args[1]);
-                                    Arenadata.save();
-                                } else {
-                                    p.sendMessage(ChatColor.RED + "Please enter a valid map type: " + ChatColor.YELLOW + ArenaMethods.validMapTypes.toString());
-                                }
-                                break;
-                        }
                 }
                 break;
             case "testgeneration":
-                TerrainArena.generateTerrain(p.getWorld(),new Location(p.getWorld(),Integer.parseInt(args[0]),Integer.parseInt(args[1]),Integer.parseInt(args[2])),new Location(p.getWorld(),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5])),5);
+                TerrainArena.generateTerrain(p.getWorld(),new Location(p.getWorld(),Integer.parseInt(args[0]),Integer.parseInt(args[1]),Integer.parseInt(args[2])),4,p,null);
                 break;
             case "reroll":
                 if (args[0].equalsIgnoreCase("yes")) {

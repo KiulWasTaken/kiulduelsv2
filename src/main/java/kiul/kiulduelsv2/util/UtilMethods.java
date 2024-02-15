@@ -30,8 +30,8 @@ public class UtilMethods {
     public static void becomeSpectator (Player player) {
         String arenaName = ArenaMethods.findPlayerArena(player);
         List<Player> playersInDuel = playersInMap.get(arenaName);
-        for (Player aliveplayers : playersInDuel) {
-            aliveplayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
+        for (Player alivePlayers : playersInDuel) {
+            alivePlayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
         }
     }
 

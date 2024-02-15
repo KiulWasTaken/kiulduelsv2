@@ -1,10 +1,5 @@
 package kiul.kiulduelsv2.gui.clickevents;
 
-import kiul.kiulduelsv2.arena.ArenaMethods;
-import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.duel.DuelMethods;
-import kiul.kiulduelsv2.gui.clickmethods.QueueMethods;
-import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,10 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
-import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
 
 public class QueueClickEvent implements Listener {
@@ -48,7 +40,7 @@ public class QueueClickEvent implements Listener {
 
             if (e.getCurrentItem().getItemMeta().getLocalizedName() != null) {
                 String localName = e.getCurrentItem().getItemMeta().getLocalizedName();
-                QueueMethods.queueAddCheck(queue.get(localName),p,localName);
+                ClickMethods.queueAddCheck(queue.get(localName),p,localName);
                 p.playSound(p,Sound.BLOCK_NOTE_BLOCK_PLING,1f,0.4f);
                 try {
                     loadGlobalKit(p, "queue");

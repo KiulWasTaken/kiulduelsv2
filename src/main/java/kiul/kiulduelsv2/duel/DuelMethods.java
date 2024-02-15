@@ -33,11 +33,16 @@ public class DuelMethods {
 
     static ArrayList<Player> preDuel = new ArrayList<>();
 
-    // haha now you need to redo it idiot
+    public static ArrayList<Player> inDuel = new ArrayList<>();
 
     public static void beginDuel (String arenaName,List<Player> players) {
-        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".team1");
-        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".team2");
+        for (Player play : players) {
+            if (preDuel.contains(play)) {
+                preDuel.remove(play);
+            }
+        }
+        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
+        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
         playersInMap.put(arenaName,players);
         List<Player> teamOne = players.subList(0,players.size()/2);
         List<Player> teamTwo = players.subList(players.size()/2,players.size());
@@ -60,6 +65,7 @@ public class DuelMethods {
             }
             preDuel.add(p);
             preDuelCountdown(p);
+            inDuel.add(p);
         }
 
     }
@@ -91,6 +97,7 @@ public class DuelMethods {
             }
             preDuel.add(p);
             preDuelCountdown(p);
+            inDuel.add(p);
         }
     }
 
@@ -126,14 +133,14 @@ public class DuelMethods {
     public static void startRealisticDuel (List<Player> players, String arenaName) {
 
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
-        Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),100,duelCentre.getZ());
+        Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());
         for (Player p : players) {
             p.teleport(teleportTo);
             p.setGameMode(GameMode.SPECTATOR);
         }
         // Create a clickable message with two components
         ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
-                .color(net.md_5.bungee.api.ChatColor.YELLOW);
+                .color(net.md_5.bungee.api.ChatColor.GRAY).color(net.md_5.bungee.api.ChatColor.ITALIC);
 
         // Add the first clickable component
         message.append("[✓]")
@@ -165,11 +172,14 @@ public class DuelMethods {
                 if (allowedToReRoll.get(arenaName).isEmpty()) {
                     if (reRollYes.size() > reRollNo.size()) {
                         for (Player p : players) {
-                            p.sendMessage(ChatColor.YELLOW + "Voting Complete! Map Re-Rolling!");
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
+                            p.teleport(teleportTo);
+                            preDuel.add(p);
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
-                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".corner1"),Arenadata.get().getLocation("arena." + arenaName + ".corner2"),7);
+                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".center"),4,null,null);
+
                         new BukkitRunnable() {
                             @Override
                             public void run() {
@@ -178,7 +188,7 @@ public class DuelMethods {
                         }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),80);
                     } else {
                         for (Player p : players) {
-                            p.sendMessage(ChatColor.YELLOW + "Voting Complete! Game Starting!");
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
                             beginDuel(arenaName,players);
@@ -189,26 +199,20 @@ public class DuelMethods {
                 }
                 if (this.time == 5) {
                     for (Player p : players) {
-                        p.sendMessage(ChatColor.YELLOW + "Voting ends in 5 seconds");
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting ends in 5 seconds");
                     }
                 }
                 if (this.time <= 0) {
                     if (reRollYes.size() > reRollNo.size()) {
                         for (Player p : players) {
-                            p.sendMessage(ChatColor.YELLOW + "Voting Complete! Map Re-Rolling!");
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
-                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".corner1"),Arenadata.get().getLocation("arena." + arenaName + ".corner2"),7);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                beginDuel(arenaName,players);
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),80);
+                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".center"),4,null,players);
                     } else {
                         for (Player p : players) {
-                            p.sendMessage(ChatColor.YELLOW + "Voting Complete! Game Starting!");
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
