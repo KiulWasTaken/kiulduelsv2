@@ -19,8 +19,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.StringUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static kiul.kiulduelsv2.inventory.KitMethods.*;
 import static kiul.kiulduelsv2.config.Userdata.*;
@@ -30,6 +34,7 @@ public class Commands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command cmd, String label, String[] args) {
         Player p = (Player) commandSender;
+
         switch (label) {
             case "kit":
                 switch (args[0]) {

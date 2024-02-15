@@ -77,9 +77,19 @@ public class TerrainArena extends ChunkGenerator {
             World world = Bukkit.getWorld(worldName);
             Location retrievalLocation = returnRetrievalLocation(world);
 
+            int size = 4;
+            Chunk c = p.getLocation().getChunk();
+            Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
+
+            Chunk SEChunk = world.getChunkAt(center.add(size*16,0,size*16));
+            Chunk NWChunk = world.getChunkAt(center.add(-size*16,0,-size*16));
+
+            Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
+            Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
+
             @Override
             public void run() {
-                if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome())) {
+                if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome()) || disallowedBiomes.contains(southeast.getBlock().getBiome()) || disallowedBiomes.contains(northwest.getBlock().getBiome())) {
                     retrievalLocation = returnRetrievalLocation(world);
 
                     if (p!=null) {

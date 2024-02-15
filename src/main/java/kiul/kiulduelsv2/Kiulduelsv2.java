@@ -10,6 +10,7 @@ import kiul.kiulduelsv2.gui.clickevents.QueueClickEvent;
 import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
+import kiul.kiulduelsv2.util.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Kiulduelsv2 extends JavaPlugin {
@@ -33,6 +34,8 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("testgeneration").setExecutor(new Commands());
         getCommand("t").setExecutor(new Commands());
         getCommand("e").setExecutor(new Commands());
+        getCommand("kit").setTabCompleter(new TabCompleter());
+        getCommand("arena").setTabCompleter(new TabCompleter());
     }
 
     @Override
