@@ -9,16 +9,16 @@ import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.gui.ItemEnum;
 import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.QueueInventory;
+import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import kiul.kiulduelsv2.inventory.KitMethods;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.StringUtil;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class Commands implements CommandExecutor {
                             ItemStack[] armourContents;
                             ItemStack[] kitContents = InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".inventory")).getContents();
 
-                            if (InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".armour")).getContents() != null) {
+                            if (Userdata.get().getString("kits.global." + args[1] + ".armour") != null) {
                                 armourContents = InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".armour")).getContents();
                                 p.getInventory().setArmorContents(armourContents);
                             }
@@ -148,6 +148,45 @@ public class Commands implements CommandExecutor {
             case "e":
                 EnchantInventory.itemEnchantInventory(p);
                 break;
+            case "exit":
+                if (ClickMethods.inEditor.contains(p)) {
+                    p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Exiting kit editor..");
+                    ClickMethods.inEditor.remove(p);
+                    p.getActivePotionEffects().clear();
+                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                        onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);
+                    }
+                    if(p.hasPotionEffect(PotionEffectType.BLINDNESS)){
+                        p.removePotionEffect(PotionEffectType.BLINDNESS);
+                    }
+                    try {
+                        lobbyKit(p);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            case "save":
+                if (ClickMethods.inEditor.contains(p)) {
+                    p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Exiting kit editor..");
+                    p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Saving kit..");
+                    long timeMillis = System.currentTimeMillis();
+                    saveInventoryToSelectedKitSlot(p);
+                    long timeFinal = System.currentTimeMillis()-timeMillis;
+                    p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Complete! (" + timeFinal + "ms)");
+                    ClickMethods.inEditor.remove(p);
+                    if(p.hasPotionEffect(PotionEffectType.BLINDNESS)){
+                        p.removePotionEffect(PotionEffectType.BLINDNESS);
+                    }
+
+                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                        onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);
+                    }
+                    try {
+                        lobbyKit(p);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
         }
     return false;
     }

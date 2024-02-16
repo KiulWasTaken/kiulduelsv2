@@ -23,13 +23,14 @@ public class KitMethods {
     }
 
     public static void saveInventoryToSelectedKitSlot (Player p) {
-        Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory",InventoryToBase64.toBase64(p.getInventory()));
+        Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getStorageContents()));
         Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+        Userdata.save();
     }
 
     public static void loadSelectedKitSlot (Player p) throws IOException {
-        ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory")).getContents();
-        ItemStack[] armourContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour")).getContents();
+        ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory"));
+        ItemStack[] armourContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour"));
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(armourContents);
     }

@@ -18,7 +18,7 @@ public class GlobalKits {
             add(" ");
         }};
         Inventory lobbyKit = Bukkit.createInventory(null,36,"lobby");
-        lobbyKit.setItem(3, ItemStackMethods.createItemStack("Kit Editor", Material.WRITABLE_BOOK,1,lore,null,null,"kiteditor"));
+        lobbyKit.setItem(3, ItemStackMethods.createItemStack("Kit Editor", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
         lobbyKit.setItem(4, ItemStackMethods.createItemStack("Queue", Material.NETHER_STAR,1,lore,null,null,"queue"));
         lobbyKit.setItem(5, ItemStackMethods.createItemStack("Settings", Material.PAPER,1,lore,null,null,"settings"));
         Userdata.get().set("kits.global.lobby.inventory", InventoryToBase64.itemStackArrayToBase64(lobbyKit.getContents()));

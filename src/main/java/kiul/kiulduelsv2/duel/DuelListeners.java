@@ -3,6 +3,9 @@ package kiul.kiulduelsv2.duel;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Arenadata;
+import kiul.kiulduelsv2.gui.ItemInventory;
+import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
+import kiul.kiulduelsv2.inventory.InventoryListeners;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.Bukkit;
@@ -104,7 +107,7 @@ public class DuelListeners implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if(DuelMethods.preDuel.contains(e.getPlayer())) {
+        if(DuelMethods.preDuel.contains(e.getPlayer()) || ClickMethods.inEditor.contains(e.getPlayer())) {
             Location to = e.getFrom();
             to.setPitch(e.getTo().getPitch());
             to.setYaw(e.getTo().getYaw());

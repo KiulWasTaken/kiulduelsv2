@@ -8,14 +8,19 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.util.ArrayList;
+
 public class KitClickEvent implements Listener {
 
     @EventHandler
     public void onGUIClick (InventoryClickEvent e) {
         Player p = (Player)e.getView().getPlayer();
         if (e.getView().getTitle().equals("Kit Selector")) {
+            e.setCancelled(true);
             if (e.getCurrentItem().getType() == Material.CYAN_TERRACOTTA) {
-                int num = e.getCurrentItem().getItemMeta().getLocalizedName().charAt(6);
+                String[] strings = e.getCurrentItem().getItemMeta().getDisplayName().split("7");
+                int num = Integer.parseInt(strings[1]);
+                p.sendMessage( ""+num);
                 KitMethods.kitSlot.put(p,num);
                 KitInventory.kitInventory(p);
             } else if (e.getCurrentItem().getType() == Material.LIME_TERRACOTTA) {
@@ -23,4 +28,5 @@ public class KitClickEvent implements Listener {
             }
         }
     }
+
 }
