@@ -33,6 +33,8 @@ public class GlobalKits {
         Inventory partyLeaderLobbyKit = Bukkit.createInventory(null,36,"lobbyPL");
 
         Inventory spectatorKit = Bukkit.createInventory(null,36,"spectator");
+        spectatorKit.setItem(9,ItemStackMethods.createItemStack("Stop Spectating",Material.RED_DYE,1,lore,null,null,"leavegame"));
+        Userdata.get().set("kits.global.spectator.inventory", InventoryToBase64.itemStackArrayToBase64(spectatorKit.getContents()));
 
         Userdata.save();
     }

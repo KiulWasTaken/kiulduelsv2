@@ -40,6 +40,7 @@ public class DuelMethods {
             if (preDuel.contains(play)) {
                 preDuel.remove(play);
             }
+            play.setGameMode(GameMode.SURVIVAL);
         }
         Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
         Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
@@ -161,42 +162,16 @@ public class DuelMethods {
 
         // Send the message
         allowedToReRoll.put(arenaName,players);
+        reRollYes.put(arenaName,new ArrayList<>());
+        reRollNo.put(arenaName,new ArrayList<>());
         for (Player p : players) {
             p.spigot().sendMessage(message.create());
         }
          new BukkitRunnable() {
-            int time = 10; //or any other number you want to start countdown from
+            int time = 20; //or any other number you want to start countdown from
 
             @Override
             public void run() {
-                if (allowedToReRoll.get(arenaName).isEmpty()) {
-                    if (reRollYes.size() > reRollNo.size()) {
-                        for (Player p : players) {
-                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
-                            p.teleport(teleportTo);
-                            preDuel.add(p);
-                        }
-                        reRollNo.remove(arenaName);
-                        reRollYes.remove(arenaName);
-                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".center"),4,null,null);
-
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                beginDuel(arenaName,players);
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),80);
-                    } else {
-                        for (Player p : players) {
-                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
-                            reRollNo.remove(arenaName);
-                            reRollYes.remove(arenaName);
-                            beginDuel(arenaName,players);
-                        }
-                    }
-                    cancel();
-                    return;
-                }
                 if (this.time == 5) {
                     for (Player p : players) {
                         p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting ends in 5 seconds");
@@ -221,6 +196,26 @@ public class DuelMethods {
                     cancel();
                     return;
                 }
+
+                    if (reRollYes.size() > reRollNo.size()) {
+                        for (Player p : players) {
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
+                            p.teleport(teleportTo);
+                            preDuel.add(p);
+                        }
+                        reRollNo.remove(arenaName);
+                        reRollYes.remove(arenaName);
+                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".center"),4,null,null);
+                        cancel();
+                    } else {
+                        for (Player p : players) {
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
+                        }
+                        reRollNo.remove(arenaName);
+                        reRollYes.remove(arenaName);
+                        beginDuel(arenaName,players);
+                        cancel();
+                    }
                 this.time--;
             }
         }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);

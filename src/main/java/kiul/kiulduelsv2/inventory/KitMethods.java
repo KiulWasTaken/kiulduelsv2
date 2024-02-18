@@ -17,7 +17,7 @@ public class KitMethods {
     }
 
     public static void spectatorKit (Player p) throws IOException {
-        ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.spectator.inventory")).getContents();
+        ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits.global.spectator.inventory"));
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(null);
     }

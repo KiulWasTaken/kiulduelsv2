@@ -32,10 +32,10 @@ public class DuelListeners implements Listener {
     @EventHandler
     public void deathUpdateDuel (EntityDamageEvent e) {
         if (e.getEntity() instanceof Player p && ((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {
-            e.setCancelled(true);
             if (ArenaMethods.findPlayerArena(p) != null) {
                 String arenaName = ArenaMethods.findPlayerArena(p);
                 if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
+                    e.setCancelled(true);
                     UtilMethods.becomeSpectator(p);
                     DuelMethods.playersInMap.remove(arenaName, p);
                     for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
@@ -48,7 +48,7 @@ public class DuelListeners implements Listener {
                     } catch (IOException er) {
                         er.printStackTrace();
                     }
-                    List<List<Player>> gameTeams = DuelMethods.mapTeams.get(p);
+                    List<List<Player>> gameTeams = DuelMethods.mapTeams.get(arenaName);
 
                     List<Player> team1 = gameTeams.get(0);
                     List<Player> team2 = gameTeams.get(1);
@@ -69,7 +69,9 @@ public class DuelListeners implements Listener {
                             }, 20L);
                         }
                         int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                        for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
+                        double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size")*2-1)*16),2);
+                        double maxDistance = (Math.sqrt(sideLength*2)/2)+2;
+                        for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), maxDistance, maxDistance, maxDistance)) {
                             if (nearbyEntities instanceof Player spectators) {
                                 UtilMethods.becomeNotSpectator(spectators);
                                 UtilMethods.teleportLobby(spectators);

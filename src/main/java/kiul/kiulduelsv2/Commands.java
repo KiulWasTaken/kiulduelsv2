@@ -130,12 +130,16 @@ public class Commands implements CommandExecutor {
                 TerrainArena.generateTerrain(p.getWorld(),new Location(p.getWorld(),Integer.parseInt(args[0]),Integer.parseInt(args[1]),Integer.parseInt(args[2])),4,p,null);
                 break;
             case "reroll":
-                if (args[0].equalsIgnoreCase("yes")) {
-                    DuelMethods.reRollYes.get(ArenaMethods.findPlayerArena(p)).add(true);
-                    DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
-                } else {
-                    DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
-                    DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).contains(p)) {
+                    if (args[0].equalsIgnoreCase("yes")) {
+                        DuelMethods.reRollYes.get(ArenaMethods.findPlayerArena(p)).add(true);
+                        DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (Y)");
+                    } else {
+                        DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
+                        DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (N)");
+                    }
                 }
                 break;
             case "test":
