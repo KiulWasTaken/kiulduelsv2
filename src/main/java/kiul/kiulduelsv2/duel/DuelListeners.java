@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,13 +61,21 @@ public class DuelListeners implements Listener {
                         for (Player team1Members : team1) {
                             team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
                             team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), new Runnable() {
-
+                            new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     UtilMethods.teleportLobby(team1Members);
                                 }
-                            }, 20L);
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
+                        }
+                        for (Player team2Members : team2) {
+                            team2Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    UtilMethods.teleportLobby(team2Members);
+                                }
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
                         }
                         int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
                         double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size")*2-1)*16),2);
@@ -83,13 +92,22 @@ public class DuelListeners implements Listener {
                         for (Player team2Members : team2) {
                             team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
                             team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), new Runnable() {
-
+                            new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     UtilMethods.teleportLobby(team2Members);
                                 }
-                            }, 20L);
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
+                        }
+                        for (Player team1Members : team1) {
+                            team1Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    UtilMethods.teleportLobby(team1Members);
+
+                                }
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
                         }
                         int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
                         for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {

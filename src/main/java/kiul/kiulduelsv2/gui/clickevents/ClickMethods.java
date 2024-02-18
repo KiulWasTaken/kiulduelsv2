@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.gui.ItemInventory;
+import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,7 +47,19 @@ public class ClickMethods {
 
 
                 } else {
-                    DuelMethods.startRealisticDuel(players, ArenaMethods.getSuitableArena());
+                    String arena = ArenaMethods.getSuitableArena();
+                    if (arena == null) {
+                        for (Player playersInQueue : players) {
+                            playersInQueue.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "No arenas available!");
+                            try {
+                                KitMethods.loadGlobalKit(playersInQueue, "lobby");
+                            }catch (IOException r) {
+                                r.printStackTrace();
+                            }
+                        }
+                        return;
+                    }
+                    DuelMethods.startRealisticDuel(players, arena);
                     // startRealisticDuel(map,type,players);
                 }
 

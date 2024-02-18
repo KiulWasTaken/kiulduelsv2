@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.arena;
 
 import kiul.kiulduelsv2.Kiulduelsv2;
+import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -72,13 +73,14 @@ public class TerrainArena extends ChunkGenerator {
         }
 
         new BukkitRunnable() {
-            int tick = 1;
+            int tick = 0;
+            int cTick = 0;
 
             World world = Bukkit.getWorld(worldName);
             Location retrievalLocation = returnRetrievalLocation(world);
 
             int size = 4;
-            Chunk c = p.getLocation().getChunk();
+            Chunk c = retrievalLocation.getChunk();
             Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
             Chunk SEChunk = world.getChunkAt(center.add(size*16,0,size*16));
@@ -91,13 +93,13 @@ public class TerrainArena extends ChunkGenerator {
             public void run() {
                 if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome()) || disallowedBiomes.contains(southeast.getBlock().getBiome()) || disallowedBiomes.contains(northwest.getBlock().getBiome())) {
                     retrievalLocation = returnRetrievalLocation(world);
-
+                    cTick++;
                     if (p!=null) {
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + tick + ")");
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + cTick + ")");
                     }
                     if (waitingForArena != null) {
                         for (Player waiter : waitingForArena) {
-                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + tick + ")");
+                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + cTick + ")");
                         }
                     }
 
@@ -123,8 +125,8 @@ public class TerrainArena extends ChunkGenerator {
                         }
                     }
 
-                    ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),4);
-                    ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),4);
+                    ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),size);
+                    ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),size);
 
                     if (p!=null) {
                         long finalTime = System.currentTimeMillis()-timeMillis;
@@ -179,6 +181,15 @@ public class TerrainArena extends ChunkGenerator {
                             tick++;
                         }
                     }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
+
+                    for (String arenaName : ArenaMethods.getArenas()) {
+                        if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
+                            if (ArenaMethods.arenasInUse.contains(arenaName)) {
+                                ArenaMethods.arenasInUse.remove(arenaName);
+                            }
+                        }
+                    }
+
                     cancel();
                 }
             }

@@ -45,8 +45,18 @@ public class DuelMethods {
         Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
         Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
         playersInMap.put(arenaName,players);
-        List<Player> teamOne = players.subList(0,players.size()/2);
-        List<Player> teamTwo = players.subList(players.size()/2,players.size());
+        List<Player> teamOne = new ArrayList<>();
+        List<Player> teamTwo = new ArrayList<>();
+
+        for (int i = 0; i < players.size(); i++) {
+            if (i >= players.size()/2) {
+                teamTwo.add(players.get(i));
+            } else {
+                teamOne.add(players.get(i));
+            }
+        }
+
+
         List<List<Player>> arenaTeams = new ArrayList<>() {{
             add(teamOne);
             add(teamTwo);
@@ -132,6 +142,10 @@ public class DuelMethods {
     }
 
     public static void startRealisticDuel (List<Player> players, String arenaName) {
+        ArenaMethods.arenasInUse.add(arenaName);
+        for (Player player : players) {
+            player.sendMessage(arenaName);
+        }
 
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
         Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());

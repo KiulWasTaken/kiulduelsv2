@@ -12,6 +12,8 @@ import java.util.*;
 
 public class ArenaMethods {
 
+    public static ArrayList<String> arenasInUse = new ArrayList<>();
+
     public static Set<String> getArenas () {
         Set<String> keys = Arenadata.get().getConfigurationSection("arenas").getKeys(false);
         return keys;}
@@ -20,10 +22,10 @@ public class ArenaMethods {
         Set<String> arenaList = getArenas();
 
         for (String arena : arenaList) {
-            if (DuelMethods.playersInMap.get(arena) == null) {
-                return arena;
-            } else if (DuelMethods.playersInMap.get(arena).size() == 0) {
-                return arena;
+            if (DuelMethods.playersInMap.get(arena) == null || DuelMethods.playersInMap.get(arena).size() == 0) {
+                if (!arenasInUse.contains(arena)) {
+                    return arena;
+                }
             }
         }
     return null;}
