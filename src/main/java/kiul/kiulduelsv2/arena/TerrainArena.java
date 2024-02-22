@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
@@ -127,6 +128,30 @@ public class TerrainArena extends ChunkGenerator {
 
                     ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),size);
                     ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),size);
+                    for (Chunk chunks : targetChunks) {
+                        new BukkitRunnable() {
+                            int tick = 0;
+
+                            @Override
+                            public void run() {
+                                if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
+                                    cancel();
+
+                                    return;
+                                }
+                                for (int x = 0; x < 16; ++x) {
+                                    for (int z = 0; z < 16; ++z) {
+                                        for (int y = 0; y < 199; ++y) {
+                                            if (chunks.getBlock(x,y,z).getType().equals(Material.WATER) || chunks.getBlock(x, y, z).getType().equals(Material.LAVA)) {
+                                                ArenaMethods.liquidFreeze.add(chunks.getBlock(x,y,z));
+                                            }
+                                        }
+                                    }
+                                }
+                                tick++;
+                            }
+                        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
+                    }
 
                     if (p!=null) {
                         long finalTime = System.currentTimeMillis()-timeMillis;
@@ -174,7 +199,9 @@ public class TerrainArena extends ChunkGenerator {
                                 for (int z = 0; z < 16; ++z) {
                                     for (int y = 0; y < 199; ++y) {
                                         targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlock(x, y, z).getType());
-
+                                        if (ArenaMethods.liquidFreeze.contains(targetChunks.get(tick).getBlock(x,y,z))) {
+                                            ArenaMethods.liquidFreeze.remove(targetChunks.get(tick).getBlock(x,y,z));
+                                        }
                                     }
                                 }
                             }
@@ -194,8 +221,8 @@ public class TerrainArena extends ChunkGenerator {
                 }
             }
         }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
-
     }
+
 
     public static Location returnRetrievalLocation (World world) {
         Random random = new Random();

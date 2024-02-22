@@ -14,6 +14,8 @@ public class ArenaMethods {
 
     public static ArrayList<String> arenasInUse = new ArrayList<>();
 
+    public static ArrayList<Block> liquidFreeze = new ArrayList<>();
+
     public static Set<String> getArenas () {
         Set<String> keys = Arenadata.get().getConfigurationSection("arenas").getKeys(false);
         return keys;}

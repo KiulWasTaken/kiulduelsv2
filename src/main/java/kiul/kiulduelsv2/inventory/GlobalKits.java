@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import javax.security.auth.callback.CallbackHandler;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,14 +19,22 @@ public class GlobalKits {
             add(" ");
         }};
         Inventory lobbyKit = Bukkit.createInventory(null,36,"lobby");
-        lobbyKit.setItem(3, ItemStackMethods.createItemStack("Kit Editor", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
-        lobbyKit.setItem(4, ItemStackMethods.createItemStack("Queue", Material.GRAY_DYE,1,lore,null,null,"queue"));
-        lobbyKit.setItem(5, ItemStackMethods.createItemStack("Settings", Material.PAPER,1,lore,null,null,"settings"));
+        lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
+        lobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.DARK_PURPLE + "Kit Editor", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right click to Queue");
+        lobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.GRAY + "Queue", Material.GRAY_DYE,1,lore,null,null,"queue"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right click to open Settings");
+        lobbyKit.setItem(5, ItemStackMethods.createItemStack(ChatColor.WHITE + "Settings", Material.PAPER,1,lore,null,null,"settings"));
+        lore.clear();
         Userdata.get().set("kits.global.lobby.inventory", InventoryToBase64.itemStackArrayToBase64(lobbyKit.getContents()));
 
 
         Inventory queueKit = Bukkit.createInventory(null,36,"queue");
-        queueKit.setItem(8,ItemStackMethods.createItemStack("Leave Queue",Material.RED_DYE,1,lore,null,null,"leavequeue"));
+        lore.add(ChatColor.GRAY + "Right click to Leave Queue");
+        queueKit.setItem(8,ItemStackMethods.createItemStack(ChatColor.RED + "Leave Queue",Material.RED_DYE,1,lore,null,null,"leavequeue"));
+        lore.clear();
         Userdata.get().set("kits.global.queue.inventory", InventoryToBase64.itemStackArrayToBase64(queueKit.getContents()));
 
         Inventory partyMemberLobbyKit = Bukkit.createInventory(null,36,"lobbyPM");
@@ -33,7 +42,9 @@ public class GlobalKits {
         Inventory partyLeaderLobbyKit = Bukkit.createInventory(null,36,"lobbyPL");
 
         Inventory spectatorKit = Bukkit.createInventory(null,36,"spectator");
-        spectatorKit.setItem(9,ItemStackMethods.createItemStack("Stop Spectating",Material.RED_DYE,1,lore,null,null,"leavegame"));
+        lore.add(ChatColor.GRAY + "Right click to Stop Spectating");
+        spectatorKit.setItem(9,ItemStackMethods.createItemStack(ChatColor.RED + "Stop Spectating",Material.RED_DYE,1,lore,null,null,"leavegame"));
+        lore.clear();
         Userdata.get().set("kits.global.spectator.inventory", InventoryToBase64.itemStackArrayToBase64(spectatorKit.getContents()));
 
         Userdata.save();
