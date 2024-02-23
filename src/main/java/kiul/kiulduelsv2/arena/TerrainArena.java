@@ -128,7 +128,6 @@ public class TerrainArena extends ChunkGenerator {
 
                     ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),size);
                     ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),size);
-                    for (Chunk chunks : targetChunks) {
                         new BukkitRunnable() {
                             int tick = 0;
 
@@ -142,8 +141,8 @@ public class TerrainArena extends ChunkGenerator {
                                 for (int x = 0; x < 16; ++x) {
                                     for (int z = 0; z < 16; ++z) {
                                         for (int y = 0; y < 199; ++y) {
-                                            if (chunks.getBlock(x,y,z).getType().equals(Material.WATER) || chunks.getBlock(x, y, z).getType().equals(Material.LAVA)) {
-                                                ArenaMethods.liquidFreeze.add(chunks.getBlock(x,y,z));
+                                            if (targetChunks.get(tick).getBlock(x,y,z).getType().equals(Material.WATER) || targetChunks.get(tick).getBlock(x, y, z).getType().equals(Material.LAVA)) {
+                                                ArenaMethods.liquidFreeze.add(targetChunks.get(tick).getBlock(x,y,z));
                                             }
                                         }
                                     }
@@ -151,7 +150,7 @@ public class TerrainArena extends ChunkGenerator {
                                 tick++;
                             }
                         }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
-                    }
+
 
                     if (p!=null) {
                         long finalTime = System.currentTimeMillis()-timeMillis;

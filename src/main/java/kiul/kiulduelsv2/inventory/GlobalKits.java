@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.inventory;
 
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
+import kiul.kiulduelsv2.party.PartyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,7 +30,6 @@ public class GlobalKits {
         lobbyKit.setItem(5, ItemStackMethods.createItemStack(ChatColor.WHITE + "Settings", Material.PAPER,1,lore,null,null,"settings"));
         lore.clear();
         Userdata.get().set("kits.global.lobby.inventory", InventoryToBase64.itemStackArrayToBase64(lobbyKit.getContents()));
-
 
         Inventory queueKit = Bukkit.createInventory(null,36,"queue");
         lore.add(ChatColor.GRAY + "Right click to Leave Queue");

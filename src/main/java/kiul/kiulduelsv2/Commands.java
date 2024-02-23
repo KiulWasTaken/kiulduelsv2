@@ -12,6 +12,9 @@ import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.party.Party;
+import kiul.kiulduelsv2.party.PartyManager;
+import kiul.kiulduelsv2.party.PartyMethods;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,9 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.StringUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static kiul.kiulduelsv2.inventory.KitMethods.*;
 import static kiul.kiulduelsv2.config.Userdata.*;
@@ -191,6 +192,84 @@ public class Commands implements CommandExecutor {
                         e.printStackTrace();
                     }
                 }
+                break;
+            case "party":
+
+                UUID uuid = p.getUniqueId();
+                PartyManager partyManager = new PartyManager();
+                if (partyManager.findPartyForMember(p.getUniqueId()) == null) {
+                    p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are not in a party!");
+                } else {
+                    Party party = partyManager.findPartyForMember(p.getUniqueId());
+                    p.sendMessage(party.getMembers().toString());
+                }
+                switch (args[0]) {
+                    case "invite":
+                        if (partyManager.findPartyForMember(uuid) != null) {
+                            if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                                if (Bukkit.getPlayer(args[1]) != null) {
+                                    Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(),partyManager.findPartyForMember(uuid));
+                                    PartyMethods.partyInvitePlayer(uuid,Bukkit.getPlayer(args[1]).getUniqueId());
+                                }
+                            }
+                        }
+                        break;
+                    case "leave":
+                        if (partyManager.findPartyForMember(uuid) != null) {
+                            if (!partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                               Party party = partyManager.findPartyForMember(uuid);
+                               party.removeMember(uuid);
+
+                            }
+                        }
+                        break;
+                    case "disband":
+                        if (partyManager.findPartyForMember(uuid) != null) {
+                            if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                                for (UUID memberUUIDs : partyManager.findPartyForMember(uuid).getMembers()) {
+                                    if (Bukkit.getPlayer(memberUUIDs) != null) {
+                                        Player member = Bukkit.getPlayer(memberUUIDs);
+                                        member.sendMessage(C.t("&#FF5263" + Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).getDisplayName() + "'s party has been disbanded"));
+                                    }
+                                }
+                                partyManager.disbandParty(partyManager.findPartyForMember(uuid));
+                                }
+                            }
+                        break;
+                    case "kick":
+                        if (partyManager.findPartyForMember(uuid) != null) {
+                            Party party = partyManager.findPartyForMember(uuid);
+                            if (Bukkit.getPlayer(args[1]) != null) {
+                                Player removed = Bukkit.getPlayer(args[1]);
+                                party.removeMember(removed.getUniqueId());
+                                removed.sendMessage(C.t("&#FF5263" + "" + ChatColor.ITALIC + "You have been kicked from the party!"));
+                                for (UUID partyMembers : party.getMembers()) {
+                                    if (Bukkit.getPlayer(partyMembers) != null) {
+                                        Bukkit.getPlayer(partyMembers).sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + removed.getDisplayName() + " has been kicked from the party.");
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case "accept":
+                        if (partyManager.findPartyForMember(uuid) == null) {
+                            if (Bukkit.getPlayer(args[1])  != null) {
+                                Party invitedTo = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
+                                if (Party.invitedPlayer.get(uuid) == invitedTo) {
+                                    Party party = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
+                                    for (UUID memberUUIDs : party.getMembers()) {
+                                        if (Bukkit.getPlayer(memberUUIDs) != null) {
+                                            Player member = Bukkit.getPlayer(memberUUIDs);
+                                            member.sendMessage(C.t("&#B755FF" + p.getDisplayName() + " has joined the party!"));
+                                        }
+                                    }
+                                    party.addMember(uuid);
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
         }
     return false;
     }

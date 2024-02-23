@@ -37,12 +37,14 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("arena").setExecutor(new Commands());
         getCommand("testgeneration").setExecutor(new Commands());
         getCommand("t").setExecutor(new Commands());
+        getCommand("party").setExecutor(new Commands());
         getCommand("e").setExecutor(new Commands());
         getCommand("exit").setExecutor(new Commands());
         getCommand("reroll").setExecutor(new Commands());
         getCommand("save").setExecutor(new Commands());
         getCommand("kit").setTabCompleter(new TabCompleter());
         getCommand("arena").setTabCompleter(new TabCompleter());
+        getCommand("party").setTabCompleter(new TabCompleter());
         if (Bukkit.getOnlinePlayers() != null) {
             for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                 kitSlot.put(onlinePlayers.getPlayer(), (int) Userdata.get().get("selected-slot." + onlinePlayers.getPlayer().getUniqueId()));

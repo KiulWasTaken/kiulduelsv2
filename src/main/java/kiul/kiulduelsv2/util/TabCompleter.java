@@ -53,6 +53,26 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
             Collections.sort(completions);
             return completions;
         }
+        if (command.getName().equalsIgnoreCase("party")) {
+            final List<String> oneArgList = new ArrayList<>();
+            final List<String> completions = new ArrayList<>();
+
+            oneArgList.add("invite");
+            oneArgList.add("accept");
+            oneArgList.add("kick");
+            oneArgList.add("disband");
+            oneArgList.add("leave");
+
+            if (args.length == 1){
+                StringUtil.copyPartialMatches(args[0], oneArgList, completions);
+            }
+            if (args.length == 2){
+                return null;
+                // Returns null to get all online players
+            }
+            Collections.sort(completions);
+            return completions;
+        }
         return Collections.EMPTY_LIST;
     }
 }

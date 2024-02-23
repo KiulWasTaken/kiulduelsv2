@@ -162,7 +162,7 @@ public class DuelMethods {
                 .color(net.md_5.bungee.api.ChatColor.GREEN)
                 .bold(true)
                 .underlined(true)
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "reroll yes"));
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll yes"));
 
         // Add a separator
         message.append(" ");
@@ -172,7 +172,7 @@ public class DuelMethods {
                 .color(net.md_5.bungee.api.ChatColor.RED)
                 .bold(true)
                 .underlined(true)
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "reroll no"));
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll no"));
 
         // Send the message
         allowedToReRoll.put(arenaName,players);
