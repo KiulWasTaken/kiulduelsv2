@@ -23,7 +23,7 @@ public class KitMethods {
     }
 
     public static void saveInventoryToSelectedKitSlot (Player p) {
-        Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getStorageContents()));
+        Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
         Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour",InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
         Userdata.save();
     }

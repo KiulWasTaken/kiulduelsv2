@@ -63,10 +63,10 @@ public class DuelMethods {
         }};
         mapTeams.put(arenaName,arenaTeams);
         for (Player p : teamOne) {
-            p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(),teamOneSpawn.getBlockZ()).getLocation());
+            p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(),teamOneSpawn.getBlockZ()).getLocation().add(0,1,0));
         }
         for (Player p : teamTwo) {
-            p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(),teamTwoSpawn.getBlockZ()).getLocation());
+            p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(),teamTwoSpawn.getBlockZ()).getLocation().add(0,1,0));
         }
         for (Player p : players) {
             try {
@@ -155,7 +155,7 @@ public class DuelMethods {
         }
         // Create a clickable message with two components
         ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
-                .color(net.md_5.bungee.api.ChatColor.GRAY).color(net.md_5.bungee.api.ChatColor.ITALIC);
+                .color(net.md_5.bungee.api.ChatColor.GRAY);
 
         // Add the first clickable component
         message.append("[✓]")
