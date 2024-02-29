@@ -38,6 +38,7 @@ public class DuelListeners implements Listener {
                     e.setCancelled(true);
                     UtilMethods.becomeSpectator(p);
                     DuelMethods.playersInMap.remove(arenaName, p);
+                    DuelMethods.inDuel.remove(p);
                     for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
                         if (team.contains(p)) {
                             team.remove(p);
