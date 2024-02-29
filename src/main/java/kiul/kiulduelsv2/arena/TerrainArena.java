@@ -74,18 +74,16 @@ public class TerrainArena extends ChunkGenerator {
         }
 
         new BukkitRunnable() {
-            int tick = 0;
             int cTick = 0;
 
             World world = Bukkit.getWorld(worldName);
             Location retrievalLocation = returnRetrievalLocation(world);
 
-            int size = 4;
             Chunk c = retrievalLocation.getChunk();
             Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
-            Chunk SEChunk = world.getChunkAt(center.add(size*16,0,size*16));
-            Chunk NWChunk = world.getChunkAt(center.add(-size*16,0,-size*16));
+            Chunk SEChunk = world.getChunkAt(center.add(size,0,size));
+            Chunk NWChunk = world.getChunkAt(center.add(-size,0,-size));
 
             Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
             Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
@@ -128,28 +126,28 @@ public class TerrainArena extends ChunkGenerator {
 
                     ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),size);
                     ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),size);
-                        new BukkitRunnable() {
-                            int tick = 0;
-
-                            @Override
-                            public void run() {
-                                if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
-                                    cancel();
-
-                                    return;
-                                }
-                                for (int x = 0; x < 16; ++x) {
-                                    for (int z = 0; z < 16; ++z) {
-                                        for (int y = 0; y < 199; ++y) {
-                                            if (targetChunks.get(tick).getBlock(x,y,z).getType().equals(Material.WATER) || targetChunks.get(tick).getBlock(x, y, z).getType().equals(Material.LAVA)) {
-                                                ArenaMethods.liquidFreeze.add(targetChunks.get(tick).getBlock(x,y,z));
-                                            }
-                                        }
-                                    }
-                                }
-                                tick++;
-                            }
-                        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
+//                        new BukkitRunnable() {
+//                            int tick = 0;
+//
+//                            @Override
+//                            public void run() {
+//                                if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
+//                                    cancel();
+//
+//                                    return;
+//                                }
+//                                for (int x = 0; x < 16; ++x) {
+//                                    for (int z = 0; z < 16; ++z) {
+//                                        for (int y = 0; y < 199; ++y) {
+//                                            if (targetChunks.get(tick).getBlock(x,y,z).getType().equals(Material.WATER) || targetChunks.get(tick).getBlock(x, y, z).getType().equals(Material.LAVA)) {
+//                                                ArenaMethods.liquidFreeze.add(targetChunks.get(tick).getBlock(x,y,z));
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                                tick++;
+//                            }
+//                        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
 
 
                     if (p!=null) {
@@ -198,9 +196,9 @@ public class TerrainArena extends ChunkGenerator {
                                 for (int z = 0; z < 16; ++z) {
                                     for (int y = 0; y < 199; ++y) {
                                         targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlock(x, y, z).getType());
-                                        if (ArenaMethods.liquidFreeze.contains(targetChunks.get(tick).getBlock(x,y,z))) {
-                                            ArenaMethods.liquidFreeze.remove(targetChunks.get(tick).getBlock(x,y,z));
-                                        }
+//                                        if (ArenaMethods.liquidFreeze.contains(targetChunks.get(tick).getBlock(x,y,z))) {
+//                                            ArenaMethods.liquidFreeze.remove(targetChunks.get(tick).getBlock(x,y,z));
+//                                        }
                                     }
                                 }
                             }
@@ -249,9 +247,10 @@ public class TerrainArena extends ChunkGenerator {
                 if (xTick <= radius) {
                     chunks.add(world.getChunkAt(cX + xTick, cZ + zTick));
                 xTick++;
-                } else if (zTick <= radius) {
+                } else if (zTick < radius) {
                     xTick = -radius;
                     zTick++;
+
                 } else {
                     cancel();
                 }

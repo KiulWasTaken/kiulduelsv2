@@ -8,10 +8,7 @@ import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +31,7 @@ public class DuelListeners implements Listener {
 
     @EventHandler
     public void deathUpdateDuel (EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player p && ((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {
+        if (e.getEntity() instanceof Player p && ((Player) e.getEntity()).getHealth() <= e.getFinalDamage() && p.getInventory().getItemInMainHand().getType() != Material.TOTEM_OF_UNDYING && p.getInventory().getItemInOffHand().getType() != Material.TOTEM_OF_UNDYING) {
             if (ArenaMethods.findPlayerArena(p) != null) {
                 String arenaName = ArenaMethods.findPlayerArena(p);
                 if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
