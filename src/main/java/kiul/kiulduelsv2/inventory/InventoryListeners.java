@@ -206,6 +206,7 @@ public class InventoryListeners implements Listener {
                 Userdata.get().set("selected-slot." + e.getPlayer().getUniqueId(), 1);
                 Userdata.save();
                 kitSlot.put(e.getPlayer(), 1);
+                try {KitMethods.lobbyKit(e.getPlayer());} catch (IOException er) {er.printStackTrace();}
             } else {
                 kitSlot.put(e.getPlayer(), (int) Userdata.get().get("selected-slot." + e.getPlayer().getUniqueId()));
             }
