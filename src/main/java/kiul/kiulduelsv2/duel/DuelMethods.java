@@ -9,10 +9,7 @@ import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,10 +60,10 @@ public class DuelMethods {
         }};
         mapTeams.put(arenaName,arenaTeams);
         for (Player p : teamOne) {
-            p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(),teamOneSpawn.getBlockZ()).getLocation());
+            p.teleport(getHighestBlockBelow(199,teamOneSpawn));
         }
         for (Player p : teamTwo) {
-            p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(),teamTwoSpawn.getBlockZ()).getLocation());
+            p.teleport(getHighestBlockBelow(199,teamTwoSpawn));
         }
         for (Player p : players) {
             try {
@@ -235,7 +232,15 @@ public class DuelMethods {
         }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
     }
 
-
+    public static Location getHighestBlockBelow (int maxY, Location loc) {
+        for (int y = maxY; y < 0; y--) {
+            if (loc.getWorld().getBlockAt(new Location(loc.getWorld(),loc.getX(),y,loc.getZ())).getType() != Material.AIR) {
+                Location newLoc = new Location(loc.getWorld(),loc.getX(),y,loc.getZ());
+                return newLoc;
+            }
+        }
+        return loc;
+    }
 
 
 }

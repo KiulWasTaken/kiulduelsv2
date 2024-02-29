@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -222,6 +223,27 @@ public class DuelListeners implements Listener {
             to.setPitch(e.getTo().getPitch());
             to.setYaw(e.getTo().getYaw());
             e.setTo(to);
+        }
+    }
+
+    @EventHandler
+    public void preventTeleportLeave (PlayerTeleportEvent e) {
+        Player p = e.getPlayer();
+        if (DuelMethods.inDuel.contains(p) && ArenaMethods.findPlayerArena(p) != null) {
+            if (!ArenaMethods.LocationIsInsideArena(e.getTo(),ArenaMethods.findPlayerArena(p))) {
+                p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Do not attempt to leave the arena!");
+                e.setCancelled(true);
+            }
+        }
+    }
+    @EventHandler
+    public void preventMoveLeave (PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        if (DuelMethods.inDuel.contains(p) && ArenaMethods.findPlayerArena(p) != null) {
+            if (!ArenaMethods.LocationIsInsideArena(e.getTo(),ArenaMethods.findPlayerArena(p))) {
+                p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Do not attempt to leave the arena!");
+                e.setCancelled(true);
+            }
         }
     }
 }

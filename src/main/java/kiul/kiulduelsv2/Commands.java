@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2;
 
 import kiul.kiulduelsv2.arena.ArenaMethods;
+import kiul.kiulduelsv2.arena.Region;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
@@ -84,8 +85,13 @@ public class Commands implements CommandExecutor {
                             Chunk c = p.getLocation().getChunk();
                             Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
+
                             Chunk SEChunk = world.getChunkAt(center.add(size*16,0,size*16));
                             Chunk NWChunk = world.getChunkAt(center.add(-size*16,0,-size*16));
+
+                            Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, -64, 16);
+                            Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+                            Region arenaRegion = new Region(SECorner.toVector(),NWCorner.toVector());
 
                             Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
                             Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
@@ -95,6 +101,7 @@ public class Commands implements CommandExecutor {
                             Arenadata.get().set("arenas." + args[1] + ".size", size);
                             Arenadata.get().set("arenas." + args[1] + ".southeast", southeast);
                             Arenadata.get().set("arenas." + args[1] + ".northwest", northwest);
+                            Arenadata.get().set("arenas." + args[1] + ".region", arenaRegion);
                             Arenadata.save();
                             long finalTime = System.currentTimeMillis()-timeMillis;
                             p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "arena " + "'" + ChatColor.WHITE + args[1] + ChatColor.GRAY +  "'" + " created (" + finalTime + ")");
