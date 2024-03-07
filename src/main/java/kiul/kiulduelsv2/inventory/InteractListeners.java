@@ -1,14 +1,17 @@
 package kiul.kiulduelsv2.inventory;
 
+import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
-import kiul.kiulduelsv2.gui.EnchantInventory;
-import kiul.kiulduelsv2.gui.ItemInventory;
-import kiul.kiulduelsv2.gui.KitInventory;
-import kiul.kiulduelsv2.gui.QueueInventory;
+import kiul.kiulduelsv2.gui.*;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.gui.clickevents.QueueClickEvent;
+import kiul.kiulduelsv2.party.Party;
+import kiul.kiulduelsv2.party.PartyManager;
+import kiul.kiulduelsv2.party.PartyMethods;
 import net.md_5.bungee.api.chat.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -24,6 +27,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
@@ -45,8 +51,22 @@ public class InteractListeners implements Listener {
                 return;
             }
         }
+        if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
+                switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
+                    case "partysplit":
+                        e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partyffa");
+                        break;
+                    case "partyffa":
+                        e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partysplit");
+                        break;
+                }
+            }
+        }
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
+                PartyManager partyManager = new PartyManager();
+                Party party = partyManager.findPartyForMember(p.getUniqueId());
                 switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
                     case "queue":
                         e.setCancelled(true);
@@ -81,6 +101,34 @@ public class InteractListeners implements Listener {
                         e.setCancelled(true);
                         KitInventory.kitInventory(e.getPlayer());
                         break;
+                    case "partysplit":
+                        ArrayList<Player> players = new ArrayList<>();
+                        for (UUID playerUUID : party.getMembers()) {
+                            if (Bukkit.getServer().getPlayer(playerUUID) != null) {
+                                players.add(Bukkit.getServer().getPlayer(playerUUID));
+                            }
+                        }
+                        DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(),players,party.teamOne(),party.teamTwo(),false);
+                        break;
+                    case "partyffa":
+                        ArrayList<Player> players2 = new ArrayList<>();
+                        for (UUID playerUUID : party.getMembers()) {
+                            if (Bukkit.getServer().getPlayer(playerUUID) != null) {
+                                players2.add(Bukkit.getServer().getPlayer(playerUUID));
+                            }
+                        }
+                        DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(),players2,null,null,true);
+                        break;
+                    case "partyteam":
+                        e.setCancelled(true);
+                        party.changeTeam(p.getUniqueId());
+                        List<String> lore = new ArrayList<>();
+                        lore.add(ChatColor.GRAY + "Right-Click to change party team");
+                        if (party.teamOne().contains(p)) {
+                            p.getInventory().setItemInMainHand(ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "RED", Material.RED_WOOL, 1, lore, null, null, "partyteam"));
+                        } else {
+                            p.getInventory().setItemInMainHand(ItemStackMethods.createItemStack(ChatColor.BLUE + "" + ChatColor.BOLD + "BLUE", Material.BLUE_WOOL, 1, lore, null, null, "partyteam"));
+                        }
                     case "leavequeue":
                         e.setCancelled(true);
                         try {

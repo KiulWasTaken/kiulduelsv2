@@ -21,7 +21,7 @@ public class GlobalKits {
         }};
         Inventory lobbyKit = Bukkit.createInventory(null,36,"lobby");
         lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
-        lobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.DARK_PURPLE + "Kit Editor", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
+        lobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Kit Editor", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right click to Queue");
         lobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.GRAY + "Queue", Material.GRAY_DYE,1,lore,null,null,"queue"));
@@ -38,8 +38,30 @@ public class GlobalKits {
         Userdata.get().set("kits.global.queue.inventory", InventoryToBase64.itemStackArrayToBase64(queueKit.getContents()));
 
         Inventory partyMemberLobbyKit = Bukkit.createInventory(null,36,"lobbyPM");
+        lore.add(ChatColor.GRAY + "Right click to Leave Party");
+        partyMemberLobbyKit.setItem(5,ItemStackMethods.createItemStack(ChatColor.RED + "Leave Party",Material.RED_DYE,1,lore,null,null,"leaveparty"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
+        partyMemberLobbyKit.setItem(4, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Kit Editor", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right click to open Settings");
+        partyMemberLobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.WHITE + "Settings", Material.PAPER,1,lore,null,null,"partysettings"));
+        lore.clear();
+        Userdata.get().set("kits.global.partymember.inventory", InventoryToBase64.itemStackArrayToBase64(partyMemberLobbyKit.getContents()));
 
         Inventory partyLeaderLobbyKit = Bukkit.createInventory(null,36,"lobbyPL");
+        lore.add(ChatColor.GRAY + "Right-Click to play an in-party fight");
+        partyLeaderLobbyKit.setItem(3,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Fight",Material.PINK_DYE,1,lore,null,null,"partysplit"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-Click to queue for a party versus party duel");
+        partyLeaderLobbyKit.setItem(5,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Versus",Material.PURPLE_DYE,1,lore,null,null,"partyffa"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-Click to queue for 2v2 *if applicable*");
+        partyLeaderLobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.GRAY + "Queue", Material.GRAY_DYE,1,lore,null,null,"partyqueue"));
+        lore.add(ChatColor.GRAY + "Right click to open Settings");
+        partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.WHITE + "Settings", Material.PAPER,1,lore,null,null,"partysettings"));
+        lore.clear();
+        Userdata.get().set("kits.global.partyleader.inventory", InventoryToBase64.itemStackArrayToBase64(partyLeaderLobbyKit.getContents()));
 
         Inventory spectatorKit = Bukkit.createInventory(null,36,"spectator");
         lore.add(ChatColor.GRAY + "Right click to Stop Spectating");

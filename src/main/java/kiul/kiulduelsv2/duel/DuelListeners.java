@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.duel;
 
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
+import kiul.kiulduelsv2.arena.Region;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
@@ -37,23 +38,147 @@ public class DuelListeners implements Listener {
                 if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
                     e.setCancelled(true);
                     UtilMethods.becomeSpectator(p);
-                    DuelMethods.playersInMap.remove(arenaName, p);
+                    DuelMethods.playersInMap.get(arenaName).remove(p);
                     DuelMethods.inDuel.remove(p);
+                    if (DuelMethods.mapTeams.get(arenaName) != null) {
+                        for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
+                            if (team.contains(p)) {
+                                team.remove(p);
+                            }
+                        }
+                        try {
+                            KitMethods.spectatorKit(p);
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                        List<List<Player>> gameTeams = DuelMethods.mapTeams.get(arenaName);
+
+                        List<Player> team1 = gameTeams.get(0);
+                        List<Player> team2 = gameTeams.get(1);
+
+
+                        // if only one team has players, end the game.
+                        if (team2.size() == 0) {
+                            // team 1 wins
+                            for (Player team1Members : team1) {
+                                team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
+                                team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        UtilMethods.teleportLobby(team1Members);
+                                    }
+                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                            }
+                            for (Player team2Members : team2) {
+                                team2Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        UtilMethods.teleportLobby(team2Members);
+                                    }
+                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                            }
+                            int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
+                            double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size") * 2 - 1) * 16), 2);
+                            double maxDistance = (Math.sqrt(sideLength * 2) / 2) + 2;
+                            for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), maxDistance, maxDistance, maxDistance)) {
+                                if (nearbyEntities instanceof Player spectators) {
+                                    UtilMethods.becomeNotSpectator(spectators);
+                                    UtilMethods.teleportLobby(spectators);
+                                }
+                            }
+                            ArenaMethods.regenerateArena(arenaName);
+                            DuelMethods.mapTeams.remove(arenaName);
+                            DuelMethods.playersInMap.remove(arenaName);
+                        } else if (team1.size() == 0) {
+                            for (Player team2Members : team2) {
+                                team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
+                                team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        UtilMethods.teleportLobby(team2Members);
+                                    }
+                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                            }
+                            for (Player team1Members : team1) {
+                                team1Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        UtilMethods.teleportLobby(team1Members);
+
+                                    }
+                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                            }
+                            Region region = (Region) Arenadata.get().get("arenas." + arenaName + ".region");
+                            for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
+                                if (nearbyEntities instanceof Player spectators) {
+                                    if (region.contains(nearbyEntities.getLocation())) {
+                                        UtilMethods.becomeNotSpectator(spectators);
+                                        UtilMethods.teleportLobby(spectators);
+                                    }
+                                }
+                            }
+                            ArenaMethods.regenerateArena(arenaName);
+                            DuelMethods.mapTeams.remove(arenaName);
+                            DuelMethods.playersInMap.remove(arenaName);
+                        }
+                    } else {
+                        try {
+                            KitMethods.spectatorKit(p);
+                        } catch (IOException er) {
+                            er.printStackTrace();
+                        }
+                        p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
+                        if (DuelMethods.playersInMap.get(arenaName).size() <=1) {
+                            Player victor = DuelMethods.playersInMap.get(arenaName).get(0);
+                            victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
+                            victor.playSound(victor, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    UtilMethods.teleportLobby(victor);
+                                }
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+
+                            Region region = (Region) Arenadata.get().get("arenas." + arenaName + ".region");
+                            for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
+                                if (nearbyEntities instanceof Player spectators) {
+                                    if (region.contains(nearbyEntities.getLocation())) {
+                                        UtilMethods.becomeNotSpectator(spectators);
+                                        UtilMethods.teleportLobby(spectators);
+                                    }
+                                }
+                            }
+                            ArenaMethods.regenerateArena(arenaName);
+                            DuelMethods.playersInMap.remove(arenaName);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void playerQuitUpdateDuel (PlayerQuitEvent e) {
+        Player p = e.getPlayer();
+        if (ArenaMethods.findPlayerArena(p) != null) {
+            String arenaName = ArenaMethods.findPlayerArena(p);
+            if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
+                DuelMethods.playersInMap.get(arenaName).remove(p);
+                if (DuelMethods.mapTeams.get(arenaName) != null) {
                     for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
                         if (team.contains(p)) {
                             team.remove(p);
                         }
                     }
-                    try {
-                        KitMethods.spectatorKit(p);
-                    } catch (IOException er) {
-                        er.printStackTrace();
-                    }
+
                     List<List<Player>> gameTeams = DuelMethods.mapTeams.get(arenaName);
 
                     List<Player> team1 = gameTeams.get(0);
                     List<Player> team2 = gameTeams.get(1);
-
 
                     // if only one team has players, end the game.
                     if (team2.size() == 0) {
@@ -66,7 +191,7 @@ public class DuelListeners implements Listener {
                                 public void run() {
                                     UtilMethods.teleportLobby(team1Members);
                                 }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                         }
                         for (Player team2Members : team2) {
                             team2Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
@@ -75,11 +200,11 @@ public class DuelListeners implements Listener {
                                 public void run() {
                                     UtilMethods.teleportLobby(team2Members);
                                 }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                         }
                         int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                        double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size")*2-1)*16),2);
-                        double maxDistance = (Math.sqrt(sideLength*2)/2)+2;
+                        double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size") * 2 - 1) * 16), 2);
+                        double maxDistance = (Math.sqrt(sideLength * 2) / 2) + 2;
                         for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), maxDistance, maxDistance, maxDistance)) {
                             if (nearbyEntities instanceof Player spectators) {
                                 UtilMethods.becomeNotSpectator(spectators);
@@ -98,7 +223,7 @@ public class DuelListeners implements Listener {
                                 public void run() {
                                     UtilMethods.teleportLobby(team2Members);
                                 }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                         }
                         for (Player team1Members : team1) {
                             team1Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
@@ -108,7 +233,7 @@ public class DuelListeners implements Listener {
                                     UtilMethods.teleportLobby(team1Members);
 
                                 }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                         }
                         int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
                         for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
@@ -121,94 +246,31 @@ public class DuelListeners implements Listener {
                         DuelMethods.mapTeams.remove(arenaName);
                         DuelMethods.playersInMap.remove(arenaName);
                     }
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void playerQuitUpdateDuel (PlayerQuitEvent e) {
-        Player p = e.getPlayer();
-        if (ArenaMethods.findPlayerArena(p) != null) {
-            String arenaName = ArenaMethods.findPlayerArena(p);
-            if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
-                DuelMethods.playersInMap.remove(arenaName, p);
-                for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
-                    if (team.contains(p)) {
-                        team.remove(p);
-                    }
-                }
-
-                List<List<Player>> gameTeams = DuelMethods.mapTeams.get(arenaName);
-
-                List<Player> team1 = gameTeams.get(0);
-                List<Player> team2 = gameTeams.get(1);
-
-                // if only one team has players, end the game.
-                if (team2.size() == 0) {
-                    // team 1 wins
-                    for (Player team1Members : team1) {
-                        team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                        team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                } else {
+                    p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
+                    if (DuelMethods.playersInMap.get(arenaName).size() <=1) {
+                        Player victor = DuelMethods.playersInMap.get(arenaName).get(0);
+                        victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
+                        victor.playSound(victor, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                UtilMethods.teleportLobby(team1Members);
+                                UtilMethods.teleportLobby(victor);
                             }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
-                    }
-                    for (Player team2Members : team2) {
-                        team2Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                UtilMethods.teleportLobby(team2Members);
+                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+
+                        Region region = (Region) Arenadata.get().get("arenas." + arenaName + ".region");
+                        for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
+                            if (nearbyEntities instanceof Player spectators) {
+                                if (region.contains(nearbyEntities.getLocation())) {
+                                    UtilMethods.becomeNotSpectator(spectators);
+                                    UtilMethods.teleportLobby(spectators);
+                                }
                             }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
-                    }
-                    int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                    double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size")*2-1)*16),2);
-                    double maxDistance = (Math.sqrt(sideLength*2)/2)+2;
-                    for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), maxDistance, maxDistance, maxDistance)) {
-                        if (nearbyEntities instanceof Player spectators) {
-                            UtilMethods.becomeNotSpectator(spectators);
-                            UtilMethods.teleportLobby(spectators);
                         }
+                        ArenaMethods.regenerateArena(arenaName);
+                        DuelMethods.playersInMap.remove(arenaName);
                     }
-                    ArenaMethods.regenerateArena(arenaName);
-                    DuelMethods.mapTeams.remove(arenaName);
-                    DuelMethods.playersInMap.remove(arenaName);
-                } else if (team1.size() == 0) {
-                    for (Player team2Members : team2) {
-                        team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                        team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                UtilMethods.teleportLobby(team2Members);
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
-                    }
-                    for (Player team1Members : team1) {
-                        team1Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                UtilMethods.teleportLobby(team1Members);
-
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),40);
-                    }
-                    int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                    for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), size, size, size)) {
-                        if (nearbyEntities instanceof Player spectators) {
-                            UtilMethods.becomeNotSpectator(spectators);
-                            UtilMethods.teleportLobby(spectators);
-                        }
-                    }
-                    ArenaMethods.regenerateArena(arenaName);
-                    DuelMethods.mapTeams.remove(arenaName);
-                    DuelMethods.playersInMap.remove(arenaName);
                 }
             }
         }

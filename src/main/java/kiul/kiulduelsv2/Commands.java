@@ -219,6 +219,13 @@ public class Commands implements CommandExecutor {
                                     PartyMethods.partyInvitePlayer(uuid,Bukkit.getPlayer(args[1]).getUniqueId());
                                 }
                             }
+                        } else {
+                            if (Bukkit.getPlayer(args[1]) != null) {
+                                partyManager.createParty(p.getUniqueId());
+                                Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), partyManager.findPartyForMember(uuid));
+                                PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
+                                try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
+                            }
                         }
                         break;
                     case "leave":
@@ -271,6 +278,7 @@ public class Commands implements CommandExecutor {
                                         }
                                     }
                                     party.addMember(uuid);
+                                    try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
                                 }
                             }
                         }

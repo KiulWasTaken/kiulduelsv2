@@ -236,6 +236,46 @@ public class DuelMethods {
     }
 
 
+    public static void startPartyDuel (String arenaName,List<Player> players,List<Player> teamOne,List<Player> teamTwo, boolean ffa) {
+        for (Player play : players) {
+            if (preDuel.contains(play)) {
+                preDuel.remove(play);
+            }
+            play.setGameMode(GameMode.SURVIVAL);
+        }
+        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
+        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
+        playersInMap.put(arenaName,players);
+        if (!ffa) {
+            List<List<Player>> arenaTeams = new ArrayList<>() {{
+                add(teamOne);
+                add(teamTwo);
+            }};
 
+            mapTeams.put(arenaName, arenaTeams);
 
+            for (Player p : teamOne) {
+                p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(), teamOneSpawn.getBlockZ()).getLocation());
+            }
+            for (Player p : teamTwo) {
+                p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(), teamTwoSpawn.getBlockZ()).getLocation());
+            }
+        } else {
+            Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
+            for (Player p : players) {
+                p.teleport(spawn.getWorld().getHighestBlockAt(spawn.getBlockX(), spawn.getBlockZ()).getLocation());
+            }
+        }
+        for (Player p : players) {
+            try {
+                KitMethods.loadSelectedKitSlot(p);
+            } catch (IOException err) {
+                err.printStackTrace();
+            }
+            preDuel.add(p);
+            preDuelCountdown(p);
+            inDuel.add(p);
+        }
+
+    }
 }
