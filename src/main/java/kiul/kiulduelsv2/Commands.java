@@ -91,7 +91,7 @@ public class Commands implements CommandExecutor {
 
                             Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, -64, 16);
                             Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
-                            Region arenaRegion = new Region(SECorner.toVector(),NWCorner.toVector());
+
 
                             Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
                             Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
@@ -101,7 +101,7 @@ public class Commands implements CommandExecutor {
                             Arenadata.get().set("arenas." + args[1] + ".size", size);
                             Arenadata.get().set("arenas." + args[1] + ".southeast", southeast);
                             Arenadata.get().set("arenas." + args[1] + ".northwest", northwest);
-                            Arenadata.get().set("arenas." + args[1] + ".region", arenaRegion);
+
                             Arenadata.save();
                             long finalTime = System.currentTimeMillis()-timeMillis;
                             p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC + "arena " + "'" + ChatColor.WHITE + args[1] + ChatColor.GRAY +  "'" + " created (" + finalTime + ")");
@@ -160,7 +160,7 @@ public class Commands implements CommandExecutor {
             case "e":
                 EnchantInventory.itemEnchantInventory(p);
                 break;
-            case "exit":
+            case "cancel":
                 if (ClickMethods.inEditor.contains(p)) {
                     p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Exiting kit editor..");
                     ClickMethods.inEditor.remove(p);

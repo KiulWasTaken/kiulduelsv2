@@ -280,9 +280,9 @@ public class DuelMethods {
     public static Block getHighestBlockBelow (int y, Location location) {
 
         for (int i = y; i < -63; i--) {
-            Location newloc = new Location(location.getWorld(), location.getX(), y, location.getZ());
-            if (newloc.getBlock().getType() != Material.AIR) {
-            return newloc.getBlock();
+            Location newLoc = new Location(location.getWorld(), location.getX(), i, location.getZ());
+            if (newLoc.getBlock().getType().toString() != "AIR") {
+            return newLoc.getBlock();
             }
         }
         return location.getBlock();

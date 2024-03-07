@@ -41,11 +41,6 @@ public class InventoryListeners implements Listener {
                         e.getCursor().setAmount(0);
                         return;
                     }
-                    if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getBottomInventory() && e.getClick() == ClickType.SHIFT_LEFT) {
-                        e.setCancelled(true);
-                        e.getCurrentItem().setType(Material.AIR);
-                        return;
-                    }
                     for (ItemEnum item : ItemEnum.values()) {
                         if (e.getCurrentItem() == null)
                             break;
@@ -143,7 +138,8 @@ public class InventoryListeners implements Listener {
                             }
                         }
                     }
-                } else if (e.getView().getTitle().equalsIgnoreCase(EnchantInventory.itemEnchantInvTitle)) {
+                }
+            } else if (e.getView().getTitle().equalsIgnoreCase(EnchantInventory.itemEnchantInvTitle)) {
                     if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory() || e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
                         e.setCancelled(true);
                         if (e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
@@ -198,7 +194,7 @@ public class InventoryListeners implements Listener {
                 }
             }
         }
-    }
+
 
         @EventHandler
         public void setSlotonPlayerJoin (PlayerJoinEvent e){

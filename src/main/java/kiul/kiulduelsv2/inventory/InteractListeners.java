@@ -80,18 +80,19 @@ public class InteractListeners implements Listener {
                             // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
 
 
-                            if (p.getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
-                                String localName = p.getInventory().getItemInMainHand().getItemMeta().getLocalizedName();
-                                ClickMethods.queueAddCheck(QueueClickEvent.queue.get(localName), p, localName);
-                                p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.4f);
-                                try {
-                                    loadGlobalKit(p, "queue");
-                                } catch (IOException err) {
-                                    err.printStackTrace();
+                            if (p.getInventory().getItemInMainHand().getItemMeta() != null) {
+                                if (p.getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
+                                    String localName = p.getInventory().getItemInMainHand().getItemMeta().getLocalizedName();
+                                    ClickMethods.queueAddCheck(QueueClickEvent.queue.get("SMP"), p, localName);
+                                    p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.4f);
+                                    try {
+                                        loadGlobalKit(p, "queue");
+                                    } catch (IOException err) {
+                                        err.printStackTrace();
+                                    }
+                                } else {
+                                    p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 0.3f, 0.4f);
                                 }
-
-                            } else {
-                                p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 0.3f, 0.4f);
                             }
                         } else {
                             p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Selected kit slot (" + KitMethods.kitSlot.get(p) + ") is empty!");

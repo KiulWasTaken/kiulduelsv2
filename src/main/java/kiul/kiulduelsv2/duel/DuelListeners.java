@@ -112,7 +112,7 @@ public class DuelListeners implements Listener {
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                             }
-                            Region region = (Region) Arenadata.get().get("arenas." + arenaName + ".region");
+                            Region region = ArenaMethods.getArenaRegion(arenaName);
                             for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
                                 if (nearbyEntities instanceof Player spectators) {
                                     if (region.contains(nearbyEntities.getLocation())) {
@@ -143,7 +143,7 @@ public class DuelListeners implements Listener {
                                 }
                             }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
 
-                            Region region = (Region) Arenadata.get().get("arenas." + arenaName + ".region");
+                            Region region = ArenaMethods.getArenaRegion(arenaName);
                             for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
                                 if (nearbyEntities instanceof Player spectators) {
                                     if (region.contains(nearbyEntities.getLocation())) {
@@ -259,7 +259,7 @@ public class DuelListeners implements Listener {
                             }
                         }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
 
-                        Region region = (Region) Arenadata.get().get("arenas." + arenaName + ".region");
+                        Region region = ArenaMethods.getArenaRegion(arenaName);
                         for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
                             if (nearbyEntities instanceof Player spectators) {
                                 if (region.contains(nearbyEntities.getLocation())) {
