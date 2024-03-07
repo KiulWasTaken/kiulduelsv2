@@ -9,10 +9,8 @@ import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,10 +61,10 @@ public class DuelMethods {
         }};
         mapTeams.put(arenaName,arenaTeams);
         for (Player p : teamOne) {
-            p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(),teamOneSpawn.getBlockZ()).getLocation());
+            p.teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
         }
         for (Player p : teamTwo) {
-            p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(),teamTwoSpawn.getBlockZ()).getLocation());
+            p.teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
         }
         for (Player p : players) {
             try {
@@ -255,15 +253,15 @@ public class DuelMethods {
             mapTeams.put(arenaName, arenaTeams);
 
             for (Player p : teamOne) {
-                p.teleport(teamOneSpawn.getWorld().getHighestBlockAt(teamOneSpawn.getBlockX(), teamOneSpawn.getBlockZ()).getLocation());
+                p.teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
             }
             for (Player p : teamTwo) {
-                p.teleport(teamTwoSpawn.getWorld().getHighestBlockAt(teamTwoSpawn.getBlockX(), teamTwoSpawn.getBlockZ()).getLocation());
+                p.teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
             }
         } else {
             Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
             for (Player p : players) {
-                p.teleport(spawn.getWorld().getHighestBlockAt(spawn.getBlockX(), spawn.getBlockZ()).getLocation());
+                p.teleport(getHighestBlockBelow(199,spawn).getLocation());
             }
         }
         for (Player p : players) {
@@ -278,4 +276,16 @@ public class DuelMethods {
         }
 
     }
+
+    public static Block getHighestBlockBelow (int y, Location location) {
+
+        for (int i = y; i < -63; i--) {
+            Location newloc = new Location(location.getWorld(), location.getX(), y, location.getZ());
+            if (newloc.getBlock().getType() != Material.AIR) {
+            return newloc.getBlock();
+            }
+        }
+        return location.getBlock();
+    }
+    
 }
