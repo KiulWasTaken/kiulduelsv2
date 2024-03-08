@@ -132,7 +132,7 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "testgeneration":
-                TerrainArena.generateTerrainPerformant(p.getLocation(),Integer.parseInt(args[0]));
+                TerrainArena.generateTerrainPerformant(p.getLocation(),4);
 
 //      TerrainArena.generateTerrain(p.getWorld(), new Location(p.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 4, p, null);
 

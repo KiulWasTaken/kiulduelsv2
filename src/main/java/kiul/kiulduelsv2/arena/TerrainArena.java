@@ -1,10 +1,13 @@
 package kiul.kiulduelsv2.arena;
 
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -27,8 +30,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static org.bukkit.Bukkit.getServer;
+
 public class TerrainArena extends ChunkGenerator {
 
+    static final Fawe awe = (Fawe) Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
     static ArrayList<Biome> disallowedBiomes = new ArrayList<>() {{
         add(Biome.OCEAN);
         add(Biome.DEEP_OCEAN);
@@ -41,13 +47,13 @@ public class TerrainArena extends ChunkGenerator {
 
     }};
 
-    public static void generateTerrain (World targetWorld, Location targetLocation, int size,Player p,List<Player> waitingForArena) {
+    public static void generateTerrain(World targetWorld, Location targetLocation, int size, Player p, List<Player> waitingForArena) {
         long timeMillis = System.currentTimeMillis();
 
         String worldName = "arenaTerrain";
 
 // Check if the world is already loaded
-        if (p!=null) {
+        if (p != null) {
             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "instantiating world object..");
         }
         if (waitingForArena != null) {
@@ -65,17 +71,17 @@ public class TerrainArena extends ChunkGenerator {
             worldCreator = worldCreator.generateStructures(true); // Enable or disable structures as needed
             worldCreator.createWorld();
         }
-        if (p!=null) {
-            long finalTime = System.currentTimeMillis()-timeMillis;
+        if (p != null) {
+            long finalTime = System.currentTimeMillis() - timeMillis;
             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
         }
         if (waitingForArena != null) {
-            long finalTime = System.currentTimeMillis()-timeMillis;
+            long finalTime = System.currentTimeMillis() - timeMillis;
             for (Player waiter : waitingForArena) {
                 waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
             }
         }
-        if (p!=null) {
+        if (p != null) {
             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "re-rolling biome..");
         }
         if (waitingForArena != null) {
@@ -90,12 +96,12 @@ public class TerrainArena extends ChunkGenerator {
             public void run() {
 
 
-                if (p!=null) {
+                if (p != null) {
                     p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "rolling location..");
                 }
                 Location retrievalLocation = returnRetrievalLocation(world);
-                if (p!=null) {
-                    long finalTime = System.currentTimeMillis()-timeMillis;
+                if (p != null) {
+                    long finalTime = System.currentTimeMillis() - timeMillis;
                     p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
                 }
 //
@@ -107,10 +113,6 @@ public class TerrainArena extends ChunkGenerator {
 //
 //                Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
 //                Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
-
-
-
-
 
 
 //                        if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome()) || disallowedBiomes.contains(southeast.getBlock().getBiome()) || disallowedBiomes.contains(northwest.getBlock().getBiome())) {
@@ -133,32 +135,60 @@ public class TerrainArena extends ChunkGenerator {
 //
 //                        } else {
 
-                            if (p != null) {
-                                long finalTime = System.currentTimeMillis() - timeMillis;
-                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                            }
-                            if (waitingForArena != null) {
-                                long finalTime = System.currentTimeMillis() - timeMillis;
-                                for (Player waiter : waitingForArena) {
-                                    waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                                }
-                            }
+                if (p != null) {
+                    long finalTime = System.currentTimeMillis() - timeMillis;
+                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                }
+                if (waitingForArena != null) {
+                    long finalTime = System.currentTimeMillis() - timeMillis;
+                    for (Player waiter : waitingForArena) {
+                        waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                    }
+                }
 
-                            if (p != null) {
-                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
-                            }
-                            if (waitingForArena != null) {
-                                for (Player waiter : waitingForArena) {
-                                    waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
-                                }
-                            }
+                if (p != null) {
+                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
+                }
+                if (waitingForArena != null) {
+                    for (Player waiter : waitingForArena) {
+                        waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
+                    }
+                }
 
-                            ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(), size);
+                ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(), size);
 
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    ArrayList<ChunkSnapshot> retrieveChunks = getChunkSnapshotsAround(retrievalLocation.getChunk(), size);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        ArrayList<ChunkSnapshot> retrieveChunks = getChunkSnapshotsAround(retrievalLocation.getChunk(), size);
+                        if (p != null) {
+                            long finalTime = System.currentTimeMillis() - timeMillis;
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                        }
+                        if (waitingForArena != null) {
+                            long finalTime = System.currentTimeMillis() - timeMillis;
+                            for (Player waiter : waitingForArena) {
+                                waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                            }
+                        }
+
+                        if (p != null) {
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                        }
+                        if (waitingForArena != null) {
+                            for (Player waiter : waitingForArena) {
+                                waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                            }
+                        }
+
+                        new BukkitRunnable() {
+                            int tick = 0;
+
+                            @Override
+                            public void run() {
+                                if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
+                                    cancel();
+
                                     if (p != null) {
                                         long finalTime = System.currentTimeMillis() - timeMillis;
                                         p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
@@ -168,65 +198,37 @@ public class TerrainArena extends ChunkGenerator {
                                         for (Player waiter : waitingForArena) {
                                             waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
                                         }
-                                    }
-
-                                    if (p != null) {
-                                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
-                                    }
-                                    if (waitingForArena != null) {
-                                        for (Player waiter : waitingForArena) {
-                                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                                        DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)), waitingForArena);
+                                    } else {
+                                        for (String arenaName : ArenaMethods.getArenas()) {
+                                            if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
+                                                if (ArenaMethods.arenasInUse.contains(arenaName)) {
+                                                    ArenaMethods.arenasInUse.remove(arenaName);
+                                                }
+                                            }
                                         }
                                     }
 
-                                    new BukkitRunnable() {
-                                        int tick = 0;
-
-                                        @Override
-                                        public void run() {
-                                            if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
-                                                cancel();
-
-                                                if (p != null) {
-                                                    long finalTime = System.currentTimeMillis() - timeMillis;
-                                                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                                                }
-                                                if (waitingForArena != null) {
-                                                    long finalTime = System.currentTimeMillis() - timeMillis;
-                                                    for (Player waiter : waitingForArena) {
-                                                        waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                                                    }
-                                                    DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)), waitingForArena);
-                                                } else {
-                                                    for (String arenaName : ArenaMethods.getArenas()) {
-                                                        if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
-                                                            if (ArenaMethods.arenasInUse.contains(arenaName)) {
-                                                                ArenaMethods.arenasInUse.remove(arenaName);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                return;
-                                            }
-                                            for (int x = 0; x < 16; ++x) {
-                                                for (int z = 0; z < 16; ++z) {
-                                                    for (int y = 0; y < 199; ++y) {
-                                                        targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlockType(x, y, z));
+                                    return;
+                                }
+                                for (int x = 0; x < 16; ++x) {
+                                    for (int z = 0; z < 16; ++z) {
+                                        for (int y = 0; y < 199; ++y) {
+                                            targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlockType(x, y, z));
 //                                        if (ArenaMethods.liquidFreeze.contains(targetChunks.get(tick).getBlock(x,y,z))) {
 //                                            ArenaMethods.liquidFreeze.remove(targetChunks.get(tick).getBlock(x,y,z));
 //                                        }
-                                                    }
-                                                }
-                                            }
-                                            tick++;
-                                            if (p !=null) {
-                                                p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"..");
-                                            }
                                         }
-                                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 300, 30L);
+                                    }
                                 }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),300);
+                                tick++;
+                                if (p != null) {
+                                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "..");
+                                }
+                            }
+                        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 300, 30L);
+                    }
+                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 300);
 
 //                        new BukkitRunnable() {
 //                            int tick = 0;
@@ -252,21 +254,20 @@ public class TerrainArena extends ChunkGenerator {
 //                        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
 
 
-
-
-                            cancel();
+                cancel();
 //                        }
             }
         }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 50L);
     }
 
 
-    public static Location returnRetrievalLocation (World world) {
-        double x = (Math.random()-0.5)*8000;
-        double z = (Math.random()-0.5)*8000;
-        int y = world.getHighestBlockAt((int)x,(int)z).getY();
-        Location retrievalLocation = new Location(world,x,y,z);
-        return retrievalLocation;}
+    public static Location returnRetrievalLocation(World world) {
+        double x = (Math.random() - 0.5) * 8000;
+        double z = (Math.random() - 0.5) * 8000;
+        int y = world.getHighestBlockAt((int) x, (int) z).getY();
+        Location retrievalLocation = new Location(world, x, y, z);
+        return retrievalLocation;
+    }
 
     public static ArrayList<Chunk> getChunksAround(Chunk origin, int radius) {
         World world = origin.getWorld();
@@ -286,7 +287,7 @@ public class TerrainArena extends ChunkGenerator {
                 if (xTick <= radius) {
                     chunks.add(world.getChunkAt(cX + xTick, cZ + zTick));
 
-                xTick++;
+                    xTick++;
                 } else if (zTick < radius) {
                     xTick = -radius;
                     zTick++;
@@ -295,7 +296,7 @@ public class TerrainArena extends ChunkGenerator {
                     cancel();
                 }
             }
-        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),0,8);
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0, 8);
         return chunks;
     }
 
@@ -326,7 +327,61 @@ public class TerrainArena extends ChunkGenerator {
                     cancel();
                 }
             }
-        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),0,8);
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0, 8);
         return chunks;
     }
+
+    public static void generateTerrainPerformant(Location targetLocation, int size) {
+        String worldName = "arenaTerrain";
+
+        // Check if the world is already loaded
+        World world = Bukkit.getWorld(worldName);
+
+
+        // If the world is not loaded, load it
+        if (world == null) {
+            WorldCreator worldCreator = new WorldCreator(worldName);
+            worldCreator = worldCreator.environment(World.Environment.NORMAL); // Adjust the environment if needed
+            worldCreator = worldCreator.generateStructures(true); // Enable or disable structures as needed
+            worldCreator.createWorld();
+        }
+        Location center = returnRetrievalLocation(world);
+
+        Chunk ch = center.getChunk();
+        Location retrieveCenter = new Location(ch.getWorld(), ch.getX() << 4, 64, ch.getZ() << 4).add(8, 0, 8);
+
+
+        Chunk SEChunk = world.getChunkAt(center.getChunk().getX() + size, center.getChunk().getZ() + size);
+        Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - size, center.getChunk().getZ() - size);
+
+        Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, 0, 16);
+        Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+
+
+        CuboidRegion region = new CuboidRegion(BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()), BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ()));
+        com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(world);
+        BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+        clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
+        ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
+                faweWorld, region, clipboard, region.getMinimumPoint()
+        );
+// configure here
+        Operations.complete(forwardExtentCopy);
+
+
+        Chunk c = targetLocation.getChunk();
+        Location targetCenter = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
+
+        com.sk89q.worldedit.world.World fawePasteWorld = BukkitAdapter.adapt(targetLocation.getWorld());
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(fawePasteWorld)) {
+            Operation operation = new ClipboardHolder(clipboard)
+                    .createPaste(editSession)
+                    .to(BlockVector3.at(targetCenter.getX(), targetCenter.getBlockY(), targetCenter.getZ()))
+                    .build();
+            Operations.completeBlindly(operation);
+            editSession.close();
+
+        }
+    }
 }
+
