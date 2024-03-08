@@ -65,8 +65,8 @@ public class ArenaMethods {
         int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
         World world = center.getWorld();
 
-        Chunk SEChunk = world.getChunkAt(center.add((size*16)+16,0,(size*16)+16));
-        Chunk NWChunk = world.getChunkAt(center.add((-size*16)-16,0,(-size*16)-16));
+        Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+        Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
 
         Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, -64, 16);
         Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);

@@ -86,11 +86,8 @@ public class Commands implements CommandExecutor {
                             Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
 
-                            Chunk SEChunk = world.getChunkAt(center.add(size*16,0,size*16));
-                            Chunk NWChunk = world.getChunkAt(center.add(-size*16,0,-size*16));
-
-                            Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, -64, 16);
-                            Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+                            Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+                            Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
 
 
                             Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
@@ -135,7 +132,10 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "testgeneration":
-                TerrainArena.generateTerrain(p.getWorld(),new Location(p.getWorld(),Integer.parseInt(args[0]),Integer.parseInt(args[1]),Integer.parseInt(args[2])),4,p,null);
+                TerrainArena.generateTerrainPerformant(p.getLocation(),Integer.parseInt(args[0]));
+
+//      TerrainArena.generateTerrain(p.getWorld(), new Location(p.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 4, p, null);
+
                 break;
             case "reroll":
                 if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).contains(p)) {

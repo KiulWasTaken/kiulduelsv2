@@ -13,6 +13,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -40,8 +42,17 @@ public class DuelMethods {
             }
             play.setGameMode(GameMode.SURVIVAL);
         }
-        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
-        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
+
+        Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
+        int size = Arenadata.get().getInt("arenas."+arenaName+".size");
+        World world = center.getWorld();
+
+        Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+        Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
+
+
+        Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
+        Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
         playersInMap.put(arenaName,players);
         List<Player> teamOne = new ArrayList<>();
         List<Player> teamTwo = new ArrayList<>();
@@ -69,6 +80,12 @@ public class DuelMethods {
         for (Player p : players) {
             try {
                 KitMethods.loadSelectedKitSlot(p);
+                    p.setSaturation(5);
+                    p.setFoodLevel(20);
+                    p.setHealth(20);
+                    for (PotionEffect potionEffect : p.getActivePotionEffects()) {
+                        p.removePotionEffect(potionEffect.getType());
+                    }
             } catch (IOException err) {
                 err.printStackTrace();
             }
@@ -77,37 +94,6 @@ public class DuelMethods {
             inDuel.add(p);
         }
 
-    }
-
-    public static void startClassicDuel (String arenaName,String kitName,ArrayList<Player> players) {
-
-        playersInMap.put(arenaName,players);
-        List<Player> teamOne = players.subList(0,players.size()/2);
-       List<Player> teamTwo = players.subList(players.size()/2,players.size());
-       List<List<Player>> arenaTeams = new ArrayList<>() {{
-           add(teamOne);
-           add(teamTwo);
-        }};
-       mapTeams.put(arenaName,arenaTeams);
-
-        for (Player p : teamOne) {
-            p.setDisplayName(ChatColor.RED+p.getDisplayName());
-            p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team1"));
-        }
-        for (Player p : teamTwo) {
-            p.setDisplayName(ChatColor.BLUE+p.getDisplayName());
-            p.teleport(Arenadata.get().getLocation("arenas."+arenaName+"team2"));
-        }
-        for (Player p : players) {
-            try {
-                KitMethods.loadGlobalKit(p, kitName);
-            } catch (IOException err) {
-                err.printStackTrace();
-            }
-            preDuel.add(p);
-            preDuelCountdown(p);
-            inDuel.add(p);
-        }
     }
 
     public static void preDuelCountdown (Player p) {
@@ -128,15 +114,6 @@ public class DuelMethods {
 
             }
         }, 0L, 20L);
-    }
-
-
-    public void endDuel (String arenaName) {
-        List<Player> players = playersInMap.get(arenaName);
-        playersInMap.remove(arenaName);
-        mapTeams.remove(arenaName);
-
-
     }
 
     public static void startRealisticDuel (List<Player> players, String arenaName) {
@@ -279,7 +256,7 @@ public class DuelMethods {
 
     public static Block getHighestBlockBelow (int y, Location location) {
 
-        for (int i = y; i < -63; i--) {
+        for (int i = y; i > -63; i--) {
             Location newLoc = new Location(location.getWorld(), location.getX(), i, location.getZ());
             if (newLoc.getBlock().getType().toString() != "AIR") {
             return newLoc.getBlock();

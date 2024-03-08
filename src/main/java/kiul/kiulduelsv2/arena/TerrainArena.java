@@ -1,5 +1,16 @@
 package kiul.kiulduelsv2.arena;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
@@ -74,58 +85,149 @@ public class TerrainArena extends ChunkGenerator {
         }
 
         new BukkitRunnable() {
-            int cTick = 0;
-
-            World world = Bukkit.getWorld(worldName);
-            Location retrievalLocation = returnRetrievalLocation(world);
-
-            Chunk c = retrievalLocation.getChunk();
-            Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
-
-            Chunk SEChunk = world.getChunkAt(center.add(size,0,size));
-            Chunk NWChunk = world.getChunkAt(center.add(-size,0,-size));
-
-            Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
-            Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
 
             @Override
             public void run() {
-                if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome()) || disallowedBiomes.contains(southeast.getBlock().getBiome()) || disallowedBiomes.contains(northwest.getBlock().getBiome())) {
-                    retrievalLocation = returnRetrievalLocation(world);
-                    cTick++;
-                    if (p!=null) {
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + cTick + ")");
-                    }
-                    if (waitingForArena != null) {
-                        for (Player waiter : waitingForArena) {
-                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + cTick + ")");
-                        }
-                    }
 
-                } else {
 
-                    if (p!=null) {
-                        long finalTime = System.currentTimeMillis()-timeMillis;
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                    }
-                    if (waitingForArena != null) {
-                        long finalTime = System.currentTimeMillis()-timeMillis;
-                        for (Player waiter : waitingForArena) {
-                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                        }
-                    }
+                if (p!=null) {
+                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "rolling location..");
+                }
+                Location retrievalLocation = returnRetrievalLocation(world);
+                if (p!=null) {
+                    long finalTime = System.currentTimeMillis()-timeMillis;
+                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                }
+//
+                Chunk c = retrievalLocation.getChunk();
+                Location center = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
+//
+//                Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+//                Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
+//
+//                Location southeast = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
+//                Location northwest = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
 
-                    if (p!=null) {
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
-                    }
-                    if (waitingForArena != null) {
-                        for (Player waiter : waitingForArena) {
-                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
-                        }
-                    }
 
-                    ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(),size);
-                    ArrayList<Chunk> retrieveChunks = getChunksAround(retrievalLocation.getChunk(),size);
+
+
+
+
+//                        if (disallowedBiomes.contains(retrievalLocation.getBlock().getBiome()) || disallowedBiomes.contains(southeast.getBlock().getBiome()) || disallowedBiomes.contains(northwest.getBlock().getBiome())) {
+//                            if (p != null) {
+//                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "getting location..");
+//                            }
+//                            retrievalLocation = returnRetrievalLocation(world);
+//                            if (p != null) {
+//                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "..done!");
+//                            }
+//                            cTick++;
+//                            if (p != null) {
+//                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + cTick + ")");
+//                            }
+//                            if (waitingForArena != null) {
+//                                for (Player waiter : waitingForArena) {
+//                                    waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "attempting.. (" + cTick + ")");
+//                                }
+//                            }
+//
+//                        } else {
+
+                            if (p != null) {
+                                long finalTime = System.currentTimeMillis() - timeMillis;
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                            }
+                            if (waitingForArena != null) {
+                                long finalTime = System.currentTimeMillis() - timeMillis;
+                                for (Player waiter : waitingForArena) {
+                                    waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                }
+                            }
+
+                            if (p != null) {
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
+                            }
+                            if (waitingForArena != null) {
+                                for (Player waiter : waitingForArena) {
+                                    waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "adding chunks to list..");
+                                }
+                            }
+
+                            ArrayList<Chunk> targetChunks = getChunksAround(targetLocation.getChunk(), size);
+
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    ArrayList<ChunkSnapshot> retrieveChunks = getChunkSnapshotsAround(retrievalLocation.getChunk(), size);
+                                    if (p != null) {
+                                        long finalTime = System.currentTimeMillis() - timeMillis;
+                                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                    }
+                                    if (waitingForArena != null) {
+                                        long finalTime = System.currentTimeMillis() - timeMillis;
+                                        for (Player waiter : waitingForArena) {
+                                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                        }
+                                    }
+
+                                    if (p != null) {
+                                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                                    }
+                                    if (waitingForArena != null) {
+                                        for (Player waiter : waitingForArena) {
+                                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
+                                        }
+                                    }
+
+                                    new BukkitRunnable() {
+                                        int tick = 0;
+
+                                        @Override
+                                        public void run() {
+                                            if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
+                                                cancel();
+
+                                                if (p != null) {
+                                                    long finalTime = System.currentTimeMillis() - timeMillis;
+                                                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                                }
+                                                if (waitingForArena != null) {
+                                                    long finalTime = System.currentTimeMillis() - timeMillis;
+                                                    for (Player waiter : waitingForArena) {
+                                                        waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
+                                                    }
+                                                    DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)), waitingForArena);
+                                                } else {
+                                                    for (String arenaName : ArenaMethods.getArenas()) {
+                                                        if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
+                                                            if (ArenaMethods.arenasInUse.contains(arenaName)) {
+                                                                ArenaMethods.arenasInUse.remove(arenaName);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                return;
+                                            }
+                                            for (int x = 0; x < 16; ++x) {
+                                                for (int z = 0; z < 16; ++z) {
+                                                    for (int y = 0; y < 199; ++y) {
+                                                        targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlockType(x, y, z));
+//                                        if (ArenaMethods.liquidFreeze.contains(targetChunks.get(tick).getBlock(x,y,z))) {
+//                                            ArenaMethods.liquidFreeze.remove(targetChunks.get(tick).getBlock(x,y,z));
+//                                        }
+                                                    }
+                                                }
+                                            }
+                                            tick++;
+                                            if (p !=null) {
+                                                p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"..");
+                                            }
+                                        }
+                                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 300, 30L);
+                                }
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),300);
+
 //                        new BukkitRunnable() {
 //                            int tick = 0;
 //
@@ -150,82 +252,19 @@ public class TerrainArena extends ChunkGenerator {
 //                        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
 
 
-                    if (p!=null) {
-                        long finalTime = System.currentTimeMillis()-timeMillis;
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                    }
-                    if (waitingForArena != null) {
-                        long finalTime = System.currentTimeMillis()-timeMillis;
-                        for (Player waiter : waitingForArena) {
-                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                        }
-                    }
 
-                    if (p!=null) {
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
-                    }
-                    if (waitingForArena != null) {
-                        for (Player waiter : waitingForArena) {
-                            waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "pasting chunks..");
-                        }
-                    }
 
-                    new BukkitRunnable() {
-                        int tick = 0;
-
-                        @Override
-                        public void run() {
-                            if (tick >= targetChunks.size() || tick >= retrieveChunks.size()) {
-                                cancel();
-
-                                if (p!=null) {
-                                    long finalTime = System.currentTimeMillis()-timeMillis;
-                                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                                }
-                                if (waitingForArena != null) {
-                                    long finalTime = System.currentTimeMillis()-timeMillis;
-                                    for (Player waiter : waitingForArena) {
-                                        waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
-                                    }
-                                    DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)),waitingForArena);
-                                }
-
-                                return;
-                            }
-                            for (int x = 0; x < 16; ++x) {
-                                for (int z = 0; z < 16; ++z) {
-                                    for (int y = 0; y < 199; ++y) {
-                                        targetChunks.get(tick).getBlock(x, y, z).setType(retrieveChunks.get(tick).getBlock(x, y, z).getType());
-//                                        if (ArenaMethods.liquidFreeze.contains(targetChunks.get(tick).getBlock(x,y,z))) {
-//                                            ArenaMethods.liquidFreeze.remove(targetChunks.get(tick).getBlock(x,y,z));
-//                                        }
-                                    }
-                                }
-                            }
-                            tick++;
-                        }
-                    }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 60, 30L);
-
-                    for (String arenaName : ArenaMethods.getArenas()) {
-                        if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
-                            if (ArenaMethods.arenasInUse.contains(arenaName)) {
-                                ArenaMethods.arenasInUse.remove(arenaName);
-                            }
-                        }
-                    }
-
-                    cancel();
-                }
+                            cancel();
+//                        }
             }
-        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 50L);
     }
 
 
     public static Location returnRetrievalLocation (World world) {
-        Random random = new Random();
-        int x = random.nextInt(-7900,7900);
-        int z = random.nextInt(-7900,7900);
-        int y = world.getHighestBlockAt(x,z).getY();
+        double x = (Math.random()-0.5)*8000;
+        double z = (Math.random()-0.5)*8000;
+        int y = world.getHighestBlockAt((int)x,(int)z).getY();
         Location retrievalLocation = new Location(world,x,y,z);
         return retrievalLocation;}
 
@@ -246,7 +285,39 @@ public class TerrainArena extends ChunkGenerator {
             public void run() {
                 if (xTick <= radius) {
                     chunks.add(world.getChunkAt(cX + xTick, cZ + zTick));
+
                 xTick++;
+                } else if (zTick < radius) {
+                    xTick = -radius;
+                    zTick++;
+
+                } else {
+                    cancel();
+                }
+            }
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),0,8);
+        return chunks;
+    }
+
+    public static ArrayList<ChunkSnapshot> getChunkSnapshotsAround(Chunk origin, int radius) {
+        World world = origin.getWorld();
+
+        int length = (radius * 2) + 1;
+        ArrayList<ChunkSnapshot> chunks = new ArrayList<>(length * length);
+
+        int cX = origin.getX();
+        int cZ = origin.getZ();
+
+        new BukkitRunnable() {
+            int xTick = -radius;
+            int zTick = -radius;
+
+            @Override
+            public void run() {
+                if (xTick <= radius) {
+                    chunks.add(world.getChunkAt(cX + xTick, cZ + zTick).getChunkSnapshot());
+
+                    xTick++;
                 } else if (zTick < radius) {
                     xTick = -radius;
                     zTick++;

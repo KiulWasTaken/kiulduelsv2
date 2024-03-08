@@ -69,6 +69,11 @@ public class DuelListeners implements Listener {
                                         UtilMethods.teleportLobby(team1Members);
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                                for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+                                    if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayer.getLocation())) {
+                                        UtilMethods.teleportLobby(onlinePlayer);
+                                    }
+                                }
                             }
                             for (Player team2Members : team2) {
                                 team2Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
@@ -78,15 +83,6 @@ public class DuelListeners implements Listener {
                                         UtilMethods.teleportLobby(team2Members);
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            }
-                            int size = Arenadata.get().getInt("arenas." + arenaName + ".size");
-                            double sideLength = Math.pow(((Arenadata.get().getDouble("arenas." + arenaName + ".size") * 2 - 1) * 16), 2);
-                            double maxDistance = (Math.sqrt(sideLength * 2) / 2) + 2;
-                            for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), maxDistance, maxDistance, maxDistance)) {
-                                if (nearbyEntities instanceof Player spectators) {
-                                    UtilMethods.becomeNotSpectator(spectators);
-                                    UtilMethods.teleportLobby(spectators);
-                                }
                             }
                             ArenaMethods.regenerateArena(arenaName);
                             DuelMethods.mapTeams.remove(arenaName);
@@ -99,6 +95,11 @@ public class DuelListeners implements Listener {
                                     @Override
                                     public void run() {
                                         UtilMethods.teleportLobby(team2Members);
+                                        for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+                                            if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayer.getLocation())) {
+                                                UtilMethods.teleportLobby(onlinePlayer);
+                                            }
+                                        }
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                             }
@@ -111,15 +112,6 @@ public class DuelListeners implements Listener {
 
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            }
-                            Region region = ArenaMethods.getArenaRegion(arenaName);
-                            for (Entity nearbyEntities : p.getWorld().getNearbyEntities(Arenadata.get().getLocation("arenas." + arenaName + ".center"), 200, 200, 200)) {
-                                if (nearbyEntities instanceof Player spectators) {
-                                    if (region.contains(nearbyEntities.getLocation())) {
-                                        UtilMethods.becomeNotSpectator(spectators);
-                                        UtilMethods.teleportLobby(spectators);
-                                    }
-                                }
                             }
                             ArenaMethods.regenerateArena(arenaName);
                             DuelMethods.mapTeams.remove(arenaName);
