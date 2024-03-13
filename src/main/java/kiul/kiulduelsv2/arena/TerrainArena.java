@@ -14,6 +14,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import io.papermc.lib.PaperLib;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
@@ -26,15 +27,17 @@ import org.bukkit.generator.WorldInfo;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
+import static org.bukkit.Bukkit.getScheduler;
 import static org.bukkit.Bukkit.getServer;
 
 public class TerrainArena extends ChunkGenerator {
-
-    static final Fawe awe = (Fawe) Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
     static ArrayList<Biome> disallowedBiomes = new ArrayList<>() {{
         add(Biome.OCEAN);
         add(Biome.DEEP_OCEAN);
@@ -46,6 +49,8 @@ public class TerrainArena extends ChunkGenerator {
         add(Biome.DEEP_LUKEWARM_OCEAN);
 
     }};
+
+    private static Random random = new Random();
 
     public static void generateTerrain(World targetWorld, Location targetLocation, int size, Player p, List<Player> waitingForArena) {
         long timeMillis = System.currentTimeMillis();
@@ -331,9 +336,41 @@ public class TerrainArena extends ChunkGenerator {
         return chunks;
     }
 
-    public static void generateTerrainPerformant(Location targetLocation, int size) {
-        String worldName = "arenaTerrain";
+    public static void loadChunksAround(Chunk origin, int radius) {
+        World world = origin.getWorld();
 
+        int length = (radius * 2) + 1;
+        ArrayList<ChunkSnapshot> chunks = new ArrayList<>(length * length);
+
+        int cX = origin.getX();
+        int cZ = origin.getZ();
+
+        new BukkitRunnable() {
+            int xTick = -radius;
+            int zTick = -radius;
+
+            @Override
+            public void run() {
+                if (xTick <= radius) {
+                    Chunk chunk = world.getChunkAt(cX + xTick, cZ + zTick);
+                    chunk.load();
+
+                    xTick++;
+                } else if (zTick < radius) {
+                    xTick = -radius;
+                    zTick++;
+
+                } else {
+                    cancel();
+                }
+            }
+        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0, 16);
+    }
+
+    public static void generateTerrainPerformant(Location targetLocation, int size) {
+        long timeMillis = System.currentTimeMillis();
+        String worldName = "arenaTerrain";
+        BukkitScheduler scheduler = getServer().getScheduler();
         // Check if the world is already loaded
         World world = Bukkit.getWorld(worldName);
 
@@ -344,44 +381,66 @@ public class TerrainArena extends ChunkGenerator {
             worldCreator = worldCreator.environment(World.Environment.NORMAL); // Adjust the environment if needed
             worldCreator = worldCreator.generateStructures(true); // Enable or disable structures as needed
             worldCreator.createWorld();
+
         }
-        Location center = returnRetrievalLocation(world);
-
-        Chunk ch = center.getChunk();
-        Location retrieveCenter = new Location(ch.getWorld(), ch.getX() << 4, 64, ch.getZ() << 4).add(8, 0, 8);
-
-
-        Chunk SEChunk = world.getChunkAt(center.getChunk().getX() + size, center.getChunk().getZ() + size);
-        Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - size, center.getChunk().getZ() - size);
-
-        Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, 0, 16);
-        Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+        scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+            double Rx = random.nextDouble(0,1);
+            double Rz = random.nextDouble(0,1);
+            double Lx = (Rx-0.5)*8000;
+            double Lz = (Rz-0.5)*8000;
+            scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"math.random operation complete (" + Lx + ", " + Lz + ")");
 
 
-        CuboidRegion region = new CuboidRegion(BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()), BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ()));
-        com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(world);
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
-        clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
-        ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
-                faweWorld, region, clipboard, region.getMinimumPoint()
-        );
+                 Location center = new Location(world,Lx,0,Lz);
+
+                Chunk ch = center.getChunk();
+
+                Location retrieveCenter = new Location(ch.getWorld(), ch.getX() << 4, 64, ch.getZ() << 4).add(8, 0, 8);
+
+
+                Chunk SEChunk = world.getChunkAt(center.getChunk().getX() + size, center.getChunk().getZ() + size);
+                Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - size, center.getChunk().getZ() - size);
+
+                Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, 0, 16);
+                Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+
+                scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                    CuboidRegion region = new CuboidRegion(BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()), BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ()));
+                    com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(world);
+                    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+                    clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
+                    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
+                            faweWorld, region, clipboard, region.getMinimumPoint()
+                    );
+                    Operations.complete(forwardExtentCopy);
+                    scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"copy operation complete");
+                    });
 // configure here
-        Operations.complete(forwardExtentCopy);
 
 
-        Chunk c = targetLocation.getChunk();
-        Location targetCenter = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
-        com.sk89q.worldedit.world.World fawePasteWorld = BukkitAdapter.adapt(targetLocation.getWorld());
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(fawePasteWorld)) {
-            Operation operation = new ClipboardHolder(clipboard)
-                    .createPaste(editSession)
-                    .to(BlockVector3.at(targetCenter.getX(), targetCenter.getBlockY(), targetCenter.getZ()))
-                    .build();
-            Operations.completeBlindly(operation);
-            editSession.close();
+                    Chunk c = targetLocation.getChunk();
+                    Location targetCenter = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
-        }
+                    com.sk89q.worldedit.world.World fawePasteWorld = BukkitAdapter.adapt(targetLocation.getWorld());
+                    try (EditSession editSession = WorldEdit.getInstance().newEditSession(fawePasteWorld)) {
+                        Operation operation = new ClipboardHolder(clipboard)
+                                .createPaste(editSession)
+                                .to(BlockVector3.at(targetCenter.getX(), targetCenter.getBlockY(), targetCenter.getZ()))
+                                .build();
+                        Operations.complete(operation);
+
+                        editSession.close();
+                        scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                            long finalTime = (System.currentTimeMillis()-timeMillis)/1000;
+                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"paste operation complete (finished in " + finalTime + "s)");
+                        });
+                    }
+                });
+            });
+        });
     }
 }
 
