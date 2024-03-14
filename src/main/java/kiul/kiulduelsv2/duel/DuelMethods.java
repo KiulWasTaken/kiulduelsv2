@@ -116,7 +116,7 @@ public class DuelMethods {
         }, 0L, 20L);
     }
 
-    public static void startRealisticDuel (List<Player> players, String arenaName) {
+    public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled) {
         ArenaMethods.arenasInUse.add(arenaName);
         for (Player player : players) {
             player.sendMessage(arenaName);
@@ -128,65 +128,72 @@ public class DuelMethods {
             p.teleport(teleportTo);
             p.setGameMode(GameMode.SPECTATOR);
         }
-        // Create a clickable message with two components
-        ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
-                .color(net.md_5.bungee.api.ChatColor.GRAY).color(net.md_5.bungee.api.ChatColor.ITALIC);
 
-        // Add the first clickable component
-        message.append("[✓]")
-                .color(net.md_5.bungee.api.ChatColor.GREEN)
-                .bold(true)
-                .underlined(true)
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll yes"));
 
-        // Add a separator
-        message.append(" ");
+        if (ArenaMethods.getSuitableArena() != null && !reRolled) {
+            String backupArena = ArenaMethods.getSuitableArena();
+            ArenaMethods.arenasInUse.add(backupArena);
+            // Create a clickable message with two components
+            ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
+                    .color(net.md_5.bungee.api.ChatColor.GRAY).color(net.md_5.bungee.api.ChatColor.ITALIC);
 
-        // Add the second clickable component
-        message.append("[❌]")
-                .color(net.md_5.bungee.api.ChatColor.RED)
-                .bold(true)
-                .underlined(true)
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll no"));
+            // Add the first clickable component
+            message.append("[✓]")
+                    .color(net.md_5.bungee.api.ChatColor.GREEN)
+                    .bold(true)
+                    .underlined(true)
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll yes"));
 
-        // Send the message
-        allowedToReRoll.put(arenaName,players);
-        reRollYes.put(arenaName,new ArrayList<>());
-        reRollNo.put(arenaName,new ArrayList<>());
-        for (Player p : players) {
-            p.spigot().sendMessage(message.create());
-        }
-         new BukkitRunnable() {
-            int time = 20; //or any other number you want to start countdown from
+            // Add a separator
+            message.append(" ");
 
-            @Override
-            public void run() {
-                if (this.time == 5) {
-                    for (Player p : players) {
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting ends in 5 seconds");
-                    }
-                }
-                if (this.time <= 0) {
-                    if (reRollYes.size() > reRollNo.size()) {
+            // Add the second clickable component
+            message.append("[❌]")
+                    .color(net.md_5.bungee.api.ChatColor.RED)
+                    .bold(true)
+                    .underlined(true)
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll no"));
+
+            // Send the message
+            allowedToReRoll.put(arenaName, players);
+            reRollYes.put(arenaName, new ArrayList<>());
+            reRollNo.put(arenaName, new ArrayList<>());
+            for (Player p : players) {
+                p.spigot().sendMessage(message.create());
+            }
+            new BukkitRunnable() {
+                int time = 20; //or any other number you want to start countdown from
+
+                @Override
+                public void run() {
+                    if (this.time == 5) {
                         for (Player p : players) {
-                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
+                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting ends in 5 seconds");
                         }
-                        reRollNo.remove(arenaName);
-                        reRollYes.remove(arenaName);
-                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".center"),4,null,players);
-                    } else {
-                        for (Player p : players) {
-                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
-                        }
-                        reRollNo.remove(arenaName);
-                        reRollYes.remove(arenaName);
-                        beginDuel(arenaName,players);
                     }
-                    cancel();
-                    return;
-                }
+                    if (this.time <= 0) {
+                        if (reRollYes.size() > reRollNo.size()) {
+                            for (Player p : players) {
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
+                            }
+                            reRollNo.remove(arenaName);
+                            reRollYes.remove(arenaName);
+                            TerrainArena.generateTerrainPerformant(duelCentre,4);
+                            startRealisticDuel(players,backupArena,true);
+                        } else {
+                            for (Player p : players) {
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
+                            }
+                            reRollNo.remove(arenaName);
+                            reRollYes.remove(arenaName);
+                            beginDuel(arenaName, players);
+                            ArenaMethods.arenasInUse.remove(backupArena);
+                        }
+                        cancel();
+                        return;
+                    }
 
-                    if (reRollYes.size() > reRollNo.size()) {
+                    if (reRollYes.size() > reRollNo.size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
                             p.teleport(teleportTo);
@@ -194,20 +201,33 @@ public class DuelMethods {
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
-                        TerrainArena.generateTerrain(players.get(0).getWorld(),Arenadata.get().getLocation("arena." + arenaName + ".center"),4,null,null);
+                        TerrainArena.generateTerrainPerformant(duelCentre,4);
+                        startRealisticDuel(players,backupArena,true);
                         cancel();
-                    } else {
+                    } else if (reRollYes.size() < reRollNo.size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
-                        beginDuel(arenaName,players);
+                        beginDuel(arenaName, players);
+                        ArenaMethods.arenasInUse.remove(backupArena);
                         cancel();
                     }
-                this.time--;
+                    this.time--;
+                }
+            }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
+        } else {
+            for (Player p : players) {
+                p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"No backup maps available, game starting in 10 seconds.");
             }
-        }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    beginDuel(arenaName,players);
+                }
+            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),200);
+        }
     }
 
 

@@ -436,6 +436,13 @@ public class TerrainArena extends ChunkGenerator {
                         scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
                             long finalTime = (System.currentTimeMillis()-timeMillis)/1000;
                         Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"paste operation complete (finished in " + finalTime + "s)");
+                            for (String arenaName : ArenaMethods.getArenas()) {
+                                if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
+                                    if (ArenaMethods.arenasInUse.contains(arenaName)) {
+                                        ArenaMethods.arenasInUse.remove(arenaName);
+                                    }
+                                }
+                            }
                         });
                     }
                 });

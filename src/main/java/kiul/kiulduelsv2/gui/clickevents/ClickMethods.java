@@ -59,7 +59,7 @@ public class ClickMethods {
                         }
                         return;
                     }
-                    DuelMethods.startRealisticDuel(players, arena);
+                    DuelMethods.startRealisticDuel(players, arena,false);
                     // startRealisticDuel(map,type,players);
                 }
 

@@ -48,7 +48,7 @@ public class ArenaMethods {
 
     public static void regenerateArena (String arenaName) {
             Location center = Arenadata.get().getLocation("arenas." + arenaName + ".center");
-            TerrainArena.generateTerrain(center.getWorld(),center,4,null,null);
+            TerrainArena.generateTerrainPerformant(center,4);
     }
 
     public static boolean LocationIsInsideArena (Location loc,String arenaName) {
