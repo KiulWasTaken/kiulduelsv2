@@ -20,7 +20,6 @@ public class KitClickEvent implements Listener {
             if (e.getCurrentItem().getType() == Material.CYAN_TERRACOTTA) {
                 String[] strings = e.getCurrentItem().getItemMeta().getDisplayName().split("7");
                 int num = Integer.parseInt(strings[1]);
-                p.sendMessage( ""+num);
                 KitMethods.kitSlot.put(p,num);
                 KitInventory.kitInventory(p);
             } else if (e.getCurrentItem().getType() == Material.LIME_TERRACOTTA) {

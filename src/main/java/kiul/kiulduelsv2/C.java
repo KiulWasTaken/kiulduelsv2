@@ -1,5 +1,7 @@
 package kiul.kiulduelsv2;
 
+import kiul.kiulduelsv2.party.Party;
+import kiul.kiulduelsv2.party.PartyManager;
 import org.bukkit.ChatColor;
 
 import java.util.regex.Matcher;
@@ -19,5 +21,7 @@ public class C {
 
         return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
     }
+
+    public static PartyManager partyManager = new PartyManager();
 
 }

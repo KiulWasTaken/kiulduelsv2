@@ -1,11 +1,13 @@
 package kiul.kiulduelsv2.party;
 
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class PartyManager {
-    private List<Party> parties;
+    private static List<Party> parties;
 
     public PartyManager() {
         this.parties = new ArrayList<>();
@@ -24,6 +26,9 @@ public class PartyManager {
     public Party findPartyForMember(UUID playerName) {
         for (Party party : parties) {
             if (party.isMember(playerName)) {
+                return party;
+            }
+            if (party.isLeader(playerName)) {
                 return party;
             }
         }

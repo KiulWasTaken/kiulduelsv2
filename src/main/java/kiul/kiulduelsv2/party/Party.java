@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.party;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class Party {
     private List<UUID> teamOne;
     private List<UUID> teamTwo;
 
-    public static HashMap<UUID,Party> invitedPlayer = new HashMap<>();
+    public static HashMap<UUID,UUID> invitedPlayer = new HashMap<>();
 
     public Party(UUID leader) {
         this.leader = leader;
@@ -62,11 +63,19 @@ public class Party {
 
     public void changeTeam(UUID member) {
         if (teamOne.contains(member)) {
-            teamOne.remove(member);
-            teamTwo.add(member);
+            if (teamOne.size() > 1) {
+                teamOne.remove(member);
+                teamTwo.add(member);
+            } else {
+                Bukkit.getPlayer(member).sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Your team is too small for you to swap teams");
+            }
         } else {
-            teamTwo.remove(member);
-            teamOne.add(member);
+            if (teamTwo.size() > 1) {
+                teamTwo.remove(member);
+                teamOne.add(member);
+            } else {
+                Bukkit.getPlayer(member).sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Your team is too small for you to swap teams");
+            }
         }
     }
 

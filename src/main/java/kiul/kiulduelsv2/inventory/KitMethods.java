@@ -14,12 +14,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static kiul.kiulduelsv2.C.partyManager;
+
 public class KitMethods {
 
     public static HashMap<Player,Integer> kitSlot = new HashMap<>();
     public static void lobbyKit (Player p) throws IOException {
+        p.setFlying(false);
+        p.setAllowFlight(false);
         ItemStack[] kitContents;
-        PartyManager partyManager = new PartyManager();
         List<String> lore = new ArrayList<>();
         if (partyManager.findPartyForMember(p.getUniqueId()) != null) {
             if (partyManager.findPartyForMember(p.getUniqueId()).isLeader(p.getUniqueId())) {
@@ -29,7 +32,6 @@ public class KitMethods {
             }
         } else {
             kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global.lobby.inventory")).getContents();
-
         }
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(null);
@@ -53,6 +55,8 @@ public class KitMethods {
         ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits.global.spectator.inventory"));
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(null);
+        p.setAllowFlight(true);
+        p.setFlying(true);
     }
 
     public static void saveInventoryToSelectedKitSlot (Player p) {
@@ -67,11 +71,15 @@ public class KitMethods {
         ItemStack[] armourContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour"));
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(armourContents);
+        p.setFlying(false);
+        p.setAllowFlight(false);
     }
 
     public static void loadGlobalKit (Player p, String kitName) throws IOException {
         ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global."+kitName+".inventory")).getContents();
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(null);
+        p.setFlying(false);
+        p.setAllowFlight(false);
     }
 }

@@ -7,6 +7,7 @@ import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.gui.ItemEnum;
 import kiul.kiulduelsv2.gui.ItemInventory;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -198,6 +199,8 @@ public class InventoryListeners implements Listener {
 
         @EventHandler
         public void setSlotonPlayerJoin (PlayerJoinEvent e){
+        e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
+        e.getPlayer().setGameMode(GameMode.SURVIVAL);
             if (!e.getPlayer().hasPlayedBefore()) {
                 Userdata.get().set("selected-slot." + e.getPlayer().getUniqueId(), 1);
                 Userdata.save();

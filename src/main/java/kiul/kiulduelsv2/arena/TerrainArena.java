@@ -400,9 +400,9 @@ public class TerrainArena extends ChunkGenerator {
 
 
                 Chunk SEChunk = world.getChunkAt(center.getChunk().getX() + size, center.getChunk().getZ() + size);
-                Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - size, center.getChunk().getZ() - size);
+                Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - (size-1), center.getChunk().getZ() - (size-1));
 
-                Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(16, 0, 16);
+                Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(15, 0, 15);
                 Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
 
                 scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {

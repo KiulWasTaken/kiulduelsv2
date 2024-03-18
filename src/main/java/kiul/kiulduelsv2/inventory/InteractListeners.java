@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static kiul.kiulduelsv2.C.partyManager;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
 
@@ -52,20 +53,23 @@ public class InteractListeners implements Listener {
             }
         }
         if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-            if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
+            if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null && e.getPlayer().getInventory().getItemInMainHand() != null && e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
                 switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
                     case "partysplit":
+                        e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setDisplayName(ChatColor.LIGHT_PURPLE+"Party FFA");
                         e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partyffa");
+                        e.getPlayer().getInventory().getItemInMainHand().setType(Material.PINK_DYE);
                         break;
                     case "partyffa":
+                        e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setDisplayName(ChatColor.LIGHT_PURPLE+"Party Split");
                         e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partysplit");
+                        e.getPlayer().getInventory().getItemInMainHand().setType(Material.MAGENTA_DYE);
                         break;
                 }
             }
         }
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
-                PartyManager partyManager = new PartyManager();
+            if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null && e.getPlayer().getInventory().getItemInMainHand() != null && e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
                 Party party = partyManager.findPartyForMember(p.getUniqueId());
                 switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
                     case "queue":

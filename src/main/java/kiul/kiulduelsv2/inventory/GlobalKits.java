@@ -50,22 +50,23 @@ public class GlobalKits {
         Userdata.get().set("kits.global.partymember.inventory", InventoryToBase64.itemStackArrayToBase64(partyMemberLobbyKit.getContents()));
 
         Inventory partyLeaderLobbyKit = Bukkit.createInventory(null,36,"lobbyPL");
-        lore.add(ChatColor.GRAY + "Right-Click to play an in-party fight");
-        partyLeaderLobbyKit.setItem(3,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Fight",Material.PINK_DYE,1,lore,null,null,"partysplit"));
+        lore.add(ChatColor.GRAY + "Left-Click to swap party fight mode");
+        lore.add(ChatColor.GRAY + "Right-Click to play");
+        partyLeaderLobbyKit.setItem(3,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Split",Material.PINK_DYE,1,lore,null,null,"partysplit"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right-Click to queue for a party versus party duel");
         partyLeaderLobbyKit.setItem(5,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Versus",Material.PURPLE_DYE,1,lore,null,null,"partyffa"));
         lore.clear();
-        lore.add(ChatColor.GRAY + "Right-Click to queue for 2v2 *if applicable*");
+        lore.add(ChatColor.GRAY + "Right-Click to queue for 2v2");
         partyLeaderLobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.GRAY + "Queue", Material.GRAY_DYE,1,lore,null,null,"partyqueue"));
-        lore.add(ChatColor.GRAY + "Right click to open Settings");
-        partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.WHITE + "Settings", Material.PAPER,1,lore,null,null,"partysettings"));
+        lore.add(ChatColor.GRAY + "Right-Click to open Settings");
+        partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.RED + "Disband Party", Material.RED_DYE,1,lore,null,null,"partysettings"));
         lore.clear();
         Userdata.get().set("kits.global.partyleader.inventory", InventoryToBase64.itemStackArrayToBase64(partyLeaderLobbyKit.getContents()));
 
         Inventory spectatorKit = Bukkit.createInventory(null,36,"spectator");
-        lore.add(ChatColor.GRAY + "Right click to Stop Spectating");
-        spectatorKit.setItem(9,ItemStackMethods.createItemStack(ChatColor.RED + "Stop Spectating",Material.RED_DYE,1,lore,null,null,"leavegame"));
+        lore.add(ChatColor.GRAY + "Right-Click to Stop Spectating");
+        spectatorKit.setItem(8,ItemStackMethods.createItemStack(ChatColor.RED + "Stop Spectating",Material.RED_DYE,1,lore,null,null,"leavegame"));
         lore.clear();
         Userdata.get().set("kits.global.spectator.inventory", InventoryToBase64.itemStackArrayToBase64(spectatorKit.getContents()));
 

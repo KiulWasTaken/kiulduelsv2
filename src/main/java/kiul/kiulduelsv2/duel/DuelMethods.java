@@ -7,6 +7,7 @@ import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.util.UtilMethods;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.*;
@@ -83,6 +84,7 @@ public class DuelMethods {
                     p.setSaturation(5);
                     p.setFoodLevel(20);
                     p.setHealth(20);
+                    p.setGameMode(GameMode.SURVIVAL);
                     for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                         p.removePotionEffect(potionEffect.getType());
                     }
@@ -118,15 +120,15 @@ public class DuelMethods {
 
     public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled) {
         ArenaMethods.arenasInUse.add(arenaName);
-        for (Player player : players) {
-            player.sendMessage(arenaName);
-        }
+        int size = players.size();
 
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
         Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());
         for (Player p : players) {
             p.teleport(teleportTo);
             p.setGameMode(GameMode.SPECTATOR);
+            p.setFlying(true);
+            p.setAllowFlight(true);
         }
 
 
@@ -162,40 +164,57 @@ public class DuelMethods {
                 p.spigot().sendMessage(message.create());
             }
             new BukkitRunnable() {
-                int time = 20; //or any other number you want to start countdown from
+                int time = 15; //or any other number you want to start countdown from
 
                 @Override
                 public void run() {
-                    if (this.time == 5) {
-                        for (Player p : players) {
-                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting ends in 5 seconds");
-                        }
+                    for (Player p : players) {
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + time);
                     }
+                    players.removeIf(Objects::isNull);
+                    if (players.size() != size) {
+                        for (Player p : players) {
+                            UtilMethods.teleportLobby(p);
+                        }
+                        ArenaMethods.arenasInUse.remove(arenaName);
+                        ArenaMethods.arenasInUse.remove(backupArena);
+                        cancel();
+                        return;
+                    }
+
                     if (this.time <= 0) {
-                        if (reRollYes.size() > reRollNo.size()) {
+                        if (reRollYes.get(arenaName).size() > reRollNo.get(arenaName).size()) {
                             for (Player p : players) {
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
+                                p.setFlying(false);
+                                p.setAllowFlight(false);
                             }
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
-                            TerrainArena.generateTerrainPerformant(duelCentre,4);
                             startRealisticDuel(players,backupArena,true);
+
+                            TerrainArena.generateTerrainPerformant(duelCentre,4);
+
                         } else {
                             for (Player p : players) {
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
+                                p.setFlying(false);
+                                p.setAllowFlight(false);
                             }
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
-                            beginDuel(arenaName, players);
+                            beginDuel(arenaName,players);
                             ArenaMethods.arenasInUse.remove(backupArena);
                         }
                         cancel();
                         return;
                     }
 
-                    if (reRollYes.size() > reRollNo.size() && allowedToReRoll.get(arenaName).isEmpty()) {
+                    if (reRollYes.get(arenaName).size() > reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
+                            p.setFlying(false);
+                            p.setAllowFlight(false);
                             p.teleport(teleportTo);
                             preDuel.add(p);
                         }
@@ -204,17 +223,20 @@ public class DuelMethods {
                         TerrainArena.generateTerrainPerformant(duelCentre,4);
                         startRealisticDuel(players,backupArena,true);
                         cancel();
-                    } else if (reRollYes.size() < reRollNo.size() && allowedToReRoll.get(arenaName).isEmpty()) {
+                    } else if (reRollYes.get(arenaName).size() < reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
+                            p.setFlying(false);
+                            p.setAllowFlight(false);
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
                         beginDuel(arenaName, players);
                         ArenaMethods.arenasInUse.remove(backupArena);
+
                         cancel();
                     }
-                    this.time--;
+                    time--;
                 }
             }.runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 0L, 20L);
         } else {
@@ -224,7 +246,19 @@ public class DuelMethods {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    beginDuel(arenaName,players);
+                    for (Player p : players) {
+                        if (p == null) {
+                            players.remove(p);
+                        }
+                    }
+                    if (players.size() == size) {
+                        beginDuel(arenaName, players);
+                    } else {
+                        for (Player p : players) {
+                            UtilMethods.teleportLobby(p);
+                            ArenaMethods.arenasInUse.remove(arenaName);
+                        }
+                    }
                 }
             }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class),200);
         }

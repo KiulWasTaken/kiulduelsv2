@@ -17,10 +17,12 @@ public class PartyMethods {
 
 
         player.sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + inviter.getDisplayName() + " has invited you to their party!");
-        ComponentBuilder message = new ComponentBuilder(C.t("&#FF8DFF" + ChatColor.ITALIC + "click this message to accept the invitation!" ));
+        ComponentBuilder message = new ComponentBuilder("click this message to accept the invitation!");
+        message.color(net.md_5.bungee.api.ChatColor.of("#e04ae0"));
 
         // Add the first clickable component
         message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept " + inviter.getDisplayName()));
+        player.spigot().sendMessage(message.create());
 
 
     }

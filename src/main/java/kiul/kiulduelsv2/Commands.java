@@ -28,6 +28,7 @@ import org.bukkit.util.StringUtil;
 import java.io.IOException;
 import java.util.*;
 
+import static kiul.kiulduelsv2.C.partyManager;
 import static kiul.kiulduelsv2.inventory.KitMethods.*;
 import static kiul.kiulduelsv2.config.Userdata.*;
 
@@ -141,11 +142,9 @@ public class Commands implements CommandExecutor {
                 if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).contains(p)) {
                     if (args[0].equalsIgnoreCase("yes")) {
                         DuelMethods.reRollYes.get(ArenaMethods.findPlayerArena(p)).add(true);
-                        DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
                         p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (Y)");
                     } else {
                         DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
-                        DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
                         p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (N)");
                     }
                 }
@@ -203,86 +202,133 @@ public class Commands implements CommandExecutor {
             case "party":
 
                 UUID uuid = p.getUniqueId();
-                PartyManager partyManager = new PartyManager();
-                if (partyManager.findPartyForMember(p.getUniqueId()) == null) {
+                if (partyManager.findPartyForMember(p.getUniqueId()) == null && !args[0].equalsIgnoreCase("invite") && !args[0].equalsIgnoreCase("accept")) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are not in a party!");
-                } else {
+                } else if (args.length == 0 && partyManager.findPartyForMember(p.getUniqueId()) != null) {
                     Party party = partyManager.findPartyForMember(p.getUniqueId());
-                    p.sendMessage(party.getMembers().toString());
-                }
-                switch (args[0]) {
-                    case "invite":
-                        if (partyManager.findPartyForMember(uuid) != null) {
-                            if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                if (Bukkit.getPlayer(args[1]) != null) {
-                                    Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(),partyManager.findPartyForMember(uuid));
-                                    PartyMethods.partyInvitePlayer(uuid,Bukkit.getPlayer(args[1]).getUniqueId());
-                                }
-                            }
-                        } else {
-                            if (Bukkit.getPlayer(args[1]) != null) {
-                                partyManager.createParty(p.getUniqueId());
-                                Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), partyManager.findPartyForMember(uuid));
-                                PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
-                                try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
-                            }
+                    List<String> partyMembers = new ArrayList<>();
+                    partyMembers.add(Bukkit.getPlayer(party.getLeader()).getDisplayName());
+                    if (party.getMembers() != null) {
+                        for (UUID memberUUID : party.getMembers()) {
+                            partyMembers.add(Bukkit.getPlayer(memberUUID).getDisplayName());
                         }
-                        break;
-                    case "leave":
-                        if (partyManager.findPartyForMember(uuid) != null) {
-                            if (!partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                               Party party = partyManager.findPartyForMember(uuid);
-                               party.removeMember(uuid);
-
-                            }
-                        }
-                        break;
-                    case "disband":
-                        if (partyManager.findPartyForMember(uuid) != null) {
-                            if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                for (UUID memberUUIDs : partyManager.findPartyForMember(uuid).getMembers()) {
-                                    if (Bukkit.getPlayer(memberUUIDs) != null) {
-                                        Player member = Bukkit.getPlayer(memberUUIDs);
-                                        member.sendMessage(C.t("&#FF5263" + Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).getDisplayName() + "'s party has been disbanded"));
+                    }
+                    p.sendMessage(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+"Party Members");
+                    p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+partyMembers);
+                } else {
+                    switch (args[0]) {
+                        case "invite":
+                            if (partyManager.findPartyForMember(uuid) != null) {
+                                if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                                    if (Bukkit.getPlayer(args[1]) != null) {
+                                        Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
+                                        PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
                                     }
                                 }
-                                partyManager.disbandParty(partyManager.findPartyForMember(uuid));
+                            } else {
+                                if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
+                                    Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
+                                    PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
                                 }
                             }
-                        break;
-                    case "kick":
-                        if (partyManager.findPartyForMember(uuid) != null) {
-                            Party party = partyManager.findPartyForMember(uuid);
-                            if (Bukkit.getPlayer(args[1]) != null) {
-                                Player removed = Bukkit.getPlayer(args[1]);
-                                party.removeMember(removed.getUniqueId());
-                                removed.sendMessage(C.t("&#FF5263" + "" + ChatColor.ITALIC + "You have been kicked from the party!"));
-                                for (UUID partyMembers : party.getMembers()) {
-                                    if (Bukkit.getPlayer(partyMembers) != null) {
-                                        Bukkit.getPlayer(partyMembers).sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + removed.getDisplayName() + " has been kicked from the party.");
+                            break;
+                        case "leave":
+                            if (partyManager.findPartyForMember(uuid) != null) {
+                                if (!partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                                    Party party = partyManager.findPartyForMember(uuid);
+                                    party.removeMember(uuid);
+                                    try {
+                                        KitMethods.lobbyKit(Bukkit.getPlayer(uuid));
+                                    } catch (IOException err) {
+                                        err.printStackTrace();
                                     }
                                 }
                             }
-                        }
-                        break;
-                    case "accept":
-                        if (partyManager.findPartyForMember(uuid) == null) {
-                            if (Bukkit.getPlayer(args[1])  != null) {
-                                Party invitedTo = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
-                                if (Party.invitedPlayer.get(uuid) == invitedTo) {
-                                    Party party = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
-                                    for (UUID memberUUIDs : party.getMembers()) {
+                            break;
+                        case "disband":
+                            if (partyManager.findPartyForMember(uuid) != null) {
+                                if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                                    ArrayList<Player> members = new ArrayList<>();
+                                    for (UUID memberUUIDs : partyManager.findPartyForMember(uuid).getMembers()) {
                                         if (Bukkit.getPlayer(memberUUIDs) != null) {
                                             Player member = Bukkit.getPlayer(memberUUIDs);
-                                            member.sendMessage(C.t("&#B755FF" + p.getDisplayName() + " has joined the party!"));
+                                            member.sendMessage(C.t("&#e04aac&o" + Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).getDisplayName() + "'s party has been disbanded"));
+                                            members.add(member);
                                         }
                                     }
-                                    party.addMember(uuid);
-                                    try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
+                                    members.add(Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()));
+                                    Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).sendMessage(C.t("&#e04aac&o" + "your party has been successfully disbanded"));
+                                    partyManager.disbandParty(partyManager.findPartyForMember(uuid));
+                                    for (Player member : members) {
+                                        try {
+                                            KitMethods.lobbyKit(member);
+                                        } catch (IOException err) {
+                                            err.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
-                        }
-                        break;
+                            break;
+                        case "kick":
+                            if (partyManager.findPartyForMember(uuid) != null) {
+                                Party party = partyManager.findPartyForMember(uuid);
+                                if (Bukkit.getPlayer(args[1]) != null) {
+                                    Player removed = Bukkit.getPlayer(args[1]);
+                                    party.removeMember(removed.getUniqueId());
+                                    p.sendMessage(C.t("&d" + "" + ChatColor.ITALIC + removed.getDisplayName() + " has been kicked from the party!"));
+                                    removed.sendMessage(C.t("&#e04aac&o" + "" + ChatColor.ITALIC + "You have been kicked from the party!"));
+                                    try {
+                                        KitMethods.lobbyKit(removed);
+                                    } catch (IOException err) {
+                                        err.printStackTrace();
+                                    }
+                                    for (UUID partyMembers : party.getMembers()) {
+                                        if (Bukkit.getPlayer(partyMembers) != null) {
+                                            Bukkit.getPlayer(partyMembers).sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + removed.getDisplayName() + " has been kicked from the party.");
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "accept":
+                            if (partyManager.findPartyForMember(uuid) == null) {
+                                if (Bukkit.getPlayer(args[1]) != null) {
+                                    if (Party.invitedPlayer.get(uuid) == Bukkit.getPlayer(args[1]).getUniqueId()) {
+                                        Party party;
+                                        if (partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId()) == null) {
+                                            party = partyManager.createParty(Bukkit.getPlayer(args[1]).getUniqueId());
+                                        } else {
+                                            party = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
+                                        }
+                                        for (UUID memberUUIDs : party.getMembers()) {
+                                            if (Bukkit.getPlayer(memberUUIDs) != null) {
+                                                Player member = Bukkit.getPlayer(memberUUIDs);
+                                                member.sendMessage(C.t("&#b755ff" + p.getDisplayName() + " has joined the party!"));
+                                            }
+                                        }
+                                        Bukkit.getPlayer(party.getLeader()).sendMessage(C.t("&#b755ff" + p.getDisplayName() + " has joined the party!"));
+                                        party.addMember(uuid);
+                                        try {
+                                            KitMethods.lobbyKit(Bukkit.getPlayer(party.getLeader()));
+                                        } catch (IOException err) {
+                                            err.printStackTrace();
+                                        }
+                                        try {
+                                            KitMethods.lobbyKit(p);
+                                        } catch (IOException err) {
+                                            err.printStackTrace();
+                                        }
+                                    } else {
+                                        p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are not invited to this party or it does not exist");
+                                    }
+                                } else {
+                                    p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Player is offline or does not exist");
+                                }
+                            } else {
+                                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Leave your current party before attempting to join another");
+                            }
+                            break;
+                    }
                 }
                 break;
         }
