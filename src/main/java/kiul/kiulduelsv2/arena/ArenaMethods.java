@@ -2,19 +2,16 @@ package kiul.kiulduelsv2.arena;
 
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class ArenaMethods {
 
-    public static ArrayList<String> arenasInUse = new ArrayList<>();
+    public static HashSet<String> arenasInUse = new HashSet<>();
 
     public static ArrayList<Block> liquidFreeze = new ArrayList<>();
 
@@ -26,10 +23,9 @@ public class ArenaMethods {
         Set<String> arenaList = getArenas();
 
         for (String arena : arenaList) {
-            if (DuelMethods.playersInMap.get(arena) == null || DuelMethods.playersInMap.get(arena).size() == 0) {
-                if (!arenasInUse.contains(arena)) {
-                    return arena;
-                }
+            Bukkit.broadcastMessage(arena+" - "+arenasInUse.contains(arena));
+            if (!arenasInUse.contains(arena)) {
+                return arena;
             }
         }
     return null;}

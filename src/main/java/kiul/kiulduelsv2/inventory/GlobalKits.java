@@ -55,12 +55,12 @@ public class GlobalKits {
         partyLeaderLobbyKit.setItem(3,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Split",Material.PINK_DYE,1,lore,null,null,"partysplit"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right-Click to queue for a party versus party duel");
-        partyLeaderLobbyKit.setItem(5,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Versus",Material.PURPLE_DYE,1,lore,null,null,"partyffa"));
+        partyLeaderLobbyKit.setItem(5,ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "Party Versus",Material.PURPLE_DYE,1,lore,null,null,"partyparty"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right-Click to queue for 2v2");
         partyLeaderLobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.GRAY + "Queue", Material.GRAY_DYE,1,lore,null,null,"partyqueue"));
         lore.add(ChatColor.GRAY + "Right-Click to open Settings");
-        partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.RED + "Disband Party", Material.RED_DYE,1,lore,null,null,"partysettings"));
+        partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.RED + "Disband Party", Material.RED_DYE,1,lore,null,null,"partydisband"));
         lore.clear();
         Userdata.get().set("kits.global.partyleader.inventory", InventoryToBase64.itemStackArrayToBase64(partyLeaderLobbyKit.getContents()));
 

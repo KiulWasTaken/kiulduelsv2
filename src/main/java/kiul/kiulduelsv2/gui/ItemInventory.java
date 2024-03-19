@@ -32,16 +32,21 @@ public class ItemInventory {
 
     }
 
-    public static void subItemInventory(Player p, Integer invSize, String inv, Integer itemAmount) {
+    public static void subItemInventory(Player p, Integer invSize, String inv, Integer itemAmount,Material itemType) {
 
         Inventory inventory = Bukkit.createInventory(p, invSize, itemInvTitle);
+        if (itemType == null) {
+            itemType = Material.POTION;
+        }
 
         for (int i = 1; i <= 9; i++) {
             inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
         }
-
-        inventory.setItem(invSize - 5, ItemStackMethods.createItemStack(ItemEnum.itemamount.getDisplayName(), ItemEnum.itemamount.getMaterial(), itemAmount, List.of(new String[]{"&7Left click &6⏵&8 to cycle item amount up", "&7Right click &6⏵&8 to cycle item amount down"}), null, null,null));
-
+        if (inv != "potions") {
+            inventory.setItem(invSize - 5, ItemStackMethods.createItemStack(ItemEnum.itemamount.getDisplayName(), ItemEnum.itemamount.getMaterial(), itemAmount, List.of(new String[]{"&7Left click &6⏵&8 to cycle item amount up", "&7Right click &6⏵&8 to cycle item amount down"}), null, null, null));
+        } else {
+            inventory.setItem(invSize - 5, ItemStackMethods.createItemStack(ItemEnum.itemType.getDisplayName(), itemType, itemAmount, List.of(new String[]{"&7Left click &6⏵&8 to cycle item type"}), null, null, null));
+        }
         inventory.setItem(invSize - 9, ItemStackMethods.createItemStack(ItemEnum.backtomain.getDisplayName(), ItemEnum.backtomain.getMaterial(), 1, List.of(new String[]{""}), null, null,null));
 
         inventory.setItem(invSize - 1, ItemStackMethods.createItemStack(ItemEnum.clearinventory.getDisplayName(), ItemEnum.clearinventory.getMaterial(), 1, List.of(new String[]{"&6⏵ &7Wipe your inventory of all its contents"}), null, null,null));
@@ -66,7 +71,8 @@ public class ItemInventory {
                     if (potion == false) {
                         inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), amount, lore, null, null,null));
                     } else {
-                        inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, item.getMaterial(), amount, item.getPotionData()));
+                        displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionData().getType():"") + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
+                        inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, itemType, itemAmount, item.getPotionData()));
                     }
                 }
             }

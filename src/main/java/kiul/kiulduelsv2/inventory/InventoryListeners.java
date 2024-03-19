@@ -6,6 +6,7 @@ import kiul.kiulduelsv2.gui.EnchantEnum;
 import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.gui.ItemEnum;
 import kiul.kiulduelsv2.gui.ItemInventory;
+import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -62,6 +63,39 @@ public class InventoryListeners implements Listener {
                                 EnchantInventory.itemEnchantInventory(p);
                                 return;
                             }
+                            if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemType.getDisplayName()))) {
+                                int amount = 1;
+                                Material itemType = Material.POTION;
+                                if (e.getClick() == ClickType.LEFT) {
+                                    switch (e.getCurrentItem().getType()) {
+                                        case POTION:
+                                            itemType = Material.SPLASH_POTION;
+                                            break;
+                                        case SPLASH_POTION:
+                                            itemType = Material.TIPPED_ARROW;
+                                            amount = 64;
+                                            break;
+                                        case TIPPED_ARROW:
+                                            itemType = Material.POTION;
+                                            break;
+                                    }
+                                } else if (e.getClick() == ClickType.RIGHT) {
+                                    switch (e.getCurrentItem().getType()) {
+                                        case POTION:
+                                            itemType = Material.TIPPED_ARROW;
+                                            amount = 64;
+                                            break;
+                                        case SPLASH_POTION:
+                                            itemType = Material.POTION;
+                                            break;
+                                        case TIPPED_ARROW:
+                                            itemType = Material.SPLASH_POTION;
+                                            break;
+                                    }
+                                }
+                                ItemInventory.subItemInventory(p, p.getOpenInventory().getTopInventory().getSize(), "potions", amount, itemType);
+                                break;
+                            }
                             if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemamount.getDisplayName()))) {
                                 int amount = 0;
                                 if (e.getClick() == ClickType.LEFT) {
@@ -109,31 +143,29 @@ public class InventoryListeners implements Listener {
                                 }
                                 for (ItemEnum subItem : ItemEnum.values()) {
                                     if (p.getOpenInventory().getTopInventory().getItem(0).getType() == subItem.getMaterial()) {
-                                        ItemInventory.subItemInventory(p, p.getOpenInventory().getTopInventory().getSize(), subItem.getInventory(), amount);
+                                        ItemInventory.subItemInventory(p, p.getOpenInventory().getTopInventory().getSize(), subItem.getInventory(), amount, null);
                                         break;
                                     }
                                 }
                                 break;
                             } else if (item.getInventorySize() != null) {
-                                ItemInventory.subItemInventory(p, item.getInventorySize(), item.getInventory(), 1);
+                                ItemInventory.subItemInventory(p, item.getInventorySize(), item.getInventory(), 1, null);
                                 break;
                             }
                         } else {
                             if (e.getClickedInventory() != null && e.getClickedInventory().equals(p.getOpenInventory().getTopInventory())) {
-                                for (ItemEnum subItem : ItemEnum.values()) {
-                                    if (e.getCurrentItem() != null && e.getCurrentItem().getType() == subItem.getMaterial()) {
-                                        if (subItem.getInventorySize() == null && subItem.getInventory() != null) {
-                                            if (ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).endsWith("x" + e.getCurrentItem().getAmount())) {
-                                                ItemStack itemStack = e.getCurrentItem().clone();
-                                                ItemMeta itemMeta = itemStack.getItemMeta();
-                                                itemMeta.setDisplayName("");
-                                                itemMeta.setLore(null);
-                                                itemStack.setAmount(e.getCurrentItem().getAmount());
-                                                itemStack.setItemMeta(itemMeta);
-                                                p.getInventory().addItem(itemStack);
-                                                return;
-                                            }
+                                if (e.getCurrentItem() != null) {
+                                    if (ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).endsWith("x" + e.getCurrentItem().getAmount())) {
+                                        ItemStack itemStack = e.getCurrentItem().clone();
+                                        ItemMeta itemMeta = itemStack.getItemMeta();
+                                        itemMeta.setDisplayName("");
+                                        itemMeta.setLore(null);
+                                        itemStack.setAmount(e.getCurrentItem().getAmount());
+                                        itemStack.setItemMeta(itemMeta);
+                                        if (ClickMethods.itemAmountIsWithinLimit(p,itemStack)) {
+                                            p.getInventory().addItem(itemStack);
                                         }
+                                        return;
                                     }
                                 }
                             }

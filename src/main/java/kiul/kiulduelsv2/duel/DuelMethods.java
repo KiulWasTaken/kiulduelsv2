@@ -8,8 +8,10 @@ import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -81,6 +83,9 @@ public class DuelMethods {
         for (Player p : players) {
             try {
                 KitMethods.loadSelectedKitSlot(p);
+                preDuel.add(p);
+                preDuelCountdown(p);
+                inDuel.add(p);
                     p.setSaturation(5);
                     p.setFoodLevel(20);
                     p.setHealth(20);
@@ -91,20 +96,19 @@ public class DuelMethods {
             } catch (IOException err) {
                 err.printStackTrace();
             }
-            preDuel.add(p);
-            preDuelCountdown(p);
-            inDuel.add(p);
+
         }
 
     }
 
     public static void preDuelCountdown (Player p) {
+        int timer = 10;
         Bukkit.getScheduler().runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), new Runnable() {
-            int time = 10; //or any other number you want to start countdown from
+            int time = timer; //or any other number you want to start countdown from
 
             @Override
             public void run() {
-                if (this.time != 0) {
+                if (this.time >= 0) {
                     p.sendTitle(ChatColor.DARK_AQUA + "" + time, "Ready", 0, 15, 5);
                     if (this.time == 1) {
                         p.sendTitle(ChatColor.DARK_AQUA + "" + time, "Fight!", 0, 15, 5);
@@ -127,8 +131,8 @@ public class DuelMethods {
         for (Player p : players) {
             p.teleport(teleportTo);
             p.setGameMode(GameMode.SPECTATOR);
-            p.setFlying(true);
             p.setAllowFlight(true);
+            p.setFlying(true);
         }
 
 
@@ -161,6 +165,8 @@ public class DuelMethods {
             reRollYes.put(arenaName, new ArrayList<>());
             reRollNo.put(arenaName, new ArrayList<>());
             for (Player p : players) {
+                p.setAllowFlight(true);
+                p.setFlying(true);
                 p.spigot().sendMessage(message.create());
             }
             new BukkitRunnable() {
@@ -169,7 +175,8 @@ public class DuelMethods {
                 @Override
                 public void run() {
                     for (Player p : players) {
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + time);
+                        String message = "§7"+time;
+                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                     }
                     players.removeIf(Objects::isNull);
                     if (players.size() != size) {
@@ -183,17 +190,16 @@ public class DuelMethods {
                     }
 
                     if (this.time <= 0) {
+                        cancel();
                         if (reRollYes.get(arenaName).size() > reRollNo.get(arenaName).size()) {
                             for (Player p : players) {
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
-                                p.setFlying(false);
-                                p.setAllowFlight(false);
                             }
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
                             startRealisticDuel(players,backupArena,true);
-
-                            TerrainArena.generateTerrainPerformant(duelCentre,4);
+                            ArenaMethods.regenerateArena(arenaName);
+                            return;
 
                         } else {
                             for (Player p : players) {
@@ -205,9 +211,8 @@ public class DuelMethods {
                             reRollYes.remove(arenaName);
                             beginDuel(arenaName,players);
                             ArenaMethods.arenasInUse.remove(backupArena);
+                            return;
                         }
-                        cancel();
-                        return;
                     }
 
                     if (reRollYes.get(arenaName).size() > reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
@@ -242,15 +247,13 @@ public class DuelMethods {
         } else {
             for (Player p : players) {
                 p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"No backup maps available, game starting in 10 seconds.");
+                p.setAllowFlight(true);
+                p.setFlying(true);
             }
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    for (Player p : players) {
-                        if (p == null) {
-                            players.remove(p);
-                        }
-                    }
+                    players.removeIf(Objects::isNull);
                     if (players.size() == size) {
                         beginDuel(arenaName, players);
                     } else {

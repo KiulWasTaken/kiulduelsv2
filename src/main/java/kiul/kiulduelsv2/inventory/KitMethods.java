@@ -20,8 +20,6 @@ public class KitMethods {
 
     public static HashMap<Player,Integer> kitSlot = new HashMap<>();
     public static void lobbyKit (Player p) throws IOException {
-        p.setFlying(false);
-        p.setAllowFlight(false);
         ItemStack[] kitContents;
         List<String> lore = new ArrayList<>();
         if (partyManager.findPartyForMember(p.getUniqueId()) != null) {
@@ -71,15 +69,11 @@ public class KitMethods {
         ItemStack[] armourContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour"));
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(armourContents);
-        p.setFlying(false);
-        p.setAllowFlight(false);
     }
 
     public static void loadGlobalKit (Player p, String kitName) throws IOException {
         ItemStack[] kitContents = InventoryToBase64.fromBase64((String) Userdata.get().get("kits.global."+kitName+".inventory")).getContents();
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(null);
-        p.setFlying(false);
-        p.setAllowFlight(false);
     }
 }

@@ -368,7 +368,7 @@ public class TerrainArena extends ChunkGenerator {
     }
 
     public static void generateTerrainPerformant(Location targetLocation, int size) {
-        long timeMillis = System.currentTimeMillis();
+//        long timeMillis = System.currentTimeMillis();
         String worldName = "arenaTerrain";
         BukkitScheduler scheduler = getServer().getScheduler();
         // Check if the world is already loaded
@@ -389,7 +389,7 @@ public class TerrainArena extends ChunkGenerator {
             double Lx = (Rx-0.5)*8000;
             double Lz = (Rz-0.5)*8000;
             scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-                Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"math.random operation complete (" + Lx + ", " + Lz + ")");
+//                Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"math.random operation complete (" + Lx + ", " + Lz + ")");
 
 
                  Location center = new Location(world,Lx,0,Lz);
@@ -414,9 +414,9 @@ public class TerrainArena extends ChunkGenerator {
                             faweWorld, region, clipboard, region.getMinimumPoint()
                     );
                     Operations.complete(forwardExtentCopy);
-                    scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"copy operation complete");
-                    });
+//                    scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+//                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"copy operation complete");
+//                    });
 // configure here
 
 
@@ -434,12 +434,13 @@ public class TerrainArena extends ChunkGenerator {
 
                         editSession.close();
                         scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-                            long finalTime = (System.currentTimeMillis()-timeMillis)/1000;
-                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"paste operation complete (finished in " + finalTime + "s)");
+//                            long finalTime = (System.currentTimeMillis()-timeMillis)/1000;
+//                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"paste operation complete (finished in " + finalTime + "s)");
                             for (String arenaName : ArenaMethods.getArenas()) {
-                                if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {
+                                if (Arenadata.get().getLocation("arenas." + arenaName + ".center") == targetLocation) {
                                     if (ArenaMethods.arenasInUse.contains(arenaName)) {
                                         ArenaMethods.arenasInUse.remove(arenaName);
+                                        Bukkit.broadcastMessage(ChatColor.GOLD + "+" + ChatColor.GRAY+arenaName);
                                     }
                                 }
                             }

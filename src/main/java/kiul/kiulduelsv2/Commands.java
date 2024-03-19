@@ -147,6 +147,8 @@ public class Commands implements CommandExecutor {
                         DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
                         p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (N)");
                     }
+                } else {
+                    p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"You cannot do this right now");
                 }
                 break;
             case "test":
