@@ -50,12 +50,8 @@ public class QueueInventory {
                 }
                 String itemName = ItemStackMethods.translateHexColorCodes("&#","",item.getDisplayName());
 
-                if (item.getSkullValue() != null) {
-                    inventory.setItem(item.getInventorySlot(),ItemStackMethods.createPlayerHead(item.getSkullValue(),itemName));
-                } else {
-                    inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null,item.getlocalName()));
 
-                }
+                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null,item.getlocalName()));
         }
 
         p.openInventory(inventory);

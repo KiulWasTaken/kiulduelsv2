@@ -5,8 +5,10 @@ import kiul.kiulduelsv2.arena.Region;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.gui.EnchantInventory;
+import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.gui.ItemEnum;
 import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.QueueInventory;
@@ -26,6 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.StringUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static kiul.kiulduelsv2.C.partyManager;
@@ -137,6 +140,17 @@ public class Commands implements CommandExecutor {
 
 //      TerrainArena.generateTerrain(p.getWorld(), new Location(p.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 4, p, null);
 
+                break;
+            case "recap":
+                ArrayList<Player> duelMembers = new ArrayList<>();
+                for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                    if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
+                        if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(args[0])) {
+                            duelMembers.add(onlinePlayers);
+                        }
+                    }
+                }
+                DuelMethods.openStatsGUI(duelMembers,p);
                 break;
             case "reroll":
                 if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).contains(p)) {

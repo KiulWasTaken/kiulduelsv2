@@ -1,10 +1,12 @@
 package kiul.kiulduelsv2.duel;
 
+import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
@@ -15,6 +17,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -128,11 +131,13 @@ public class DuelMethods {
 
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
         Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());
+        Map<String,Object> duelStatistics = DuelListeners.createStatsArraylist();
         for (Player p : players) {
             p.teleport(teleportTo);
             p.setGameMode(GameMode.SPECTATOR);
             p.setAllowFlight(true);
             p.setFlying(true);
+            DuelListeners.duelStatistics.put(p,duelStatistics);
         }
 
 
@@ -179,6 +184,11 @@ public class DuelMethods {
                         p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                     }
                     players.removeIf(Objects::isNull);
+                    for (Player p : players) {
+                        if (!p.isOnline()) {
+                            players.remove(p);
+                        }
+                    }
                     if (players.size() != size) {
                         for (Player p : players) {
                             UtilMethods.teleportLobby(p);
@@ -254,6 +264,11 @@ public class DuelMethods {
                 @Override
                 public void run() {
                     players.removeIf(Objects::isNull);
+                    for (Player p : players) {
+                        if (!p.isOnline()) {
+                            players.remove(p);
+                        }
+                     }
                     if (players.size() == size) {
                         beginDuel(arenaName, players);
                     } else {
@@ -269,11 +284,13 @@ public class DuelMethods {
 
 
     public static void startPartyDuel (String arenaName,List<Player> players,List<Player> teamOne,List<Player> teamTwo, boolean ffa) {
+        Map<String,Object> duelStatistics = DuelListeners.createStatsArraylist();
         for (Player play : players) {
             if (preDuel.contains(play)) {
                 preDuel.remove(play);
             }
             play.setGameMode(GameMode.SURVIVAL);
+            DuelListeners.duelStatistics.put(play,duelStatistics);
         }
         Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
         Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
@@ -321,5 +338,63 @@ public class DuelMethods {
         }
         return location.getBlock();
     }
-    
+
+
+    public static void openStatsGUI (ArrayList<Player> players,Player p) {
+        int invSize = 18+(int)Math.ceil(players.size() / 7.0)*9;
+        Inventory inventory = Bukkit.createInventory(null,invSize,"Statistics");
+        ItemStack item = ItemStackMethods.createItemStack(" ", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null);
+        int rowCount = invSize / 9;
+
+        for(int index = 0; index < invSize; index++) {
+            int row = index / 9;
+            int column = (index % 9) + 1;
+
+            if(row == 0 || row == rowCount-1 || column == 1 || column == 9)
+                inventory.setItem(index, item);
+        }
+        ArrayList<String> lore = new ArrayList<>();
+        for (int i = 0; i < players.size(); i++) {
+            lore.add("Hits: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("hits_dealt"));
+            lore.add("Hits Taken: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("hits_taken"));
+            lore.add("Damage Dealt: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("damage_dealt"));
+            lore.add("Longest Combo: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("longest_combo"));
+
+            inventory.addItem(ItemStackMethods.createSkullItem(players.get(i).getDisplayName(),players.get(i),lore));
+            lore.clear();
+        }
+
+
+
+        p.openInventory(inventory);
+    }
+
+    public static void sendMatchRecap (Player p, Player winner,String mode) {
+        ArrayList<Player> duelMembers = new ArrayList<>();
+        for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+            if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
+                if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(p).get("uuid").toString())) {
+                    duelMembers.add(onlinePlayers);
+                }
+            }
+        }
+            p.sendMessage(C.t("&#50bd4a&m&l-------|&r &#378033&lMatch Recap &#50bd4a&m&l|-------"));
+        for (Player player : duelMembers) {
+            if (player == winner) {
+                String displayName = ChatColor.WHITE+ player.getDisplayName();
+                p.sendMessage(C.t("&#50bd4a▸&7 ") + displayName + C.t("&6 (WINNER)"));
+            } else {
+                String displayName = ChatColor.GRAY+ player.getDisplayName();
+                p.sendMessage(C.t("&#50bd4a▸&7 ") + displayName);
+            }
+        }
+            p.sendMessage("");
+            TextComponent message = new TextComponent("Click to see more information..");
+            message.setColor(net.md_5.bungee.api.ChatColor.GRAY);
+            message.setItalic(true);
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/recap " + DuelListeners.duelStatistics.get(p).get("uuid").toString()));
+            p.spigot().sendMessage(message);
+            p.sendMessage(C.t("&#50bd4a&m&l---------------------------"));
+
+    }
 }

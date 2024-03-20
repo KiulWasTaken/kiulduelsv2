@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Skull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -49,15 +50,14 @@ public class ItemStackMethods {
             return i;
     }
 
-    public static ItemStack createPlayerHead(String textureValue, String displayName) {
-        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta sm = (SkullMeta) playerHead.getItemMeta();
-        //OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(head_uuid));
-        OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(textureValue));
-        sm.setOwningPlayer(player);
-        sm.setDisplayName(displayName);
-        playerHead.setItemMeta(sm);
-        return playerHead;
+    public static ItemStack createSkullItem(String displayName,Player player,ArrayList<String> lore) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        meta.setDisplayName(displayName);
+        meta.setLore(lore);
+        meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
+        item.setItemMeta(meta);
+        return item;
     }
 
     public static ItemStack createPotion(String displayName, Material mat, int amount, PotionData potionData) {

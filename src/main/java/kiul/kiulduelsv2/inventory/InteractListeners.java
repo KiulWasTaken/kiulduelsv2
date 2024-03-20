@@ -80,12 +80,14 @@ public class InteractListeners implements Listener {
                         Party party = partyManager.findPartyForMember(p.getUniqueId());
                         UUID uuid = p.getUniqueId();
                         ArrayList<Player> players = new ArrayList<>();
-                        for (UUID playerUUID : party.getMembers()) {
-                            if (Bukkit.getServer().getPlayer(playerUUID) != null) {
-                                players.add(Bukkit.getServer().getPlayer(playerUUID));
+                        if (party != null) {
+                            for (UUID playerUUID : party.getMembers()) {
+                                if (Bukkit.getServer().getPlayer(playerUUID) != null) {
+                                    players.add(Bukkit.getServer().getPlayer(playerUUID));
+                                }
                             }
+                            players.add(Bukkit.getServer().getPlayer(party.getLeader()));
                         }
-                        players.add(Bukkit.getServer().getPlayer(party.getLeader()));
                         switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
                             case "queue":
                                 e.setCancelled(true);

@@ -14,6 +14,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -22,9 +23,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class DuelListeners implements Listener {
 
@@ -70,16 +69,12 @@ public class DuelListeners implements Listener {
                                             DuelMethods.inDuel.remove(team1Members);
                                         }
                                         UtilMethods.teleportLobby(team1Members);
+                                        DuelMethods.sendMatchRecap(team1Members, team1Members, "SMP");
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                                for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                                    if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayers.getLocation())) {
-                                        UtilMethods.becomeNotSpectator(onlinePlayers);
-                                        UtilMethods.teleportLobby(onlinePlayers);
-                                    }
 
-                                }
                             }
+
                             for (Player team2Members : team2) {
                                 team2Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                 new BukkitRunnable() {
@@ -92,6 +87,23 @@ public class DuelListeners implements Listener {
                             ArenaMethods.regenerateArena(arenaName);
                             DuelMethods.mapTeams.remove(arenaName);
                             DuelMethods.playersInMap.remove(arenaName);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                                        if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayers.getLocation())) {
+                                            UtilMethods.becomeNotSpectator(onlinePlayers);
+                                            UtilMethods.teleportLobby(onlinePlayers);
+                                            if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
+                                                if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(team1.get(0)).get("uuid").toString())) {
+                                                    DuelMethods.sendMatchRecap(onlinePlayers, team1.get(0), "SMP");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                            DuelMethods.mapTeams.remove(arenaName);
                         } else if (team1.size() == 0) {
                             for (Player team2Members : team2) {
                                 team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
@@ -103,16 +115,12 @@ public class DuelListeners implements Listener {
                                             DuelMethods.inDuel.remove(team2Members);
                                         }
                                         UtilMethods.teleportLobby(team2Members);
-                                        for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                                            if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayers.getLocation())) {
-                                                UtilMethods.becomeNotSpectator(onlinePlayers);
-                                                UtilMethods.teleportLobby(onlinePlayers);
-                                            }
+                                        DuelMethods.sendMatchRecap(team2Members, team2Members, "SMP");
 
-                                        }
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                             }
+
                             for (Player team1Members : team1) {
                                 team1Members.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                 new BukkitRunnable() {
@@ -120,12 +128,30 @@ public class DuelListeners implements Listener {
                                     public void run() {
                                         UtilMethods.teleportLobby(team1Members);
 
+
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                             }
                             ArenaMethods.regenerateArena(arenaName);
                             DuelMethods.mapTeams.remove(arenaName);
                             DuelMethods.playersInMap.remove(arenaName);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                                        if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayers.getLocation())) {
+                                            UtilMethods.becomeNotSpectator(onlinePlayers);
+                                            UtilMethods.teleportLobby(onlinePlayers);
+                                            if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
+                                                if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(team2.get(0)).get("uuid").toString()) ) {
+                                                    DuelMethods.sendMatchRecap(onlinePlayers, team2.get(0), "SMP");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                            DuelMethods.mapTeams.remove(arenaName);
                         }
                     } else {
                         try {
@@ -150,6 +176,11 @@ public class DuelListeners implements Listener {
                                     if (region.contains(onlinePlayers.getLocation())) {
                                         UtilMethods.becomeNotSpectator(onlinePlayers);
                                         UtilMethods.teleportLobby(onlinePlayers);
+                                        if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
+                                            if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString() == DuelListeners.duelStatistics.get(victor).get("uuid")) {
+                                                DuelMethods.sendMatchRecap(onlinePlayers, victor, "SMP");
+                                            }
+                                        }
                                     }
 
                             }
@@ -306,6 +337,40 @@ public class DuelListeners implements Listener {
             if (!ArenaMethods.LocationIsInsideArena(e.getTo(),ArenaMethods.findPlayerArena(p))) {
                 p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Do not attempt to leave the arena!");
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    public static HashMap<Player, Map<String,Object>> duelStatistics = new HashMap<>();
+
+    public static Map<String,Object> createStatsArraylist() {
+        UUID duelUUID = new UUID(5,5);
+        Map<String,Object> duelStats = new HashMap<>() {{
+           put("hits_dealt",0);
+           put("hits_taken",0);
+           put("combo",0);
+           put("longest_combo",0);
+           put("damage_dealt",0);
+           put("uuid",duelUUID);
+
+
+        }};
+        return duelStats;
+    }
+
+    @EventHandler
+    public void hitStatTracker (EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player damager) {
+            if (e.getEntity() instanceof  Player damaged) {
+
+                duelStatistics.get(damager).put("hits_dealt",(int)duelStatistics.get(damager).get("hits_dealt")+1);
+                duelStatistics.get(damager).put("combo",(int)duelStatistics.get(damager).get("combo")+1);
+                duelStatistics.get(damager).put("damage_dealt",(int)duelStatistics.get(damager).get("damage_dealt")+(int)e.getFinalDamage());
+                duelStatistics.get(damaged).put("hits_taken",(int)duelStatistics.get(damaged).get("hits_taken")+1);
+                if ((int)duelStatistics.get(damaged).get("combo") > (int)duelStatistics.get(damaged).get("longest_combo")) {
+                    duelStatistics.get(damaged).put("longest_combo",duelStatistics.get(damaged).get("combo"));
+                }
+                duelStatistics.get(damaged).put("combo",0);
             }
         }
     }
