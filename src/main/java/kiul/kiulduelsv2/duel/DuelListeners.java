@@ -7,6 +7,7 @@ import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
+import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.*;
@@ -39,6 +40,9 @@ public class DuelListeners implements Listener {
                     UtilMethods.becomeSpectator(p);
                     DuelMethods.playersInMap.get(arenaName).remove(p);
                     DuelMethods.inDuel.remove(p);
+                    DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead",true);
+                    DuelMethods.inventoryPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
+                    DuelMethods.armourPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
                     if (DuelMethods.mapTeams.get(arenaName) != null) {
                         for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
                             if (team.contains(p)) {
@@ -61,6 +65,8 @@ public class DuelListeners implements Listener {
                             // team 1 wins
                             for (Player team1Members : team1) {
                                 team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
+                                DuelMethods.inventoryPreview.put(team1Members,InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getContents()));
+                                DuelMethods.armourPreview.put(team1Members,InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getArmorContents()));
                                 team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                                 new BukkitRunnable() {
                                     @Override
@@ -69,7 +75,6 @@ public class DuelListeners implements Listener {
                                             DuelMethods.inDuel.remove(team1Members);
                                         }
                                         UtilMethods.teleportLobby(team1Members);
-                                        DuelMethods.sendMatchRecap(team1Members, team1Members, "SMP");
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
 
@@ -91,14 +96,15 @@ public class DuelListeners implements Listener {
                                 @Override
                                 public void run() {
                                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                                        if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
+                                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").equals(DuelListeners.duelStatistics.get(team1.get(0).getUniqueId()).get("uuid"))) {
+                                                DuelMethods.sendMatchRecap(onlinePlayers, team1.get(0), "SMP");
+                                            }
+                                        }
                                         if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayers.getLocation())) {
                                             UtilMethods.becomeNotSpectator(onlinePlayers);
                                             UtilMethods.teleportLobby(onlinePlayers);
-                                            if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
-                                                if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(team1.get(0)).get("uuid").toString())) {
-                                                    DuelMethods.sendMatchRecap(onlinePlayers, team1.get(0), "SMP");
-                                                }
-                                            }
+
                                         }
                                     }
                                 }
@@ -107,6 +113,8 @@ public class DuelListeners implements Listener {
                         } else if (team1.size() == 0) {
                             for (Player team2Members : team2) {
                                 team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
+                                DuelMethods.inventoryPreview.put(team2Members,InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getContents()));
+                                DuelMethods.armourPreview.put(team2Members,InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getArmorContents()));
                                 team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                                 new BukkitRunnable() {
                                     @Override
@@ -115,7 +123,6 @@ public class DuelListeners implements Listener {
                                             DuelMethods.inDuel.remove(team2Members);
                                         }
                                         UtilMethods.teleportLobby(team2Members);
-                                        DuelMethods.sendMatchRecap(team2Members, team2Members, "SMP");
 
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
@@ -139,14 +146,16 @@ public class DuelListeners implements Listener {
                                 @Override
                                 public void run() {
                                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+
+                                        if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
+
+                                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").equals(DuelListeners.duelStatistics.get(team2.get(0).getUniqueId()).get("uuid")) ) {
+                                                DuelMethods.sendMatchRecap(onlinePlayers, team2.get(0), "SMP");
+                                            }
+                                        }
                                         if (ArenaMethods.getArenaRegion(arenaName).contains(onlinePlayers.getLocation())) {
                                             UtilMethods.becomeNotSpectator(onlinePlayers);
                                             UtilMethods.teleportLobby(onlinePlayers);
-                                            if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
-                                                if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(team2.get(0)).get("uuid").toString()) ) {
-                                                    DuelMethods.sendMatchRecap(onlinePlayers, team2.get(0), "SMP");
-                                                }
-                                            }
                                         }
                                     }
                                 }
@@ -164,6 +173,8 @@ public class DuelListeners implements Listener {
                             Player victor = DuelMethods.playersInMap.get(arenaName).get(0);
                             victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
                             victor.playSound(victor, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+                            DuelMethods.inventoryPreview.put(victor,InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getContents()));
+                            DuelMethods.armourPreview.put(victor,InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getArmorContents()));
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
@@ -176,8 +187,9 @@ public class DuelListeners implements Listener {
                                     if (region.contains(onlinePlayers.getLocation())) {
                                         UtilMethods.becomeNotSpectator(onlinePlayers);
                                         UtilMethods.teleportLobby(onlinePlayers);
-                                        if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
-                                            if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString() == DuelListeners.duelStatistics.get(victor).get("uuid")) {
+                                        if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
+
+                                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
                                                 DuelMethods.sendMatchRecap(onlinePlayers, victor, "SMP");
                                             }
                                         }
@@ -341,16 +353,17 @@ public class DuelListeners implements Listener {
         }
     }
 
-    public static HashMap<Player, Map<String,Object>> duelStatistics = new HashMap<>();
+    public static HashMap<UUID, Map<String,Object>> duelStatistics = new HashMap<>();
 
     public static Map<String,Object> createStatsArraylist() {
-        UUID duelUUID = new UUID(5,5);
+        UUID duelUUID = UUID.randomUUID();
         Map<String,Object> duelStats = new HashMap<>() {{
            put("hits_dealt",0);
            put("hits_taken",0);
            put("combo",0);
            put("longest_combo",0);
            put("damage_dealt",0);
+           put("dead",false);
            put("uuid",duelUUID);
 
 
@@ -360,17 +373,30 @@ public class DuelListeners implements Listener {
 
     @EventHandler
     public void hitStatTracker (EntityDamageByEntityEvent e) {
-        if (e.getDamager() instanceof Player damager) {
-            if (e.getEntity() instanceof  Player damaged) {
+        if (e.getDamager() instanceof Player) {
+            if (e.getEntity() instanceof Player ) {
+                Player damaged = (Player) e.getEntity();
+                Player damager = (Player) e.getDamager();
+                if (DuelMethods.inDuel.contains(damager) && DuelMethods.inDuel.contains(damaged)) {
 
-                duelStatistics.get(damager).put("hits_dealt",(int)duelStatistics.get(damager).get("hits_dealt")+1);
-                duelStatistics.get(damager).put("combo",(int)duelStatistics.get(damager).get("combo")+1);
-                duelStatistics.get(damager).put("damage_dealt",(int)duelStatistics.get(damager).get("damage_dealt")+(int)e.getFinalDamage());
-                duelStatistics.get(damaged).put("hits_taken",(int)duelStatistics.get(damaged).get("hits_taken")+1);
-                if ((int)duelStatistics.get(damaged).get("combo") > (int)duelStatistics.get(damaged).get("longest_combo")) {
-                    duelStatistics.get(damaged).put("longest_combo",duelStatistics.get(damaged).get("combo"));
+                    int getDamagerHitsDealt = (int) duelStatistics.get(damager.getUniqueId()).get("hits_dealt");
+                    damager.sendMessage(getDamagerHitsDealt + "");
+
+                    int getDamagerCombo = (int) duelStatistics.get(damager.getUniqueId()).get("combo");
+                    int getDamagerDamageDealt = (int) duelStatistics.get(damager.getUniqueId()).get("damage_dealt");
+
+                    int getDamagedHitsTaken = (int) duelStatistics.get(damaged.getUniqueId()).get("hits_taken");
+
+
+                    duelStatistics.get(damager.getUniqueId()).put("hits_dealt", getDamagerHitsDealt + 1);
+                    duelStatistics.get(damager.getUniqueId()).put("combo", getDamagerCombo + 1);
+                    duelStatistics.get(damager.getUniqueId()).put("damage_dealt", getDamagerDamageDealt + (int) e.getFinalDamage());
+                    duelStatistics.get(damaged.getUniqueId()).put("hits_taken", getDamagedHitsTaken + 1);
+                    if ((int) duelStatistics.get(damager.getUniqueId()).get("combo") > (int) duelStatistics.get(damager.getUniqueId()).get("longest_combo")) {
+                        duelStatistics.get(damager.getUniqueId()).put("longest_combo", duelStatistics.get(damager.getUniqueId()).get("combo"));
+                    }
+                    duelStatistics.get(damaged.getUniqueId()).put("combo", 0);
                 }
-                duelStatistics.get(damaged).put("combo",0);
             }
         }
     }

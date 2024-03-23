@@ -40,6 +40,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("party").setExecutor(new Commands());
         getCommand("e").setExecutor(new Commands());
         getCommand("cancel").setExecutor(new Commands());
+        getCommand("previewinv").setExecutor(new Commands());
         getCommand("reroll").setExecutor(new Commands());
         getCommand("recap").setExecutor(new Commands());
         getCommand("save").setExecutor(new Commands());

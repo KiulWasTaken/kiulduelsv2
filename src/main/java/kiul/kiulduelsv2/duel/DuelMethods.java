@@ -37,6 +37,9 @@ public class DuelMethods {
     public static HashMap<String, List<Player>> playersInMap = new HashMap<>();
     public static HashMap<String, List<List<Player>>> mapTeams = new HashMap<>();
 
+    public static HashMap<Player,String> inventoryPreview = new HashMap<>();
+    public static HashMap<Player,String> armourPreview = new HashMap<>();
+
     static ArrayList<Player> preDuel = new ArrayList<>();
 
     public static ArrayList<Player> inDuel = new ArrayList<>();
@@ -131,13 +134,15 @@ public class DuelMethods {
 
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
         Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());
-        Map<String,Object> duelStatistics = DuelListeners.createStatsArraylist();
+        UUID duelUUID = UUID.randomUUID();
         for (Player p : players) {
             p.teleport(teleportTo);
             p.setGameMode(GameMode.SPECTATOR);
             p.setAllowFlight(true);
             p.setFlying(true);
-            DuelListeners.duelStatistics.put(p,duelStatistics);
+            DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
+            DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
+            p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
         }
 
 
@@ -166,7 +171,7 @@ public class DuelMethods {
                     .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reroll no"));
 
             // Send the message
-            allowedToReRoll.put(arenaName, players);
+            allowedToReRoll.put(arenaName, new ArrayList<>(players));
             reRollYes.put(arenaName, new ArrayList<>());
             reRollNo.put(arenaName, new ArrayList<>());
             for (Player p : players) {
@@ -183,9 +188,8 @@ public class DuelMethods {
                         String message = "§7"+time;
                         p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                     }
-                    players.removeIf(Objects::isNull);
                     for (Player p : players) {
-                        if (!p.isOnline()) {
+                        if (!Bukkit.getOnlinePlayers().contains(p)) {
                             players.remove(p);
                         }
                     }
@@ -201,7 +205,7 @@ public class DuelMethods {
 
                     if (this.time <= 0) {
                         cancel();
-                        if (reRollYes.get(arenaName).size() > reRollNo.get(arenaName).size()) {
+                        if (reRollYes.get(arenaName).size() >= reRollNo.get(arenaName).size()) {
                             for (Player p : players) {
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
                             }
@@ -225,7 +229,7 @@ public class DuelMethods {
                         }
                     }
 
-                    if (reRollYes.get(arenaName).size() > reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
+                    if (reRollYes.get(arenaName).size() >= reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Map Re-Rolling!");
                             p.setFlying(false);
@@ -238,6 +242,7 @@ public class DuelMethods {
                         TerrainArena.generateTerrainPerformant(duelCentre,4);
                         startRealisticDuel(players,backupArena,true);
                         cancel();
+                        return;
                     } else if (reRollYes.get(arenaName).size() < reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
                             p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Voting Complete! Game Starting!");
@@ -250,6 +255,7 @@ public class DuelMethods {
                         ArenaMethods.arenasInUse.remove(backupArena);
 
                         cancel();
+                        return;
                     }
                     time--;
                 }
@@ -290,7 +296,7 @@ public class DuelMethods {
                 preDuel.remove(play);
             }
             play.setGameMode(GameMode.SURVIVAL);
-            DuelListeners.duelStatistics.put(play,duelStatistics);
+            DuelListeners.duelStatistics.put(play.getUniqueId(),duelStatistics);
         }
         Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
         Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
@@ -341,26 +347,25 @@ public class DuelMethods {
 
 
     public static void openStatsGUI (ArrayList<Player> players,Player p) {
-        int invSize = 18+(int)Math.ceil(players.size() / 7.0)*9;
+        int invSize = 9+(int)Math.ceil(players.size() / 7.0)*9;
         Inventory inventory = Bukkit.createInventory(null,invSize,"Statistics");
-        ItemStack item = ItemStackMethods.createItemStack(" ", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null);
-        int rowCount = invSize / 9;
-
-        for(int index = 0; index < invSize; index++) {
-            int row = index / 9;
-            int column = (index % 9) + 1;
-
-            if(row == 0 || row == rowCount-1 || column == 1 || column == 9)
-                inventory.setItem(index, item);
+        for (int i = 1; i <= 9; i++) {
+            inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
         }
+
         ArrayList<String> lore = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
-            lore.add("Hits: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("hits_dealt"));
-            lore.add("Hits Taken: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("hits_taken"));
-            lore.add("Damage Dealt: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("damage_dealt"));
-            lore.add("Longest Combo: " + (int)DuelListeners.duelStatistics.get(players.get(i)).get("longest_combo"));
+            String displayName = ChatColor.WHITE+players.get(i).getDisplayName();
+            if ((boolean)DuelListeners.duelStatistics.get(p.getUniqueId()).get("dead")) {
+                displayName = ChatColor.GRAY+players.get(i).getDisplayName() + ChatColor.RED + " (DEAD)";
+            }
 
-            inventory.addItem(ItemStackMethods.createSkullItem(players.get(i).getDisplayName(),players.get(i),lore));
+            lore.add(ChatColor.GRAY + "Hits: " + isThisStatTheBest(players.get(i),players,"hits_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_dealt"));
+            lore.add(ChatColor.GRAY + "Hits Taken: " + isThisStatTheBest(players.get(i),players,"hits_taken") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_taken"));
+            lore.add(ChatColor.GRAY + "Damage Dealt: " + isThisStatTheBest(players.get(i),players,"damage_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("damage_dealt"));
+            lore.add(ChatColor.GRAY + "Longest Combo: " + isThisStatTheBest(players.get(i),players,"longest_combo") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("longest_combo"));
+
+            inventory.addItem(ItemStackMethods.createSkullItem(displayName,players.get(i),lore));
             lore.clear();
         }
 
@@ -369,32 +374,83 @@ public class DuelMethods {
         p.openInventory(inventory);
     }
 
+    public static ChatColor isThisStatTheBest (Player p,ArrayList<Player> competition,String category) {
+        int myStat = (int)DuelListeners.duelStatistics.get(p.getUniqueId()).get(category);
+        List<Integer> statList = new ArrayList<>();
+        for (Player player : competition) {
+            int stat = (int)DuelListeners.duelStatistics.get(player.getUniqueId()).get(category);
+            statList.add(stat);
+        }
+        Collections.sort(statList);
+        Collections.reverse(statList);
+        if (myStat >= statList.get(0)) {
+            return ChatColor.GOLD;
+        }
+    return ChatColor.WHITE;}
+
     public static void sendMatchRecap (Player p, Player winner,String mode) {
         ArrayList<Player> duelMembers = new ArrayList<>();
         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-            if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
-                if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(p).get("uuid").toString())) {
+            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
+
+                if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").equals(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid")) ) {
                     duelMembers.add(onlinePlayers);
                 }
             }
         }
-            p.sendMessage(C.t("&#50bd4a&m&l-------|&r &#378033&lMatch Recap &#50bd4a&m&l|-------"));
+            p.sendMessage(C.t("&#50bd4a&m&l------- |&r &#378033&lMatch Recap &#50bd4a&m&l| -------"));
+        TextComponent bulletPoint = new TextComponent("▸ ");
+        bulletPoint.setColor(net.md_5.bungee.api.ChatColor.of("#50bd4a"));
         for (Player player : duelMembers) {
             if (player == winner) {
-                String displayName = ChatColor.WHITE+ player.getDisplayName();
-                p.sendMessage(C.t("&#50bd4a▸&7 ") + displayName + C.t("&6 (WINNER)"));
+
+                TextComponent displayName = new TextComponent(player.getDisplayName());
+                TextComponent winnerMessage = new TextComponent(ChatColor.GOLD+" (WINNER)");
+                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getDisplayName()));
+                p.spigot().sendMessage(bulletPoint,displayName,winnerMessage);
+
             } else {
-                String displayName = ChatColor.GRAY+ player.getDisplayName();
-                p.sendMessage(C.t("&#50bd4a▸&7 ") + displayName);
+                TextComponent displayName = new TextComponent(player.getDisplayName());
+                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getDisplayName()));
+                p.spigot().sendMessage(bulletPoint,displayName);
             }
         }
             p.sendMessage("");
+            p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Click names for inventories..");
             TextComponent message = new TextComponent("Click to see more information..");
             message.setColor(net.md_5.bungee.api.ChatColor.GRAY);
             message.setItalic(true);
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/recap " + DuelListeners.duelStatistics.get(p).get("uuid").toString()));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/recap " + DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString()));
             p.spigot().sendMessage(message);
-            p.sendMessage(C.t("&#50bd4a&m&l---------------------------"));
+            p.sendMessage(C.t("&#50bd4a&m&l-----------------------------"));
 
     }
+
+    public static void previewInventorySnapshot(Player user, Player target) {
+        int invSize = 45;
+        Inventory inventory = Bukkit.createInventory(null,invSize,target.getDisplayName()+"'s Inventory");
+
+        try {
+            ItemStack[] targetInventory = InventoryToBase64.itemStackArrayFromBase64(DuelMethods.inventoryPreview.get(target));
+            ItemStack[] targetArmour = InventoryToBase64.itemStackArrayFromBase64(DuelMethods.armourPreview.get(target));
+            for (ItemStack i : targetInventory) {
+                if (i != null) {
+                    inventory.addItem(i);
+                }
+            }
+            for (int i = 0; i < 3; i++) {
+                if (targetArmour[i] != null) {
+                    inventory.setItem(28 + i, targetArmour[i]);
+                }
+            }
+            for (int i = 1; i <= 9; i++) {
+                inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
+            }
+
+        } catch (IOException err) {err.printStackTrace();}
+
+        user.openInventory(inventory);
+
+    }
+
 }

@@ -34,6 +34,10 @@ public class InventoryListeners implements Listener {
     @EventHandler
     public void inventoryClick(InventoryClickEvent e) {
 
+        if (e.getView().getTitle().equalsIgnoreCase("Statistics") || e.getView().getTitle().contains("'s Inventory")) {
+            e.setCancelled(true);
+        }
+
         if (e.getWhoClicked() instanceof Player p) {
             if (e.getView().getTitle().equalsIgnoreCase(ItemInventory.itemInvTitle)) {
 

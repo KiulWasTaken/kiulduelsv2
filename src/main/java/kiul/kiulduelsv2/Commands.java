@@ -18,6 +18,7 @@ import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
 import kiul.kiulduelsv2.party.PartyMethods;
+import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -144,25 +145,54 @@ public class Commands implements CommandExecutor {
             case "recap":
                 ArrayList<Player> duelMembers = new ArrayList<>();
                 for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                    if (DuelListeners.duelStatistics.get(onlinePlayers) != null) {
-                        if (DuelListeners.duelStatistics.get(onlinePlayers).get("uuid").toString().equalsIgnoreCase(args[0])) {
+                    if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
+                        if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString().equalsIgnoreCase(args[0])) {
                             duelMembers.add(onlinePlayers);
                         }
                     }
                 }
                 DuelMethods.openStatsGUI(duelMembers,p);
                 break;
+            case "previewinv":
+                String displayName = args[0].substring(1, args[0].length() - 1);
+                Player target = Bukkit.getPlayer(displayName);
+                if (target != null) {
+                    DuelMethods.previewInventorySnapshot(p, target);
+                } else {
+                    p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "player is offline or does not exist");
+                }
+                break;
             case "reroll":
-                if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).contains(p)) {
-                    if (args[0].equalsIgnoreCase("yes")) {
-                        DuelMethods.reRollYes.get(ArenaMethods.findPlayerArena(p)).add(true);
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (Y)");
+                if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)) != null) {
+                    if (DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).contains(p)) {
+                        if (args[0].equalsIgnoreCase("yes")) {
+                            DuelMethods.reRollYes.get(ArenaMethods.findPlayerArena(p)).add(true);
+                            DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                        } else {
+                            DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
+                            DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
+                        }
+                        List<Player> playersInMap = new ArrayList<>();
+                        for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
+                                if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString())) {
+                                    playersInMap.add(onlinePlayers);
+                                }
+                            }
+                        }
+                        for (Player mapPlayers : playersInMap) {
+                            String reRollYes = ChatColor.GREEN+"■";
+                            String reRollNo = ChatColor.RED+"■";
+                            String votes = ChatColor.GRAY +"■";
+                            String arenaName = ArenaMethods.findPlayerArena(p);
+                            mapPlayers.sendTitle("",reRollYes.repeat(DuelMethods.reRollYes.get(arenaName).size())+reRollNo.repeat(DuelMethods.reRollNo.get(arenaName).size())+votes.repeat(DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).size()));
+                            mapPlayers.playSound(mapPlayers,Sound.BLOCK_NOTE_BLOCK_BASEDRUM,0.5f,1f);
+                        }
                     } else {
-                        DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Vote added! (N)");
+                        p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You cannot do this right now");
                     }
                 } else {
-                    p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"You cannot do this right now");
+                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You cannot do this right now");
                 }
                 break;
             case "test":
