@@ -452,5 +452,4 @@ public class DuelMethods {
         user.openInventory(inventory);
 
     }
-
 }

@@ -3,12 +3,15 @@ package kiul.kiulduelsv2;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // not used in my user, implement it yourself.
 public class C {
+
+    public static Plugin plugin = Kiulduelsv2.getPlugin(Kiulduelsv2.class);
 
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-f])");
 
