@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 public class C {
 
     public static Plugin plugin = Kiulduelsv2.getPlugin(Kiulduelsv2.class);
-
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-f])");
 
     public static String t(String textToTranslate) {
@@ -26,5 +25,20 @@ public class C {
     }
 
     public static PartyManager partyManager = new PartyManager();
+
+    public static int[] splitTimestampSince(long pastTimeStamp) {
+        long millisecondsRemaining = System.currentTimeMillis() - pastTimeStamp;
+        long hours = millisecondsRemaining / 3600000;
+        long minutes = (millisecondsRemaining % 3600000) / 60000;
+        long seconds = ((millisecondsRemaining % 3600000) % 60000) / 1000;
+        return new int[]{(int)hours, (int)minutes, (int)seconds};
+    }
+    public static int[] splitTimestampUntil(long futureTimestamp) {
+        long millisecondsRemaining = futureTimestamp - System.currentTimeMillis();
+        long hours = millisecondsRemaining / 3600000;
+        long minutes = (millisecondsRemaining % 3600000) / 60000;
+        long seconds = ((millisecondsRemaining % 3600000) % 60000) / 1000;
+        return new int[]{(int)hours, (int)minutes, (int)seconds};
+    }
 
 }

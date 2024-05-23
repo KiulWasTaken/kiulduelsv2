@@ -6,7 +6,7 @@ import kiul.kiulduelsv2.config.ConfigListeners;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.gui.clickevents.KitClickEvent;
-import kiul.kiulduelsv2.gui.clickevents.QueueClickEvent;
+import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
@@ -27,7 +27,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         GlobalKits.instantiate();
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
-        getServer().getPluginManager().registerEvents(new QueueClickEvent(),this);
+        getServer().getPluginManager().registerEvents(new Queue(),this);
         getServer().getPluginManager().registerEvents(new KitClickEvent(),this);
         getServer().getPluginManager().registerEvents(new InteractListeners(),this);
         getServer().getPluginManager().registerEvents(new DuelListeners(),this);

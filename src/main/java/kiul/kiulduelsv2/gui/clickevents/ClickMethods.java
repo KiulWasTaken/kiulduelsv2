@@ -33,50 +33,7 @@ public class ClickMethods {
     }};
 
 
-    public static void queueAddCheck (ArrayList<Player> queue,Player p,String type) {
-        p.closeInventory();
-        try {
-            KitMethods.loadGlobalKit(p, "queue");
-        } catch (IOException e) {e.printStackTrace();}
 
-        if (!queue.contains(p)) {
-            queue.add(p);
-            if (queue.size() >= 2) {
-                List<Player> players = new ArrayList<>() {{
-                    add(queue.get(0));
-                    add(queue.get(1));
-                }};
-
-                for (Player playersInQueue : players) {
-                    queue.remove(playersInQueue);
-                }
-
-                if (type.contains("CLASSIC")) {
-                    String[] strings = type.split("-");
-                    String kit = strings[0];
-                    // startArcadeDuel(map,kit,players);
-
-
-                } else {
-                    String arena = ArenaMethods.getSuitableArena();
-                    if (arena == null) {
-                        for (Player playersInQueue : players) {
-                            playersInQueue.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "No arenas available!");
-                            try {
-                                KitMethods.loadGlobalKit(playersInQueue, "lobby");
-                            }catch (IOException r) {
-                                r.printStackTrace();
-                            }
-                        }
-                        return;
-                    }
-                    DuelMethods.startRealisticDuel(players, arena,false);
-                    // startRealisticDuel(map,type,players);
-                }
-
-            }
-        }
-    }
 
     public static void enterKitEditor (Player p) {
         inEditor.add(p);

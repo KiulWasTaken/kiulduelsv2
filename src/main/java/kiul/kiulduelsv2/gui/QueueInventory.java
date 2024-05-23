@@ -1,17 +1,15 @@
 package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.duel.DuelMethods;
-import kiul.kiulduelsv2.gui.clickevents.QueueClickEvent;
+import kiul.kiulduelsv2.duel.Queue;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class QueueInventory {
@@ -45,7 +43,7 @@ public class QueueInventory {
                 }
                 if (item.getlocalName() == "SMP") {
                     lore.add(ChatColor.GRAY + "Players in Match: " + ChatColor.RED + DuelMethods.inDuel.size());
-                    lore.add(ChatColor.GRAY + "Players in Queue: " + ChatColor.YELLOW + QueueClickEvent.queue.get("SMP").size());
+                    lore.add(ChatColor.GRAY + "Players in Queue: " + ChatColor.YELLOW + Queue.queue.get("SMP").size());
                     lore.clear();
                 }
                 String itemName = ItemStackMethods.translateHexColorCodes("&#","",item.getDisplayName());
