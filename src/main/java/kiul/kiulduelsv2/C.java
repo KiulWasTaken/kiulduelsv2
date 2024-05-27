@@ -2,6 +2,7 @@ package kiul.kiulduelsv2;
 
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
@@ -12,7 +13,29 @@ import java.util.regex.Pattern;
 public class C {
 
     public static Plugin plugin = Kiulduelsv2.getPlugin(Kiulduelsv2.class);
-    private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-f])");
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-fA-F])");
+
+    public static String primary = "&#5c8a0b";
+    public static String secondary = "&#5c944e";
+    public static String text = "&#e0deca";
+
+    public static double safeDivide(double dividend, double divisor) {
+        if(Double.compare(divisor, Double.NaN) == 0) return Double.NaN;
+        if(Double.compare(dividend, Double.NaN) == 0) return Double.NaN;
+        if(Double.compare(divisor, 0.0) == 0) {
+            if(Double.compare(dividend, 0.0) == -1) {
+                dividend = 1.0;
+            }
+            divisor = 1.0;
+        }
+        if(Double.compare(divisor, -0.0) == 0) {
+            if(Double.compare(dividend, -0.0) == 1) {
+                dividend = 1.0;
+            }
+            divisor = 1.0;
+        }
+        return dividend / divisor;
+    }
 
     public static String t(String textToTranslate) {
         Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
@@ -25,6 +48,7 @@ public class C {
     }
 
     public static PartyManager partyManager = new PartyManager();
+    public static ScoreboardLibrary scoreboardLibrary;
 
     public static int[] splitTimestampSince(long pastTimeStamp) {
         long millisecondsRemaining = System.currentTimeMillis() - pastTimeStamp;

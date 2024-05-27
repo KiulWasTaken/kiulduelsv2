@@ -237,7 +237,15 @@ public class InventoryListeners implements Listener {
         public void setSlotonPlayerJoin (PlayerJoinEvent e){
         e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
         e.getPlayer().setGameMode(GameMode.SURVIVAL);
-            if (!e.getPlayer().hasPlayedBefore()) {
+        if (Userdata.get().get(e.getPlayer().getUniqueId()+".stats.wins") == null) {
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.wins", 0);
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.losses", 0);
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.streak", 0);
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.best_streak", 0);
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.kills", 0);
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.deaths", 0);
+        }
+            if (!e.getPlayer().hasPlayedBefore() ||  Userdata.get().get("selected-slot." + e.getPlayer().getUniqueId()) == null) {
                 Userdata.get().set("selected-slot." + e.getPlayer().getUniqueId(), 1);
                 Userdata.save();
                 kitSlot.put(e.getPlayer(), 1);

@@ -9,6 +9,7 @@ import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -50,6 +51,7 @@ public class DuelMethods {
                 preDuel.remove(play);
             }
             play.setGameMode(GameMode.SURVIVAL);
+            ScoreboardMethods.duelSidebar(play,players,"competitive",System.currentTimeMillis()).addPlayer(play);
         }
 
         Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
