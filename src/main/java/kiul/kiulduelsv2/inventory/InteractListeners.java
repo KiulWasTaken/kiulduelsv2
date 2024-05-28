@@ -7,6 +7,7 @@ import kiul.kiulduelsv2.gui.*;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.party.Party;
+import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -67,29 +68,23 @@ public class InteractListeners implements Listener {
                     if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
                         Party party = partyManager.findPartyForMember(p.getUniqueId());
                         UUID uuid = p.getUniqueId();
-                        ArrayList<Player> players = new ArrayList<>();
-                        if (party != null) {
-                            for (UUID playerUUID : party.getMembers()) {
-                                if (Bukkit.getServer().getPlayer(playerUUID) != null) {
-                                    players.add(Bukkit.getServer().getPlayer(playerUUID));
-                                }
-                            }
-                            players.add(Bukkit.getServer().getPlayer(party.getLeader()));
-                        }
                         switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
                             case "queue":
                                 e.setCancelled(true);
-
+                                break;
+                            case "leavegame":
+                                UtilMethods.becomeNotSpectator(p);
+                                UtilMethods.teleportLobby(p);
                                 break;
                             case "kiteditor":
                                 e.setCancelled(true);
                                 KitInventory.kitInventory(e.getPlayer());
                                 break;
                             case "partysplit":
-                                DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), players, party.teamOne(), party.teamTwo(), false);
+                                DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), party.getMembers(), party.teamOne(), party.teamTwo(), false);
                                 break;
                             case "partyffa":
-                                DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), players, null, null, true);
+                                DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), party.getMembers(), null, null, true);
                                 break;
                             case "partyteam":
                                 e.setCancelled(true);

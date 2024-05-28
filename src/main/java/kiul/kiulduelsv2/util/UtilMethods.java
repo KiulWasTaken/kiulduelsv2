@@ -1,10 +1,11 @@
 package kiul.kiulduelsv2.util;
 
+import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 
-import static kiul.kiulduelsv2.duel.DuelMethods.inDuel;
-import static kiul.kiulduelsv2.duel.DuelMethods.playersInMap;
+import kiul.kiulduelsv2.duel.Duel;
+import kiul.kiulduelsv2.duel.DuelManager;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.DuelMethods.*;
 import kiul.kiulduelsv2.inventory.KitMethods;
@@ -21,8 +22,8 @@ import java.util.UUID;
 public class UtilMethods {
 
     public static void teleportLobby (Player p) {
-        if (inDuel.contains(p)) {
-            inDuel.remove(p);
+        if (C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
+            C.duelManager.findDuelForMember(p.getUniqueId()).remove(p.getUniqueId());
         }
         p.teleport(p.getWorld().getSpawnLocation());
         p.setDisplayName(ChatColor.WHITE + p.getName());
@@ -34,26 +35,30 @@ public class UtilMethods {
     }
 
     public static void spectatePlayer (Player player,Player spectating) {
-        player.teleport(spectating.getLocation());
-        String arenaName = ArenaMethods.findPlayerArena(player);
-        List<Player> playersInDuel = playersInMap.get(arenaName);
-        for (Player alivePlayers : playersInDuel) {
-            alivePlayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
+        Duel duel = C.duelManager.findDuelForMember(spectating.getUniqueId());
+        if (duel != null) {
+            player.teleport(spectating.getLocation());
+            List<UUID> playersInDuel = duel.getPlayers();
+            for (UUID alivePlayerUUIDs : playersInDuel) {
+                Bukkit.getPlayer(alivePlayerUUIDs).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), player);
+            }
+            duel.addSpectator(player.getUniqueId());
+        } else {
+            player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + spectating.getName() + " is not in a duel right now");
         }
-        inDuel.add(player);
     }
 
     public static void becomeSpectator (Player player) {
-        String arenaName = ArenaMethods.findPlayerArena(player);
-        List<Player> playersInDuel = playersInMap.get(arenaName);
-        for (Player alivePlayers : playersInDuel) {
-            alivePlayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
+        Duel duel = C.duelManager.findDuelForMember(player.getUniqueId());
+        for (UUID alivePlayersUUID : duel.getPlayers()) {
+            Bukkit.getPlayer(alivePlayersUUID).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
         }
         player.setAllowFlight(true);
         player.setFlying(true);
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(5);
+        try {KitMethods.spectatorKit(player);}catch (IOException err) {err.printStackTrace();}
     }
 
     public static void becomeNotSpectator (Player player) {
@@ -65,6 +70,7 @@ public class UtilMethods {
         player.setSaturation(5);
         player.setFlying(false);
         player.setAllowFlight(false);
+        try {KitMethods.lobbyKit(player);} catch (IOException err) {err.printStackTrace();}
     }
 
 

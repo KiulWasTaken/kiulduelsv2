@@ -35,15 +35,12 @@ public class DuelMethods {
     public static HashMap<String,List<Boolean>> reRollYes = new HashMap<>();
     public static HashMap<String,List<Boolean>> reRollNo = new HashMap<>();
 
-    public static HashMap<String, List<Player>> playersInMap = new HashMap<>();
-    public static HashMap<String, List<List<Player>>> mapTeams = new HashMap<>();
 
     public static HashMap<Player,String> inventoryPreview = new HashMap<>();
     public static HashMap<Player,String> armourPreview = new HashMap<>();
 
     static ArrayList<Player> preDuel = new ArrayList<>();
 
-    public static ArrayList<Player> inDuel = new ArrayList<>();
 
     public static void beginDuel (String arenaName,List<Player> players) {
         for (Player play : players) {
@@ -64,36 +61,36 @@ public class DuelMethods {
 
         Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(8, 0, 8);
         Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(8, 0, 8);
-        playersInMap.put(arenaName,players);
-        List<Player> teamOne = new ArrayList<>();
-        List<Player> teamTwo = new ArrayList<>();
+//        playersInMap.put(arenaName,players);
+        ArrayList<UUID> teamOne = new ArrayList<>();
+        ArrayList<UUID> teamTwo = new ArrayList<>();
 
         for (int i = 0; i < players.size(); i++) {
             if (i >= players.size()/2) {
-                teamTwo.add(players.get(i));
+                teamTwo.add(players.get(i).getUniqueId());
             } else {
-                teamOne.add(players.get(i));
+                teamOne.add(players.get(i).getUniqueId());
             }
         }
+        C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
 
 
-        List<List<Player>> arenaTeams = new ArrayList<>() {{
-            add(teamOne);
-            add(teamTwo);
-        }};
-        mapTeams.put(arenaName,arenaTeams);
-        for (Player p : teamOne) {
-            p.teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
+//        List<List<Player>> arenaTeams = new ArrayList<>() {{
+//            add(teamOne);
+//            add(teamTwo);
+//        }};
+//        mapTeams.put(arenaName,arenaTeams);
+        for (UUID p : teamOne) {
+            Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
         }
-        for (Player p : teamTwo) {
-            p.teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
+        for (UUID p : teamTwo) {
+            Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
         }
         for (Player p : players) {
             try {
                 KitMethods.loadSelectedKitSlot(p);
                 preDuel.add(p);
                 preDuelCountdown(p);
-                inDuel.add(p);
                     p.setSaturation(5);
                     p.setFoodLevel(20);
                     p.setHealth(20);
@@ -291,9 +288,10 @@ public class DuelMethods {
     }
 
 
-    public static void startPartyDuel (String arenaName,List<Player> players,List<Player> teamOne,List<Player> teamTwo, boolean ffa) {
+    public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> teamOne,List<UUID> teamTwo, boolean ffa) {
         Map<String,Object> duelStatistics = DuelListeners.createStatsArraylist();
-        for (Player play : players) {
+        for (UUID player : players) {
+            Player play = Bukkit.getPlayer(player);
             if (preDuel.contains(play)) {
                 preDuel.remove(play);
             }
@@ -302,36 +300,32 @@ public class DuelMethods {
         }
         Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
         Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
-        playersInMap.put(arenaName,players);
         if (!ffa) {
-            List<List<Player>> arenaTeams = new ArrayList<>() {{
-                add(teamOne);
-                add(teamTwo);
-            }};
 
-            mapTeams.put(arenaName, arenaTeams);
+            C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
 
-            for (Player p : teamOne) {
-                p.teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
+
+            for (UUID p : teamOne) {
+                Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
             }
-            for (Player p : teamTwo) {
-                p.teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
+            for (UUID p : teamTwo) {
+                Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
             }
         } else {
+            C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName);
             Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
-            for (Player p : players) {
-                p.teleport(getHighestBlockBelow(199,spawn).getLocation());
+            for (UUID p : players) {
+                Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,spawn).getLocation());
             }
         }
-        for (Player p : players) {
+        for (UUID p : players) {
             try {
-                KitMethods.loadSelectedKitSlot(p);
+                KitMethods.loadSelectedKitSlot(Bukkit.getPlayer(p));
             } catch (IOException err) {
                 err.printStackTrace();
             }
-            preDuel.add(p);
-            preDuelCountdown(p);
-            inDuel.add(p);
+            preDuel.add(Bukkit.getPlayer(p));
+            preDuelCountdown(Bukkit.getPlayer(p));
         }
 
     }

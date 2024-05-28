@@ -42,7 +42,6 @@ public class QueueInventory {
                     lore.add((itemLore));
                 }
                 if (item.getlocalName() == "SMP") {
-                    lore.add(ChatColor.GRAY + "Players in Match: " + ChatColor.RED + DuelMethods.inDuel.size());
                     lore.add(ChatColor.GRAY + "Players in Queue: " + ChatColor.YELLOW + Queue.queue.get("SMP").size());
                     lore.clear();
                 }

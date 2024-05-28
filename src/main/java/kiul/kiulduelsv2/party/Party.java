@@ -33,7 +33,7 @@ public class Party {
         return members;
     }
 
-    public List<Player> teamOne() {
+    public List<Player> teamOnePlayers() {
         List<Player> teamOnePlayers = new ArrayList<>();
         for (UUID memberUUID : teamOne) {
             if (Bukkit.getServer().getPlayer(memberUUID) != null) {
@@ -42,7 +42,7 @@ public class Party {
         }
         return teamOnePlayers;
     }
-    public List<Player> teamTwo() {
+    public List<Player> teamTwoPlayers() {
         List<Player> teamTwoPlayers = new ArrayList<>();
         for (UUID memberUUID : teamTwo) {
             if (Bukkit.getServer().getPlayer(memberUUID) != null) {
@@ -50,6 +50,14 @@ public class Party {
             }
         }
         return teamTwoPlayers;
+    }
+
+    public List<UUID> teamOne() {
+        return teamOne;
+    }
+
+    public List<UUID> teamTwo() {
+        return teamTwo;
     }
 
     public void addMember(UUID member) {

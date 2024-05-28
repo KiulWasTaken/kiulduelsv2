@@ -18,6 +18,7 @@ import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
 import kiul.kiulduelsv2.party.PartyMethods;
+import kiul.kiulduelsv2.util.UtilMethods;
 import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -193,6 +194,13 @@ public class Commands implements CommandExecutor {
                     }
                 } else {
                 p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You cannot do this right now");
+                }
+                break;
+            case "spectate":
+                if (Bukkit.getPlayer(args[0]) != null) {
+                    UtilMethods.spectatePlayer(Bukkit.getPlayer(args[0]), p);
+                } else {
+                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "player is offline or does not exist");
                 }
                 break;
             case "test":

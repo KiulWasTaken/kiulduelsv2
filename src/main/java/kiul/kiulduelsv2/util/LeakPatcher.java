@@ -20,16 +20,5 @@ public class LeakPatcher implements Listener {
         if (ClickMethods.inEditor.contains(p)) {
             ClickMethods.inEditor.remove(p);
         }
-        if (ArenaMethods.findPlayerArena(p) != null) {
-            String arenaName = ArenaMethods.findPlayerArena(p);
-            if (DuelMethods.playersInMap.get(arenaName).contains(p)) {
-                DuelMethods.playersInMap.remove(p);
-                for (List<Player> team : DuelMethods.mapTeams.get(arenaName)) {
-                    if (team.contains(p)) {
-                        team.remove(p);
-                    }
-                }
-            }
-        }
     }
 }

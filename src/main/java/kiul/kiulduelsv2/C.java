@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2;
 
+import kiul.kiulduelsv2.duel.DuelManager;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -48,6 +49,7 @@ public class C {
     }
 
     public static PartyManager partyManager = new PartyManager();
+    public static DuelManager duelManager = new DuelManager();
     public static ScoreboardLibrary scoreboardLibrary;
 
     public static int[] splitTimestampSince(long pastTimeStamp) {
