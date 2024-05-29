@@ -11,7 +11,7 @@ public enum QueueEnum {
     SMP_RATED("&#B34E4E&lS&#A74343&lM&#9B3838&lP", Material.SHIELD, new String[]{""}, 14,"SMP-RATED",null),
 //    SMP_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.SHIELD, new String[]{""}, 5,"SMP-UNRATED",null),
 //    CRYSTAL_RATED("&#744EB3&lC&#744AAF&lR&#7547AB&lY&#7543A7&lS&#753FA3&lT&#763C9F&lA&#76389B&lL", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-RATED",null),
-//    CRYSTAL_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-UNRATED",null),
+    //    CRYSTAL_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-UNRATED",null),
     infoBoard("&fLeaderboard", Material.CLOCK, new String[]{""}, 12,"info",null);
 
     private String displayName;
