@@ -32,7 +32,9 @@ public class Queue implements Listener {
 
     public static HashMap<String,ArrayList<Player>> queue = new HashMap<>() {{
         put("SMP-CASUAL",new ArrayList<>());
+        put("SMP-CASUAL",new ArrayList<>());
         put("SMP-RATED",new ArrayList<>());
+        put("SMP-RATED-PARTY",new ArrayList<>());
     }};
 
     @EventHandler
