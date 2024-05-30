@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.inventory;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.gui.EnchantEnum;
 import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.gui.ItemEnum;
@@ -237,6 +238,9 @@ public class InventoryListeners implements Listener {
         public void setSlotonPlayerJoin (PlayerJoinEvent e){
         e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
         e.getPlayer().setGameMode(GameMode.SURVIVAL);
+        if (StatDB.readPlayer(e.getPlayer().getUniqueId(),"stat_elo") == null) {
+            StatDB.writePlayer(e.getPlayer().getUniqueId(),"stat_elo",700);
+        }
         if (Userdata.get().get(e.getPlayer().getUniqueId()+".stats.wins") == null) {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.wins", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.losses", 0);

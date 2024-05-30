@@ -70,6 +70,7 @@ public class UtilMethods {
         player.setSaturation(5);
         player.setFlying(false);
         player.setAllowFlight(false);
+
         try {KitMethods.lobbyKit(player);} catch (IOException err) {err.printStackTrace();}
     }
 

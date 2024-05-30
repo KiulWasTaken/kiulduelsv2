@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import net.md_5.bungee.api.ChatMessageType;
@@ -91,11 +92,7 @@ public class Queue implements Listener {
 
             if (p.getInventory().getItemInMainHand().getItemMeta() != null) {
                 if (p.getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
-                    String type = p.getInventory().getItemInMainHand().getItemMeta().getLocalizedName();
-                    boolean rated = false;
-                    if (type.toLowerCase().contains("rated")) {rated = true;}
-                    joinQueue(p,type,rated);
-
+                    QueueInventory.queueInventory(p);
                     p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.4f);
                     try {
                         loadGlobalKit(p, "queue");
@@ -185,7 +182,7 @@ public class Queue implements Listener {
                         for (Player duelMembers : players) {
                             getQueue(type).remove(duelMembers);
                         }
-                        DuelMethods.startRealisticDuel(players,arena,false);
+                        DuelMethods.startRealisticDuel(players,arena,false,rated);
                         cancel();
                     } else {
                         if (players.size() > 1) {
@@ -210,7 +207,7 @@ public class Queue implements Listener {
                                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED+String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
                                     String arena = ArenaMethods.getSuitableArena();
                                     if (arena != null) {
-                                        DuelMethods.startRealisticDuel(players,arena,false);
+                                        DuelMethods.startRealisticDuel(players,arena,false,rated);
                                     }
                                 }
                             }.runTaskTimer(C.plugin,0,20);
@@ -263,7 +260,7 @@ public class Queue implements Listener {
                         }
                         return;
                     }
-                    DuelMethods.startRealisticDuel(players, arena,false);
+//                    DuelMethods.startRealisticDuel(players, arena,false);
                     // startRealisticDuel(map,type,players);
                 }
 

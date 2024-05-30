@@ -59,6 +59,9 @@ public class DuelListeners implements Listener {
 
                         // if only one team has players, end the game.
                         if (team2.size() == 0) {
+                            if (duel.isRated()) {
+                                DuelMethods.updateElo(duel.getBlueTeamMembers(), duel.getRedTeamMembers());
+                            }
                             // team 1 wins
                             for (UUID team1UUIDs : duel.getRedTeam()) {
                                 if (Bukkit.getPlayer(team1UUIDs) != null) {
@@ -91,8 +94,8 @@ public class DuelListeners implements Listener {
                                 public void run() {
                                     for (UUID allUUIDs : duel.getAllContained()) {
                                         Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                                DuelMethods.sendMatchRecap(onlinePlayers, Bukkit.getPlayer(team1.get(0)), "SMP");
-                                                if (!team1.contains(onlinePlayers)) {
+                                                DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllRedTeamPlayers(), duel.isRated());
+                                                if (duel.getBlueTeamMembers().contains(allUUIDs)) {
                                                     onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                                     int losses = Userdata.get().getInt(onlinePlayers.getUniqueId()+".stats.losses");
                                                     Userdata.get().set(onlinePlayers.getUniqueId()+".stats.losses",losses+1);
@@ -105,6 +108,9 @@ public class DuelListeners implements Listener {
                             }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                             Userdata.save();
                         } else if (team1.size() == 0) {
+                            if (duel.isRated()) {
+                                DuelMethods.updateElo(duel.getRedTeamMembers(), duel.getBlueTeamMembers());
+                            }
                             for (UUID team2UUIDs : team2) {
                                 if (Bukkit.getPlayer(team2UUIDs) != null) {
                                     Player team2Members = Bukkit.getPlayer(team2UUIDs);
@@ -136,8 +142,8 @@ public class DuelListeners implements Listener {
                                 public void run() {
                                     for (UUID allUUIDs : duel.getAllContained()) {
                                         Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                        DuelMethods.sendMatchRecap(onlinePlayers, Bukkit.getPlayer(team2.get(0)), "SMP");
-                                        if (!team2.contains(onlinePlayers)) {
+                                        DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
+                                        if (duel.getRedTeamMembers().contains(allUUIDs)) {
                                             onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                             int losses = Userdata.get().getInt(onlinePlayers.getUniqueId()+".stats.losses");
                                             Userdata.get().set(onlinePlayers.getUniqueId()+".stats.losses",losses+1);
@@ -185,9 +191,11 @@ public class DuelListeners implements Listener {
                                 Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
                                 UtilMethods.becomeNotSpectator(onlinePlayers);
                                 UtilMethods.teleportLobby(onlinePlayers);
+
                                     if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
                                         if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
-                                            DuelMethods.sendMatchRecap(onlinePlayers, victor, "SMP");
+                                            List<Player> winners = new ArrayList<>() {{add(victor);}};
+                                            DuelMethods.sendMatchRecap(onlinePlayers,winners, duel.isRated());
                                         }
                                     }
                                 }
@@ -257,8 +265,8 @@ public class DuelListeners implements Listener {
                             public void run() {
                                 for (UUID allUUIDs : duel.getAllContained()) {
                                     Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    DuelMethods.sendMatchRecap(onlinePlayers, Bukkit.getPlayer(team1.get(0)), "SMP");
-                                    if (!team1.contains(onlinePlayers)) {
+                                    DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
+                                    if (duel.getRedTeamMembers().contains(allUUIDs)) {
                                         onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                         int losses = Userdata.get().getInt(onlinePlayers.getUniqueId() + ".stats.losses");
                                         Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.losses", losses + 1);
@@ -302,8 +310,8 @@ public class DuelListeners implements Listener {
                             public void run() {
                                 for (UUID allUUIDs : duel.getAllContained()) {
                                     Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    DuelMethods.sendMatchRecap(onlinePlayers, Bukkit.getPlayer(team2.get(0)), "SMP");
-                                    if (!team2.contains(onlinePlayers)) {
+                                    DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
+                                    if (duel.getRedTeamMembers().contains(allUUIDs)) {
                                         onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                         int losses = Userdata.get().getInt(onlinePlayers.getUniqueId() + ".stats.losses");
                                         Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.losses", losses + 1);
@@ -353,7 +361,8 @@ public class DuelListeners implements Listener {
                             UtilMethods.teleportLobby(onlinePlayers);
                             if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
                                 if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
-                                    DuelMethods.sendMatchRecap(onlinePlayers, victor, "SMP");
+                                    List<Player> winners = new ArrayList<>() {{add(victor);}};
+                                    DuelMethods.sendMatchRecap(onlinePlayers, winners, duel.isRated());
                                 }
                             }
                         }

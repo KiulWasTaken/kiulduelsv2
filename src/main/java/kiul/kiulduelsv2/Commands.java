@@ -144,6 +144,7 @@ public class Commands implements CommandExecutor {
 
                 break;
             case "recap":
+                if (DuelListeners.duelStatistics.get(p) != null) {
                 ArrayList<Player> duelMembers = new ArrayList<>();
                 for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                     if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
@@ -153,6 +154,9 @@ public class Commands implements CommandExecutor {
                     }
                 }
                 DuelMethods.openStatsGUI(duelMembers,p);
+                } else {
+                    p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"game recap has expired or does not exist");
+                }
                 break;
             case "previewinv":
                 String displayName = args[0].substring(1, args[0].length() - 1);

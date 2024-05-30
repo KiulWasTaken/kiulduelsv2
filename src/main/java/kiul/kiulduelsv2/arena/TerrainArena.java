@@ -203,7 +203,7 @@ public class TerrainArena extends ChunkGenerator {
                                         for (Player waiter : waitingForArena) {
                                             waiter.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "completed! (" + finalTime + "ms)");
                                         }
-                                        DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)), waitingForArena);
+//                                        DuelMethods.beginDuel(ArenaMethods.findPlayerArena(waitingForArena.get(0)), waitingForArena);
                                     } else {
                                         for (String arenaName : ArenaMethods.getArenas()) {
                                             if (Arenadata.get().getLocation("arenas." + arenaName + ".center").getChunk() == center.getChunk()) {

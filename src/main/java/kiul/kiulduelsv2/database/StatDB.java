@@ -134,6 +134,16 @@ public class StatDB {
             writePlayer(UUID.fromString(uuids.get(i)),key+"_placement",i+1);
         }
     }
+    public static Map<Integer,UUID> getPlacements (String stat) {
+        TreeMap<Integer,UUID> placements = new TreeMap<>();
+        for (OfflinePlayer offlinePlayers : Bukkit.getOfflinePlayers()) {
+            if (placements.size() > 10) {
+                break;
+            }
+            placements.put((int)readPlayer(offlinePlayers.getUniqueId(),stat+"_placement"),offlinePlayers.getUniqueId());
+        }
+        return placements;
+    }
     public static Object readPlayer(UUID uuid, String objectPath){
         //Lets build a minimal object to get all objects in the
         //collection "players" containing the field

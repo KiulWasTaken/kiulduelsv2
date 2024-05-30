@@ -7,6 +7,8 @@ import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +17,7 @@ public class C {
 
     public static Plugin plugin = Kiulduelsv2.getPlugin(Kiulduelsv2.class);
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-fA-F])");
+    public static int K = 30;
 
     public static String primary = "&#5c8a0b";
     public static String secondary = "&#5c944e";
@@ -65,6 +68,15 @@ public class C {
         long minutes = (millisecondsRemaining % 3600000) / 60000;
         long seconds = ((millisecondsRemaining % 3600000) % 60000) / 1000;
         return new int[]{(int)hours, (int)minutes, (int)seconds};
+    }
+
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
 }

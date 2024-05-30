@@ -13,6 +13,7 @@ import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
 import kiul.kiulduelsv2.scoreboard.ScoreboardListeners;
 import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
+import kiul.kiulduelsv2.util.LeakPatcher;
 import kiul.kiulduelsv2.util.TabCompleter;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
@@ -32,6 +33,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         Userdata.setup();
         Arenadata.setup();
         GlobalKits.instantiate();
+        getServer().getPluginManager().registerEvents(new LeakPatcher(), this);
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
         getServer().getPluginManager().registerEvents(new Queue(),this);

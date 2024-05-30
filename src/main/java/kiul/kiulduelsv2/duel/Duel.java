@@ -18,6 +18,8 @@ public class Duel {
     private List<UUID> players;
     private List<UUID> blueTeam;
     private List<UUID> redTeam;
+    private List<UUID> blueTeamMembers;
+    private List<UUID> redTeamMembers;
 
     private List<UUID> spectators;
     public Duel(List<UUID> redTeam, List<UUID> blueTeam, boolean rated,boolean ffa,String arena) {
@@ -26,6 +28,8 @@ public class Duel {
         this.spectators = new ArrayList<>();
         this.rated = rated;
         this.arena = arena;
+        this.redTeamMembers = redTeam;
+        this.blueTeamMembers = blueTeam;
         this.redTeam = redTeam;
         this.blueTeam = blueTeam;
         this.ffa = ffa;
@@ -49,6 +53,33 @@ public class Duel {
     public List<UUID> getRedTeam() {
         return redTeam;
     }
+
+    public List<UUID> getBlueTeamMembers() {
+        return blueTeamMembers;
+    }
+
+    public List<UUID> getRedTeamMembers() {
+        return redTeamMembers;
+    }
+    public List<Player> getAllBlueTeamPlayers() {
+        List<Player> allBlueTeamPlayers = new ArrayList<>();
+        for (UUID uuids : getBlueTeamMembers()) {
+            if (Bukkit.getPlayer(uuids) != null) {
+                allBlueTeamPlayers.add(Bukkit.getPlayer(uuids));
+            }
+        }
+        return allBlueTeamPlayers;
+    }
+    public List<Player> getAllRedTeamPlayers() {
+        List<Player> allRedTeamPlayers = new ArrayList<>();
+        for (UUID uuids : getRedTeamMembers()) {
+            if (Bukkit.getPlayer(uuids) != null) {
+                allRedTeamPlayers.add(Bukkit.getPlayer(uuids));
+            }
+        }
+        return allRedTeamPlayers;
+    }
+
     public void remove(UUID playerUUID) {
         if (blueTeam.contains(playerUUID)) {
             blueTeam.remove(playerUUID);

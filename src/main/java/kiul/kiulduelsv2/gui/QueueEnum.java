@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.gui;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 
@@ -12,7 +13,7 @@ public enum QueueEnum {
 //    SMP_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.SHIELD, new String[]{""}, 5,"SMP-UNRATED",null),
 //    CRYSTAL_RATED("&#744EB3&lC&#744AAF&lR&#7547AB&lY&#7543A7&lS&#753FA3&lT&#763C9F&lA&#76389B&lL", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-RATED",null),
     //    CRYSTAL_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-UNRATED",null),
-    infoBoard("&fLeaderboard", Material.CLOCK, new String[]{""}, 12,"info",null);
+    Career("&6Career", Material.CLOCK, new String[]{ChatColor.GRAY+"displays the outcome of",ChatColor.GRAY+" all your recent matches",""}, 12,"career",null);
 
     private String displayName;
     private Material material;
