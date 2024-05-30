@@ -552,4 +552,74 @@ public class DuelMethods {
             StatDB.writePlayer(uuid,"stat_elo",elo+eloChange.get(uuid));
         }
     }
+    public static void updateCareer (List<UUID> losingTeam, List<UUID> winningTeam,boolean rated) {
+        String losingTeamMembers = "";
+        String winningTeamMembers = "";
+        String comma = ", ";
+        for (int i = 0; i < losingTeam.size(); i++) {
+            if (i == losingTeam.size()-1) {
+                comma = "";
+            }
+            if (i > 2) {
+                comma = "..";
+                losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getDisplayName() + comma;
+                break;
+            }
+            losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getDisplayName() + comma;
+        }
+        comma = ", ";
+        for (int i = 0; i < winningTeam.size(); i++) {
+            if (i == losingTeam.size()-1) {
+                comma = "";
+            }
+            if (i > 2) {
+                comma = "..";
+                losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getDisplayName() + comma;
+                break;
+            }
+            winningTeamMembers += Bukkit.getPlayer(winningTeam.get(i)).getDisplayName() + comma;
+        }
+
+        for (UUID uuid : losingTeam) {
+            String playerElo = "";
+            if (rated) {
+                int eloChange = (int) DuelListeners.duelStatistics.get(uuid).get("elo");
+                    playerElo = ChatColor.WHITE + " (" + ChatColor.GOLD + "+" + eloChange + ChatColor.WHITE + ")";
+                if (eloChange < 0) {
+                    playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";
+                }
+            }
+            ArrayList<String> career;
+            career = new ArrayList<String>();
+            if (Userdata.get().get(uuid+".career") != null) {
+                career = (ArrayList<String>) Userdata.get().get(uuid+".career");
+            }
+            career.add(C.t(losingTeamMembers + " &c☠&r " + winningTeamMembers + playerElo));
+            if (career.size() > 10) {
+                career.remove(10);
+            }
+            Userdata.get().set(uuid+".career",career);
+        }
+        for (UUID uuid : winningTeam) {
+            String playerElo = "";
+            if (rated) {
+                int eloChange = (int) DuelListeners.duelStatistics.get(uuid).get("elo");
+                    playerElo = ChatColor.WHITE + " (" + ChatColor.GOLD + "+" + eloChange + ChatColor.WHITE + ")";
+                if (eloChange < 0) {
+                    playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";
+                }
+            }
+            ArrayList<String> career;
+            career = new ArrayList<String>();
+            if (Userdata.get().get(uuid+".career") != null) {
+                career = (ArrayList<String>) Userdata.get().get(uuid+".career");
+            }
+            career.add(C.t(losingTeamMembers + " &e★&r " + winningTeamMembers + playerElo));
+            if (career.size() > 10) {
+                career.remove(10);
+            }
+            Userdata.get().set(uuid+".career",career);
+        }
+
+    }
 }

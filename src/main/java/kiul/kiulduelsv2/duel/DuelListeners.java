@@ -62,6 +62,7 @@ public class DuelListeners implements Listener {
                             if (duel.isRated()) {
                                 DuelMethods.updateElo(duel.getBlueTeamMembers(), duel.getRedTeamMembers());
                             }
+                            DuelMethods.updateCareer(duel.getBlueTeamMembers(),duel.getRedTeamMembers(),duel.isRated());
                             // team 1 wins
                             for (UUID team1UUIDs : duel.getRedTeam()) {
                                 if (Bukkit.getPlayer(team1UUIDs) != null) {
@@ -111,6 +112,7 @@ public class DuelListeners implements Listener {
                             if (duel.isRated()) {
                                 DuelMethods.updateElo(duel.getRedTeamMembers(), duel.getBlueTeamMembers());
                             }
+                            DuelMethods.updateCareer(duel.getBlueTeamMembers(),duel.getRedTeamMembers(),duel.isRated());
                             for (UUID team2UUIDs : team2) {
                                 if (Bukkit.getPlayer(team2UUIDs) != null) {
                                     Player team2Members = Bukkit.getPlayer(team2UUIDs);

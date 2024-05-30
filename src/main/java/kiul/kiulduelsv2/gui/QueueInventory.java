@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Queue;
@@ -73,8 +74,16 @@ public class QueueInventory {
                     }
 
                 }
+                if (item.getlocalName().equalsIgnoreCase("career")) {
+                    ArrayList<String> career = new ArrayList<String>();
+                    if (Userdata.get().get(p.getUniqueId()+".career") != null) {
+                        career = (ArrayList<String>) Userdata.get().get(p.getUniqueId()+".career");
+                    }
+                    for (int i = 0; i < 10; i++) {
+                        lore.add(career.get(i));
+                    }
+                }
                 String itemName = C.t(item.getDisplayName());
-
 
                 inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null,item.getlocalName()));
         }
