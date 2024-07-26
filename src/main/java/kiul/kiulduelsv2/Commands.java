@@ -7,6 +7,7 @@ import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.duel.Recap;
 import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.gui.ItemEnum;
@@ -153,16 +154,15 @@ public class Commands implements CommandExecutor {
                         }
                     }
                 }
-                DuelMethods.openStatsGUI(duelMembers,p);
+                Recap.openStatsGUI(duelMembers,p);
                 } else {
                     p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"game recap has expired or does not exist");
                 }
                 break;
             case "previewinv":
-                String displayName = args[0].substring(1, args[0].length() - 1);
-                Player target = Bukkit.getPlayer(displayName);
+                Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
-                    DuelMethods.previewInventorySnapshot(p, target);
+                    Recap.open(p, target,true);
                 } else {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "player is offline or does not exist");
                 }

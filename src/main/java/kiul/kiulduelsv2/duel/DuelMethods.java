@@ -346,212 +346,88 @@ public class DuelMethods {
     }
 
 
-    public static void openStatsGUI (ArrayList<Player> players,Player p) {
-        int invSize = 9+(int)Math.ceil(players.size() / 7.0)*9;
-        Inventory inventory = Bukkit.createInventory(null,invSize,"Statistics");
-        for (int i = 1; i <= 9; i++) {
-            inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
-        }
-
-        ArrayList<String> lore = new ArrayList<>();
-        for (int i = 0; i < players.size(); i++) {
-            String displayName = ChatColor.WHITE+players.get(i).getDisplayName();
-            if ((boolean)DuelListeners.duelStatistics.get(p.getUniqueId()).get("dead")) {
-                displayName = ChatColor.GRAY+players.get(i).getDisplayName() + ChatColor.RED + " (DEAD)";
-            }
-
-            lore.add(ChatColor.GRAY + "Hits: " + isThisStatTheBest(players.get(i),players,"hits_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_dealt"));
-            lore.add(ChatColor.GRAY + "Hits Taken: " + isThisStatTheBest(players.get(i),players,"hits_taken") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_taken"));
-            lore.add(ChatColor.GRAY + "Damage Dealt: " + isThisStatTheBest(players.get(i),players,"damage_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("damage_dealt"));
-            lore.add(ChatColor.GRAY + "Longest Combo: " + isThisStatTheBest(players.get(i),players,"longest_combo") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("longest_combo"));
-
-            inventory.addItem(ItemStackMethods.createSkullItem(displayName,players.get(i),lore));
-            lore.clear();
-        }
 
 
+    public static void updateElo(List<UUID> losingTeam, List<UUID> winningTeam) {
+        Map<UUID, Integer> loserScoreboard = new HashMap<>();
+        Map<UUID, Integer> winnerScoreboard = new HashMap<>();
+        Map<UUID, Integer> eloChange = new HashMap<>();
 
-        p.openInventory(inventory);
-    }
-
-    public static ChatColor isThisStatTheBest (Player p,ArrayList<Player> competition,String category) {
-        int myStat = (int)DuelListeners.duelStatistics.get(p.getUniqueId()).get(category);
-        List<Integer> statList = new ArrayList<>();
-        for (Player player : competition) {
-            int stat = (int)DuelListeners.duelStatistics.get(player.getUniqueId()).get(category);
-            statList.add(stat);
-        }
-        Collections.sort(statList);
-        Collections.reverse(statList);
-        if (myStat >= statList.get(0)) {
-            return ChatColor.GOLD;
-        }
-    return ChatColor.WHITE;}
-
-    public static void sendMatchRecap (Player p,List<Player> winner,boolean rated) {
-        ArrayList<Player> duelMembers = new ArrayList<>();
-        for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
-
-                if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").equals(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid")) ) {
-                    duelMembers.add(onlinePlayers);
-                }
-            }
-        }
-            p.sendMessage(C.t("&#50bd4a&m&l⎯⎯⎯⎯⎯⎯⎯ |&r &#378033&lMatch Recap &#50bd4a&m&l| ⎯⎯⎯⎯⎯⎯⎯"));
-        TextComponent bulletPoint = new TextComponent("▸ ");
-        bulletPoint.setColor(net.md_5.bungee.api.ChatColor.of("#50bd4a"));
-        for (Player player : duelMembers) {
-            String playerElo = "";
-            if (rated) {
-                int eloChange = (int) DuelListeners.duelStatistics.get(player.getUniqueId()).get("elo");
-                    playerElo = ChatColor.WHITE + " (" + ChatColor.GREEN + "+" + eloChange + ChatColor.WHITE + ")";
-                if (eloChange < 0) {
-                    playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";
-                }
-            }
-            if (winner.contains(player)) {
-
-                TextComponent displayName = new TextComponent(player.getDisplayName()+playerElo);
-                TextComponent winnerMessage = new TextComponent(ChatColor.GOLD+" (WINNER)");
-                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getDisplayName()));
-                p.spigot().sendMessage(bulletPoint,displayName,winnerMessage);
-
-            } else {
-                TextComponent displayName = new TextComponent(player.getDisplayName()+playerElo);
-                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getDisplayName()));
-                p.spigot().sendMessage(bulletPoint,displayName);
-            }
-        }
-            p.sendMessage("");
-            p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Click names for inventories..");
-            TextComponent message = new TextComponent("Click to see more information..");
-            message.setColor(net.md_5.bungee.api.ChatColor.GRAY);
-            message.setItalic(true);
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/recap " + DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString()));
-            p.spigot().sendMessage(message);
-            p.sendMessage(C.t("&#50bd4a&m&l⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"));
-
-    }
-
-    public static void previewInventorySnapshot(Player user, Player target) {
-        int invSize = 45;
-        Inventory inventory = Bukkit.createInventory(null,invSize,target.getDisplayName()+"'s Inventory");
-
-        try {
-            ItemStack[] targetInventory = InventoryToBase64.itemStackArrayFromBase64(DuelMethods.inventoryPreview.get(target));
-            ItemStack[] targetArmour = InventoryToBase64.itemStackArrayFromBase64(DuelMethods.armourPreview.get(target));
-            for (ItemStack i : targetInventory) {
-                if (i != null) {
-                    inventory.addItem(i);
-                }
-            }
-            for (int i = 0; i < 3; i++) {
-                if (targetArmour[i] != null) {
-                    inventory.setItem(28 + i, targetArmour[i]);
-                }
-            }
-            for (int i = 1; i <= 9; i++) {
-                inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
-            }
-
-        } catch (IOException err) {err.printStackTrace();}
-
-        user.openInventory(inventory);
-
-    }
-
-    public static void updateElo (List<UUID> losingTeam, List<UUID> winningTeam) {
-        Map<UUID,Integer> loserScoreboard = new HashMap<>();
-        Map<UUID,Integer> winnerScoreboard = new HashMap<>();
-        Map<UUID,Integer> eloChange = new HashMap<>();
-
-
+        // Setup
         for (UUID uuid : losingTeam) {
-            int damageDealt = (int)DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
-            loserScoreboard.put(uuid,damageDealt);
-            eloChange.put(uuid,0);
+            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+            loserScoreboard.put(uuid, damageDealt);
+            eloChange.put(uuid, 0);
         }
         for (UUID uuid : winningTeam) {
-            int damageDealt = (int)DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
-            winnerScoreboard.put(uuid,damageDealt);
-            eloChange.put(uuid,0);
+            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+            winnerScoreboard.put(uuid, damageDealt);
+            eloChange.put(uuid, 0);
         }
+
+        // Calculate Elo change for the winning team
         for (UUID uuid : winningTeam) {
-            int elo = (int)StatDB.readPlayer(uuid,"stat_elo");
-            int damageDealt = (int)DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
-            for (int dmgValue : winnerScoreboard.values()) {
-                UUID playedAgainst = C.getKeyByValue(winnerScoreboard,dmgValue);
-                int Eelo = (int)StatDB.readPlayer(playedAgainst,"stat_elo");
-                int expected = 1 / ((10^((elo - Eelo) / 400)) + 1);
-                int outcome;
-                int change;
+            int elo = (int) StatDB.readPlayer(uuid, "stat_elo");
+            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
 
-                if (damageDealt < dmgValue) {
-                    outcome = 0;
-                    change = C.K * (outcome - expected);
-                    eloChange.put(uuid,eloChange.get(uuid)+change);
-                    // losses
-                }
-                if (damageDealt > dmgValue) {
-                    outcome = 1;
-                    change = C.K * (outcome - expected);
-                    eloChange.put(uuid,eloChange.get(uuid)+change);
-                    // wins
-                }
+            for (UUID playedAgainst : winnerScoreboard.keySet()) {
+                if (playedAgainst.equals(uuid)) continue;
+
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
+                int outcome = damageDealt > winnerScoreboard.get(playedAgainst) ? 1 : 0;
+                int change = (int) (C.K * (outcome - expected));
+                eloChange.put(uuid, eloChange.get(uuid) + change);
             }
-            for (int i = 0; i < losingTeam.size(); i++) {
-                UUID playedAgainst = losingTeam.get(i);
-                int Eelo = (int)StatDB.readPlayer(playedAgainst,"stat_elo");
-                int expected = 1 / ((10^((elo - Eelo) / 400)) + 1);
-                int change = C.K * (1 - expected);
-                eloChange.put(uuid,eloChange.get(uuid)+change);
-                // wins
+
+            for (UUID playedAgainst : losingTeam) {
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
+                int change = (int) (C.K * (1 - expected));
+                eloChange.put(uuid, eloChange.get(uuid) + change);
             }
-            if (elo+eloChange.get(uuid) < 100) {
-                eloChange.put(uuid,(-elo)+100);
+
+            int newElo = elo + eloChange.get(uuid);
+            if (newElo < 100) {
+                eloChange.put(uuid, 100 - elo);
             }
-            DuelListeners.duelStatistics.get(uuid).put("elo",eloChange);
-            StatDB.writePlayer(uuid,"stat_elo",elo+eloChange.get(uuid));
+
+            DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
+            StatDB.writePlayer(uuid, "stat_elo", newElo);
         }
-        for (UUID uuid : losingTeam) {
-            int elo = (int)StatDB.readPlayer(uuid,"stat_elo");
-            int damageDealt = (int)DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
-            for (int dmgValue : loserScoreboard.values()) {
-                UUID playedAgainst = C.getKeyByValue(loserScoreboard,dmgValue);
-                int Eelo = (int)StatDB.readPlayer(playedAgainst,"stat_elo");
-                int expected = 1 / ((10^((elo - Eelo) / 400)) + 1);
-                int outcome;
-                int change;
 
-                if (damageDealt < dmgValue) {
-                    outcome = 0;
-                    change = C.K * (outcome - expected);
-                    eloChange.put(uuid,eloChange.get(uuid)+change);
-                    // losses
-                }
-                if (damageDealt > dmgValue) {
-                    outcome = 1;
-                    change = C.K * (outcome - expected);
-                    eloChange.put(uuid,eloChange.get(uuid)+change);
-                    // wins
-                }
+        // Calculate Elo change for the losing team
+        for (UUID uuid : losingTeam) {
+            int elo = (int) StatDB.readPlayer(uuid, "stat_elo");
+            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+
+            for (UUID playedAgainst : loserScoreboard.keySet()) {
+                if (playedAgainst.equals(uuid)) continue;
+
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
+                int outcome = damageDealt > loserScoreboard.get(playedAgainst) ? 1 : 0;
+                int change = (int) (C.K * (outcome - expected));
+                eloChange.put(uuid, eloChange.get(uuid) + change);
             }
-            for (int i = 0; i < winningTeam.size(); i++) {
-                UUID playedAgainst = losingTeam.get(i);
-                int Eelo = (int)StatDB.readPlayer(playedAgainst,"stat_elo");
-                int expected = 1 / ((10^((elo - Eelo) / 400)) + 1);
-                int change = C.K * (0 - expected);
-                eloChange.put(uuid,eloChange.get(uuid)+change);
-                // wins
+
+            for (UUID playedAgainst : winningTeam) {
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
+                int change = (int) (C.K * -expected);
+                eloChange.put(uuid, eloChange.get(uuid) + change);
             }
-            if (elo+eloChange.get(uuid) < 100) {
-                eloChange.put(uuid,(-elo)+100);
+
+            int newElo = elo + eloChange.get(uuid);
+            if (newElo < 100) {
+                eloChange.put(uuid, 100 - elo);
             }
-            DuelListeners.duelStatistics.get(uuid).put("elo",eloChange);
-            StatDB.writePlayer(uuid,"stat_elo",elo+eloChange.get(uuid));
+
+            DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
+            StatDB.writePlayer(uuid, "stat_elo", newElo);
         }
     }
+
     public static void updateCareer (List<UUID> losingTeam, List<UUID> winningTeam,boolean rated) {
         String losingTeamMembers = "";
         String winningTeamMembers = "";

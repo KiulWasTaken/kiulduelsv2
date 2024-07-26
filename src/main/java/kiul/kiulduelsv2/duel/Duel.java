@@ -28,12 +28,12 @@ public class Duel {
         this.spectators = new ArrayList<>();
         this.rated = rated;
         this.arena = arena;
-        this.redTeamMembers = redTeam;
-        this.blueTeamMembers = blueTeam;
+        this.redTeamMembers = new ArrayList<>(redTeam);
+        this.blueTeamMembers = new ArrayList<>(blueTeam);
         this.redTeam = redTeam;
         this.blueTeam = blueTeam;
         this.ffa = ffa;
-        this.allContained = players;
+        this.allContained = new ArrayList<>(players);
     }
 
     public List<UUID> getPlayers() {

@@ -39,9 +39,10 @@ public class QueueInventory {
         }
         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
         boolean partyExists = false;
-        int partySize = party.getMembers().size();
+        int partySize = 1;
         if (party != null) {
             partyExists = true;
+            partySize = party.getMembers().size();
         }
 
         for (QueueEnum item : QueueEnum.values()) {
@@ -49,28 +50,33 @@ public class QueueInventory {
                 for (String itemLore : item.getLore()) {
                     lore.add((itemLore));
                 }
-                if (lore.contains("CASUAL") || lore.contains("RATED") || lore.contains("UNRATED")) {
+
+                if (item.getlocalName().contains("CASUAL") || item.getlocalName().contains("RATED") || item.getlocalName().contains("UNRATED")) {
                     if (partyExists) {
 
                         if (partySize > 2) {
-                            lore.add(C.t("&7▸ SOLO"));
-                            lore.add(C.t("&7▸ DUO (PARTY)"));
+                            lore.add(C.t("&7⏵ SOLO"));
+                            lore.add(C.t("&7⏵ DUO (PARTY)"));
                             lore.add(C.t("&4❌ &cparty is too large"));
                         } else {
-                            lore.add(C.t("&7▸ SOLO"));
-                            lore.add(C.t("&#FF9000▸ &#FFB600D&#FFDB00U&#FFDE06O &#FFBE13(&#FF9E20P&#FFC02EA&#FFE23BR&#FFE542T&#FFC942Y&#FFAD42)"));
+                            lore.add(C.t("&7⏵ SOLO"));
+                            lore.add(C.t("&#FF9000⏵ &#FFB600D&#FFDB00U&#FFDE06O &#FFBE13(&#FF9E20P&#FFC02EA&#FFE23BR&#FFE542T&#FFC942Y&#FFAD42)"));
                         }
 
                     } else {
-                        lore.add(C.t("&#FF9000▸ &#FFD700S&#FFC610O&#FFB329L&#FFF342O"));
-                        lore.add(C.t("&7▸ DUO (PARTY)"));
+                        lore.add(C.t("&#FF9000⏵ &#FFD700S&#FFC610O&#FFB329L&#FFF342O"));
+                        lore.add(C.t("&7⏵ DUO (PARTY)"));
                     }
                 }
-                if (lore.contains("RATED")) {
+                if (item.getlocalName().contains("RATED")) {
                     lore.add("");
                     Map<Integer, UUID> placements = StatDB.getPlacements("stat_elo");
-                    for (int i = 0; i < 10; i++) {
-                        lore.add(C.t("&6#"+(i+1)+"&e▸ &f"+Bukkit.getPlayer(placements.get(i))));
+                    int numEntries = 10;
+                    if (placements.keySet().size() < 10) {
+                        numEntries = placements.keySet().size();
+                    }
+                    for (int i = 0; i < numEntries; i++) {
+                        lore.add(C.t("&6#"+(i+1)+"&e⏵ &f"+Bukkit.getOfflinePlayer(placements.get(i+1)).getName()));
                     }
 
                 }
@@ -79,7 +85,11 @@ public class QueueInventory {
                     if (Userdata.get().get(p.getUniqueId()+".career") != null) {
                         career = (ArrayList<String>) Userdata.get().get(p.getUniqueId()+".career");
                     }
-                    for (int i = 0; i < 10; i++) {
+                    int numEntries = 10;
+                    if (career.size() <= 10) {
+                        numEntries = career.size();
+                    }
+                    for (int i = 0; i < numEntries; i++) {
                         lore.add(career.get(i));
                     }
                 }

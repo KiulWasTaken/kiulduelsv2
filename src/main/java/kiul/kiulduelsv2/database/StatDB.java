@@ -1,8 +1,10 @@
 package kiul.kiulduelsv2.database;
 
 import com.mongodb.*;
+import kiul.kiulduelsv2.C;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -96,43 +98,65 @@ public class StatDB {
         DBObject obj = new BasicDBObject("uuid", uuid.toString());
         obj.put("stat_kills",0);
         obj.put("stat_kills_odds",0);
+        obj.put("stat_kills_quick",0);
+        obj.put("stat_kills_drain",0);
+        obj.put("stat_trades",0);
         obj.put("stat_run",0);
+        obj.put("stat_carts",0);
+        obj.put("stat_restocks",0);
+        obj.put("stat_elo",700);
         stats.insert(obj,WriteConcern.SAFE);
         updatePlayerPlacement("stat_kills");
         updatePlayerPlacement("stat_kills_odds");
+        updatePlayerPlacement("stat_kills_quick");
+        updatePlayerPlacement("stat_kills_drain");
+        updatePlayerPlacement("stat_trades");
         updatePlayerPlacement("stat_run");
+        updatePlayerPlacement("stat_carts");
+        updatePlayerPlacement("stat_restocks");
+        updatePlayerPlacement("stat_elo");
     }
     public static void updatePlayerPlacement (String key) {
-
-        HashMap<String, Integer> map = new HashMap<>();
-        LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
-        ArrayList<Integer> list = new ArrayList<>();
-        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-            if (!key.contains("id")) {
-                key.replaceAll(" ","");
-                if (readPlayer(offlinePlayer.getUniqueId(), key) == null) {
-                    writePlayer(offlinePlayer.getUniqueId(),key,0);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                HashMap<String, Integer> map = new HashMap<>();
+                LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
+                ArrayList<Integer> list = new ArrayList<>();
+                for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+                    if (!key.contains("id")) {
+                        key.replaceAll(" ", "");
+                        if (readPlayer(offlinePlayer.getUniqueId(), key) == null) {
+                            writePlayer(offlinePlayer.getUniqueId(), key, 0);
+                        }
+                        map.put(offlinePlayer.getUniqueId().toString(), (int) readPlayer(offlinePlayer.getUniqueId(), key));
+                    }
                 }
-                map.put(offlinePlayer.getUniqueId().toString(), (int) readPlayer(offlinePlayer.getUniqueId(), key));
-            }
-        }
 
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            list.add(entry.getValue());
-        }
-        Collections.sort(list);
-        for (Integer str : list) {
-            for (Map.Entry<String, Integer> entry : map.entrySet()) {
-                if (entry.getValue().equals(str)) {
-                    sortedMap.put(entry.getKey(), str);
+                for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                    list.add(entry.getValue());
                 }
+                Collections.sort(list);
+                Collections.reverse(list);
+                for (Integer str : list) {
+                    for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                        if (entry.getValue().equals(str)) {
+                            sortedMap.put(entry.getKey(), str);
+                        }
+                    }
+                }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        ArrayList<String> uuids = new ArrayList<>(sortedMap.keySet().stream().toList());
+                        for (int i = 0; i < sortedMap.size(); i++) {
+                            writePlayer(UUID.fromString(uuids.get(i)), key + "_placement", i + 1);
+                        }
+                    }
+                }.runTask(C.plugin);
+
             }
-        }
-        System.out.println(sortedMap);
-        ArrayList<String> uuids = new ArrayList<>(sortedMap.keySet().stream().toList());
-        for (int i = 0; i < sortedMap.size(); i++) {
-            writePlayer(UUID.fromString(uuids.get(i)),key+"_placement",i+1);
-        }
+        }.runTaskAsynchronously(C.plugin);
     }
     public static Map<Integer,UUID> getPlacements (String stat) {
         TreeMap<Integer,UUID> placements = new TreeMap<>();

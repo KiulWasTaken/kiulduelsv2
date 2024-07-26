@@ -4,8 +4,10 @@ import kiul.kiulduelsv2.arena.ArenaListeners;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.ConfigListeners;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.duel.Recap;
 import kiul.kiulduelsv2.gui.clickevents.KitClickEvent;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.inventory.GlobalKits;
@@ -42,6 +44,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DuelListeners(),this);
         getServer().getPluginManager().registerEvents(new ArenaListeners(),this);
         getServer().getPluginManager().registerEvents(new ScoreboardListeners(),this);
+        getServer().getPluginManager().registerEvents(new Recap(),this);
         getCommand("kit").setExecutor(new Commands());
         getCommand("test").setExecutor(new Commands());
         getCommand("arena").setExecutor(new Commands());
@@ -72,6 +75,9 @@ public final class Kiulduelsv2 extends JavaPlugin {
             C.scoreboardLibrary = new NoopScoreboardLibrary();
             this.getLogger().warning("No scoreboard packet adapter available!");
         }
+
+        // Database
+        StatDB.connect();
     }
 
     @Override

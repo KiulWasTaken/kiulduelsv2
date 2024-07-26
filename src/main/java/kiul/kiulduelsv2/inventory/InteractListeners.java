@@ -11,12 +11,14 @@ import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,8 +47,8 @@ public class InteractListeners implements Listener {
         if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
             if (e.getPlayer().getInventory().getItemInMainHand() != null) {
                 if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
-                    if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
-                        switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
+                    if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
+                        switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                             case "partysplit":
                                 e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setDisplayName(ChatColor.LIGHT_PURPLE + "Party FFA");
                                 e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partyffa");
@@ -65,10 +67,10 @@ public class InteractListeners implements Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getPlayer().getInventory().getItemInMainHand() != null) {
                 if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
-                    if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName() != null) {
+                    if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                         Party party = partyManager.findPartyForMember(p.getUniqueId());
                         UUID uuid = p.getUniqueId();
-                        switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getLocalizedName()) {
+                        switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                             case "queue":
                                 e.setCancelled(true);
                                 break;

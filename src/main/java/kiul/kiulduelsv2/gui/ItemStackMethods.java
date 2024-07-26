@@ -1,10 +1,7 @@
 package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.C;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.block.Skull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -13,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
@@ -39,7 +37,7 @@ public class ItemStackMethods {
             }
             iM.setLore(adjustedLore);
             if (localizedName != null) {
-                iM.setLocalizedName(localizedName);
+                iM.getPersistentDataContainer().set(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING,localizedName);
             }
             i.setAmount(amount);
             iM.setDisplayName(C.t(itemname));
@@ -50,12 +48,15 @@ public class ItemStackMethods {
             return i;
     }
 
-    public static ItemStack createSkullItem(String displayName,Player player,ArrayList<String> lore) {
+    public static ItemStack createSkullItem(String displayName,Player player,ArrayList<String> lore,String localizedName) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setDisplayName(displayName);
         meta.setLore(lore);
         meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
+        if (localizedName != null) {
+            meta.getPersistentDataContainer().set(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING, localizedName);
+        }
         item.setItemMeta(meta);
         return item;
     }

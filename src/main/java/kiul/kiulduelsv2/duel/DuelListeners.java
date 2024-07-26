@@ -42,6 +42,8 @@ public class DuelListeners implements Listener {
                 Duel duel = C.duelManager.findDuelForMember(p.getUniqueId());
                 if (duel != null) {
                     e.setCancelled(true);
+                    DuelMethods.inventoryPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
+                    DuelMethods.armourPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
                     UtilMethods.becomeSpectator(p);
                     duel.killPlayer(p.getUniqueId());
                     DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead",true);
@@ -49,8 +51,7 @@ public class DuelListeners implements Listener {
                         Userdata.get().set(p.getKiller().getUniqueId() + ".stats.kills", Userdata.get().getInt(p.getKiller().getUniqueId() + ".stats.kills") + 1);
                     }
                     Userdata.get().set(p.getUniqueId()+".stats.deaths",Userdata.get().getInt(p.getUniqueId()+".stats.deaths")+1);
-                    DuelMethods.inventoryPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
-                    DuelMethods.armourPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+
                     if (!duel.isFfa()) {
 
                         List<UUID> team1 = duel.getRedTeam();
@@ -70,12 +71,12 @@ public class DuelListeners implements Listener {
                                     team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
                                     DuelMethods.inventoryPreview.put(team1Members, InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getContents()));
                                     DuelMethods.armourPreview.put(team1Members, InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getArmorContents()));
-                                    int wins = Userdata.get().getInt(team1Members.getUniqueId() + ".stats.wins");
-                                    int streak = Userdata.get().getInt(team1Members.getUniqueId() + ".stats.streak");
-                                    Userdata.get().set(team1Members.getUniqueId() + ".stats.wins", wins + 1);
-                                    Userdata.get().set(team1Members.getUniqueId() + ".stats.streak", streak + 1);
-                                    if (Userdata.get().getInt(team1Members.getUniqueId() + ".stats.streak") > Userdata.get().getInt(team1Members.getUniqueId() + ".stats.best_streak")) {
-                                        Userdata.get().set(team1Members.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(team1Members.getUniqueId() + ".stats.streak"));
+                                    int wins = Userdata.get().getInt(team1UUIDs + ".stats.wins");
+                                    int streak = Userdata.get().getInt(team1UUIDs + ".stats.streak");
+                                    Userdata.get().set(team1UUIDs + ".stats.wins", wins + 1);
+                                    Userdata.get().set(team1UUIDs + ".stats.streak", streak + 1);
+                                    if (Userdata.get().getInt(team1UUIDs + ".stats.streak") > Userdata.get().getInt(team1UUIDs + ".stats.best_streak")) {
+                                        Userdata.get().set(team1UUIDs + ".stats.best_streak", Userdata.get().getInt(team1UUIDs + ".stats.streak"));
                                     }
                                     team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                                     new BukkitRunnable() {
@@ -84,30 +85,34 @@ public class DuelListeners implements Listener {
                                             duel.remove(team1Members.getUniqueId());
                                             UtilMethods.teleportLobby(team1Members);
                                         }
-                                    }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                                    }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 41);
                                 } else {
                                     duel.remove(team1UUIDs);
                                 }
                             }
                             ArenaMethods.regenerateArena(arenaName);
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
+
                                     for (UUID allUUIDs : duel.getAllContained()) {
                                         Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                                DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllRedTeamPlayers(), duel.isRated());
+
                                                 if (duel.getBlueTeamMembers().contains(allUUIDs)) {
                                                     onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                                                    int losses = Userdata.get().getInt(onlinePlayers.getUniqueId()+".stats.losses");
-                                                    Userdata.get().set(onlinePlayers.getUniqueId()+".stats.losses",losses+1);
-                                                    Userdata.get().set(onlinePlayers.getUniqueId()+".stats.streak",0);
+                                                    int losses = Userdata.get().getInt(allUUIDs+".stats.losses");
+                                                    Userdata.get().set(allUUIDs+".stats.losses",losses+1);
+                                                    Userdata.get().set(allUUIDs+".stats.streak",0);
+                                                    Userdata.save();
                                                 }
-                                            UtilMethods.becomeNotSpectator(onlinePlayers);
-                                            UtilMethods.teleportLobby(onlinePlayers);
+                                        new BukkitRunnable() {
+                                            @Override
+                                            public void run() {
+                                                Recap.sendMatchRecap(onlinePlayers, duel.getAllRedTeamPlayers(), duel.isRated());
+                                                UtilMethods.becomeNotSpectator(onlinePlayers);
+                                                UtilMethods.teleportLobby(onlinePlayers);
+                                            }
+                                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                                     }
-                                }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            Userdata.save();
+
+
                         } else if (team1.size() == 0) {
                             if (duel.isRated()) {
                                 DuelMethods.updateElo(duel.getRedTeamMembers(), duel.getBlueTeamMembers());
@@ -119,12 +124,12 @@ public class DuelListeners implements Listener {
                                     team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
                                     DuelMethods.inventoryPreview.put(team2Members, InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getContents()));
                                     DuelMethods.armourPreview.put(team2Members, InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getArmorContents()));
-                                    int wins = Userdata.get().getInt(team2Members.getUniqueId() + ".stats.wins");
-                                    int streak = Userdata.get().getInt(team2Members.getUniqueId() + ".stats.streak");
-                                    Userdata.get().set(team2Members.getUniqueId() + ".stats.wins", wins + 1);
-                                    Userdata.get().set(team2Members.getUniqueId() + ".stats.streak", streak + 1);
-                                    if (Userdata.get().getInt(team2Members.getUniqueId() + ".stats.streak") > Userdata.get().getInt(team2Members.getUniqueId() + ".stats.best_streak")) {
-                                        Userdata.get().set(team2Members.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(team2Members.getUniqueId() + ".stats.streak"));
+                                    int wins = Userdata.get().getInt(team2UUIDs + ".stats.wins");
+                                    int streak = Userdata.get().getInt(team2UUIDs + ".stats.streak");
+                                    Userdata.get().set(team2UUIDs + ".stats.wins", wins + 1);
+                                    Userdata.get().set(team2UUIDs + ".stats.streak", streak + 1);
+                                    if (Userdata.get().getInt(team2UUIDs + ".stats.streak") > Userdata.get().getInt(team2UUIDs + ".stats.best_streak")) {
+                                        Userdata.get().set(team2UUIDs + ".stats.best_streak", Userdata.get().getInt(team2UUIDs + ".stats.streak"));
                                     }
                                     Userdata.save();
                                     team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
@@ -135,28 +140,32 @@ public class DuelListeners implements Listener {
                                             UtilMethods.teleportLobby(team2Members);
 
                                         }
-                                    }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+                                    }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 41);
                                 }
                             }
                             ArenaMethods.regenerateArena(arenaName);
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
+
                                     for (UUID allUUIDs : duel.getAllContained()) {
                                         Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                        DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
                                         if (duel.getRedTeamMembers().contains(allUUIDs)) {
                                             onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                                            int losses = Userdata.get().getInt(onlinePlayers.getUniqueId()+".stats.losses");
-                                            Userdata.get().set(onlinePlayers.getUniqueId()+".stats.losses",losses+1);
-                                            Userdata.get().set(onlinePlayers.getUniqueId()+".stats.streak",0);
+                                            int losses = Userdata.get().getInt(allUUIDs+".stats.losses");
+                                            Userdata.get().set(allUUIDs+".stats.losses",losses+1);
+                                            Userdata.get().set(allUUIDs+".stats.streak",0);
+                                            Userdata.save();
                                         }
+                                        new BukkitRunnable() {
+                                            @Override
+                                            public void run() {
+                                            Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
                                             UtilMethods.becomeNotSpectator(onlinePlayers);
                                             UtilMethods.teleportLobby(onlinePlayers);
+
+                                            }
+                                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+
                                     }
-                                }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            Userdata.save();
+
                         }
                     } else {
                         try {
@@ -197,7 +206,7 @@ public class DuelListeners implements Listener {
                                     if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
                                         if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
                                             List<Player> winners = new ArrayList<>() {{add(victor);}};
-                                            DuelMethods.sendMatchRecap(onlinePlayers,winners, duel.isRated());
+                                            Recap.sendMatchRecap(onlinePlayers,winners, duel.isRated());
                                         }
                                     }
                                 }
@@ -267,7 +276,7 @@ public class DuelListeners implements Listener {
                             public void run() {
                                 for (UUID allUUIDs : duel.getAllContained()) {
                                     Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
+                                    Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
                                     if (duel.getRedTeamMembers().contains(allUUIDs)) {
                                         onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                         int losses = Userdata.get().getInt(onlinePlayers.getUniqueId() + ".stats.losses");
@@ -312,7 +321,7 @@ public class DuelListeners implements Listener {
                             public void run() {
                                 for (UUID allUUIDs : duel.getAllContained()) {
                                     Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    DuelMethods.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
+                                    Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
                                     if (duel.getRedTeamMembers().contains(allUUIDs)) {
                                         onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
                                         int losses = Userdata.get().getInt(onlinePlayers.getUniqueId() + ".stats.losses");
@@ -364,7 +373,7 @@ public class DuelListeners implements Listener {
                             if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
                                 if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
                                     List<Player> winners = new ArrayList<>() {{add(victor);}};
-                                    DuelMethods.sendMatchRecap(onlinePlayers, winners, duel.isRated());
+                                    Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
                                 }
                             }
                         }
@@ -403,7 +412,7 @@ public class DuelListeners implements Listener {
         if (duel != null && ArenaMethods.findPlayerArena(p) != null) {
             if (!ArenaMethods.LocationIsInsideArena(e.getTo(),duel.getArena())) {
                 p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Do not attempt to leave the arena!");
-                e.setCancelled(true);
+                p.teleport(e.getFrom());
             }
         }
     }
