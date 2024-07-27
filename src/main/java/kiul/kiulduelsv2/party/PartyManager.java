@@ -34,4 +34,8 @@ public class PartyManager {
         }
         return null;  // Player is not in any party
     }
+
+    public List<Party> getParties() {
+        return new ArrayList<>(parties);
+    }
 }

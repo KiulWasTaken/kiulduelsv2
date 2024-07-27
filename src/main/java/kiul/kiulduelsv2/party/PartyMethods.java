@@ -15,15 +15,15 @@ public class PartyMethods {
         Player inviter = Bukkit.getPlayer(partyMember);
         Player player = Bukkit.getPlayer(invited);
 
-
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + inviter.getDisplayName() + " has invited you to their party!");
+        player.sendMessage(C.t("&d&m                                                                "));
+        player.sendMessage(ChatColor.GRAY+ "" + ChatColor.ITALIC+ inviter.getDisplayName() + " has invited you to their party!");
         ComponentBuilder message = new ComponentBuilder("click this message to accept the invitation!");
-        message.color(net.md_5.bungee.api.ChatColor.of("#e04ae0"));
+        message.color(net.md_5.bungee.api.ChatColor.YELLOW).italic(true);
 
         // Add the first clickable component
         message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept " + inviter.getDisplayName()));
         player.spigot().sendMessage(message.create());
-
+        player.sendMessage(C.t("&d&m                                                                "));
 
     }
 }

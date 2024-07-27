@@ -32,7 +32,7 @@ public class InteractListeners implements Listener {
     @EventHandler
     public void hotbarInteractListener (PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (ClickMethods.inEditor.contains(e.getPlayer())) {
+        if (ClickMethods.inEditor.containsKey(e.getPlayer())) {
             if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 e.setCancelled(true);
                 ItemInventory.itemInventory(p);
@@ -82,11 +82,9 @@ public class InteractListeners implements Listener {
                                 e.setCancelled(true);
                                 KitInventory.kitInventory(e.getPlayer());
                                 break;
-                            case "partysplit":
-                                DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), party.getMembers(), party.teamOne(), party.teamTwo(), false);
-                                break;
-                            case "partyffa":
-                                DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), party.getMembers(), null, null, true);
+                            case "partyqueue":
+                                e.setCancelled(true);
+                                PartyQueueInventory.main(p);
                                 break;
                             case "partyteam":
                                 e.setCancelled(true);
@@ -113,40 +111,10 @@ public class InteractListeners implements Listener {
                                 }
                                 break;
                             case "partydisband":
-                                if (partyManager.findPartyForMember(uuid) != null) {
-                                    if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                        ArrayList<Player> members = new ArrayList<>();
-                                        for (UUID memberUUIDs : partyManager.findPartyForMember(uuid).getMembers()) {
-                                            if (Bukkit.getPlayer(memberUUIDs) != null) {
-                                                Player member = Bukkit.getPlayer(memberUUIDs);
-                                                member.sendMessage(C.t("&#e04aac&o" + Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).getDisplayName() + "'s party has been disbanded"));
-                                                members.add(member);
-                                            }
-                                        }
-                                        members.add(Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()));
-                                        Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).sendMessage(C.t("&#e04aac&o" + "your party has been successfully disbanded"));
-                                        partyManager.disbandParty(partyManager.findPartyForMember(uuid));
-                                        for (Player member : members) {
-                                            try {
-                                                KitMethods.lobbyKit(member);
-                                            } catch (IOException err) {
-                                                err.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                }
+                                p.performCommand("party disband");
                                 break;
                             case "leaveparty":
-                                if (partyManager.findPartyForMember(uuid) != null) {
-                                    if (!partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                        party.removeMember(uuid);
-                                        try {
-                                            KitMethods.lobbyKit(Bukkit.getPlayer(uuid));
-                                        } catch (IOException err) {
-                                            err.printStackTrace();
-                                        }
-                                    }
-                                }
+                                p.performCommand("party leave");
                                 break;
 
                         }
@@ -158,7 +126,7 @@ public class InteractListeners implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player p = event.getPlayer();
-        if (ClickMethods.inEditor.contains(p)) {
+        if (ClickMethods.inEditor.containsKey(p)) {
             event.getItemDrop().remove();
         }
     }

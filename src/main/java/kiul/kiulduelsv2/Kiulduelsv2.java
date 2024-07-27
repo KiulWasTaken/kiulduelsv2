@@ -8,8 +8,9 @@ import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Recap;
-import kiul.kiulduelsv2.gui.clickevents.KitClickEvent;
+import kiul.kiulduelsv2.gui.KitInventory;
 import kiul.kiulduelsv2.duel.Queue;
+import kiul.kiulduelsv2.gui.PartyQueueInventory;
 import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
@@ -25,6 +26,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 
 public final class Kiulduelsv2 extends JavaPlugin {
@@ -39,8 +44,9 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
         getServer().getPluginManager().registerEvents(new Queue(),this);
-        getServer().getPluginManager().registerEvents(new KitClickEvent(),this);
+        getServer().getPluginManager().registerEvents(new KitInventory(),this);
         getServer().getPluginManager().registerEvents(new InteractListeners(),this);
+        getServer().getPluginManager().registerEvents(new PartyQueueInventory(),this);
         getServer().getPluginManager().registerEvents(new DuelListeners(),this);
         getServer().getPluginManager().registerEvents(new ArenaListeners(),this);
         getServer().getPluginManager().registerEvents(new ScoreboardListeners(),this);
@@ -62,8 +68,18 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("arena").setTabCompleter(new TabCompleter());
         getCommand("party").setTabCompleter(new TabCompleter());
         if (Bukkit.getOnlinePlayers() != null) {
+
+            List<String> types = new ArrayList<>();
+            for (String key : Queue.queue.keySet()) {
+                String[] keys = key.split("-");
+                types.add(keys[0].toLowerCase());
+            }
+
             for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                kitSlot.put(onlinePlayers.getPlayer(), (int) Userdata.get().get("selected-slot." + onlinePlayers.getPlayer().getUniqueId()));
+                kitSlot.put(onlinePlayers.getPlayer(),new HashMap<>());
+                for (String type : types) {
+                    kitSlot.get(onlinePlayers.getPlayer()).put(type,(int) Userdata.get().get(onlinePlayers.getPlayer().getUniqueId() + ".selected-slot." + type));
+                }
             }
         }
         Userdata.save();
@@ -84,8 +100,16 @@ public final class Kiulduelsv2 extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         if (Bukkit.getOnlinePlayers() != null) {
+            List<String> types = new ArrayList<>();
+            for (String key : Queue.queue.keySet()) {
+                String[] keys = key.split("-");
+                types.add(keys[0].toLowerCase());
+            }
+
             for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                Userdata.get().set("selected-slot." + onlinePlayers.getPlayer().getUniqueId(), kitSlot.get(onlinePlayers.getPlayer()));
+                for (String type : types) {
+                    Userdata.get().set(onlinePlayers.getPlayer().getUniqueId()+".selected-slot." +type,kitSlot.get(onlinePlayers).get(type));
+                }
             }
         }
         Userdata.save();

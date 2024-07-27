@@ -28,11 +28,11 @@ import java.util.List;
 public class Recap implements Listener {
 
 
-    public static void open (Player open,Player recapping,boolean post) {
+    public static void open (Player open,Player recapping,boolean post,String kitType) {
         int invSize = 54;
-        String name = post ? "Post-Game Inventory" : "Initial Kit Used";
+        String name = post ? "Post-Game Inventory | " + kitType.toUpperCase() : "Initial Kit Used | " + kitType.toUpperCase();
         Inventory inventory = Bukkit.createInventory(null,invSize,name);
-        String kitContentsBase64 = post ? DuelMethods.inventoryPreview.get(recapping) : (String) Userdata.get().get("kits." + recapping.getUniqueId() + ".kit-slot-" + KitMethods.kitSlot.get(recapping) + ".inventory");
+        String kitContentsBase64 = post ? DuelMethods.inventoryPreview.get(recapping) : (String) Userdata.get().get("kits." + recapping.getUniqueId() + "." + kitType + ".kit-slot-" + KitMethods.kitSlot.get(recapping).get(kitType) + ".inventory");
         try{inventory.setContents(InventoryToBase64.itemStackArrayFromBase64(kitContentsBase64));}catch(IOException err){err.printStackTrace();}
         ArrayList<String> lore = new ArrayList<>();
         for (int i = 1; i <= 9; i++) {
@@ -56,17 +56,19 @@ public class Recap implements Listener {
     public void recapClickEvent (InventoryClickEvent e) {
         Player p = (Player) e.getView().getPlayer();
         if (e.getCurrentItem() == null) {return;}
-        if (e.getView().getTitle().equalsIgnoreCase("Post-Game Inventory") || e.getView().getTitle().equalsIgnoreCase("Initial Kit Used")) {
+        if (e.getView().getTitle().contains("Post-Game Inventory") || e.getView().getTitle().contains("Initial Kit Used")) {
             e.setCancelled(true);
         if (!e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {return;}
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING) == "swap") {
                 Bukkit.broadcastMessage("1");
                     Player viewing = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwningPlayer().getPlayer();
                 Bukkit.broadcastMessage("2");
-                    boolean post = e.getView().getTitle().equalsIgnoreCase("Post-Game Inventory");
+                    boolean post = e.getView().getTitle().contains("Post-Game Inventory");
                     if (viewing == null) {return;}
                 Bukkit.broadcastMessage("3");
-                    open(p,viewing,!post);
+                    String[] strings = e.getView().getTitle().split("\\|");
+                    String type = strings[1].toLowerCase().trim();
+                    open(p,viewing,!post,type);
             }
         }
     }
@@ -139,12 +141,12 @@ public class Recap implements Listener {
 
                 TextComponent displayName = new TextComponent(player.getDisplayName()+playerElo);
                 TextComponent winnerMessage = new TextComponent(ChatColor.GOLD+" (WINNER)");
-                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getName()));
+                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getName() + " " + DuelListeners.duelStatistics.get(player.getUniqueId()).get("type")));
                 p.spigot().sendMessage(bulletPoint,displayName,winnerMessage);
 
             } else {
                 TextComponent displayName = new TextComponent(player.getDisplayName()+playerElo);
-                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getName()));
+                displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getName()+ " " + DuelListeners.duelStatistics.get(player.getUniqueId()).get("type")));
                 p.spigot().sendMessage(bulletPoint,displayName);
             }
         }

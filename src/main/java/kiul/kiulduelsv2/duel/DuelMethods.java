@@ -44,13 +44,13 @@ public class DuelMethods {
     public static ArrayList<Player> preDuel = new ArrayList<>();
 
 
-    public static void beginDuel (String arenaName,List<Player> players,boolean rated) {
+    public static void beginDuel (String arenaName,List<Player> players,boolean rated,String kitType) {
         for (Player play : players) {
             if (preDuel.contains(play)) {
                 preDuel.remove(play);
             }
             play.setGameMode(GameMode.SURVIVAL);
-            ScoreboardMethods.duelSidebar(play,players,"competitive",System.currentTimeMillis()).addPlayer(play);
+            play.setScoreboard(ScoreboardMethods.duelSidebar(play,players,"competitive",System.currentTimeMillis()));
         }
 
         Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
@@ -90,7 +90,7 @@ public class DuelMethods {
         }
         for (Player p : players) {
             try {
-                KitMethods.loadSelectedKitSlot(p);
+                KitMethods.loadSelectedKitSlot(p,kitType);
                 preDuel.add(p);
                 preDuelCountdown(p);
                     p.setSaturation(5);
@@ -129,7 +129,7 @@ public class DuelMethods {
         }, 0L, 20L);
     }
 
-    public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled, boolean rated) {
+    public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled, boolean rated,String kitType) {
         ArenaMethods.arenasInUse.add(arenaName);
         int size = players.size();
 
@@ -143,6 +143,7 @@ public class DuelMethods {
             p.setFlying(true);
             DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
+            DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
             p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
         }
 
@@ -212,7 +213,7 @@ public class DuelMethods {
                             }
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
-                            startRealisticDuel(players,backupArena,true,rated);
+                            startRealisticDuel(players,backupArena,true,rated,kitType);
                             ArenaMethods.regenerateArena(arenaName);
                             return;
 
@@ -224,7 +225,7 @@ public class DuelMethods {
                             }
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
-                            beginDuel(arenaName,players,rated);
+                            beginDuel(arenaName,players,rated,kitType);
                             ArenaMethods.arenasInUse.remove(backupArena);
                             return;
                         }
@@ -242,7 +243,7 @@ public class DuelMethods {
                         reRollYes.remove(arenaName);
                         allowedToReRoll.remove(arenaName);
                         TerrainArena.generateTerrainPerformant(duelCentre,4);
-                        startRealisticDuel(players,backupArena,true,rated);
+                        startRealisticDuel(players,backupArena,true,rated,kitType);
                         cancel();
                         return;
                     } else if (reRollYes.get(arenaName).size() < reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
@@ -254,7 +255,7 @@ public class DuelMethods {
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
                         allowedToReRoll.remove(arenaName);
-                        beginDuel(arenaName, players,rated);
+                        beginDuel(arenaName, players,rated,kitType);
                         ArenaMethods.arenasInUse.remove(backupArena);
 
                         cancel();
@@ -279,7 +280,7 @@ public class DuelMethods {
                         }
                      }
                     if (players.size() == size) {
-                        beginDuel(arenaName, players,rated);
+                        beginDuel(arenaName, players,rated,kitType);
                     } else {
                         for (Player p : players) {
                             UtilMethods.teleportLobby(p);
@@ -292,7 +293,7 @@ public class DuelMethods {
     }
 
 
-    public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> teamOne,List<UUID> teamTwo, boolean ffa) {
+    public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> teamOne,List<UUID> teamTwo, boolean ffa,String kitType) {
         Map<String,Object> duelStatistics = DuelListeners.createStatsArraylist();
         for (UUID player : players) {
             Player play = Bukkit.getPlayer(player);
@@ -302,6 +303,14 @@ public class DuelMethods {
             play.setGameMode(GameMode.SURVIVAL);
             DuelListeners.duelStatistics.put(play.getUniqueId(),duelStatistics);
         }
+        UUID duelUUID = UUID.randomUUID();
+        for (UUID pUUIDs : players) {
+            Player p = Bukkit.getPlayer(pUUIDs);
+            DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
+            DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
+            DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
+            p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
+        }
         Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
         Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
         if (!ffa) {
@@ -309,12 +318,13 @@ public class DuelMethods {
             C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
 
 
-            for (UUID p : teamOne) {
-                Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
-            }
-            for (UUID p : teamTwo) {
-                Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
-            }
+                for (UUID p : teamOne) {
+                    Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation());
+                }
+                for (UUID p : teamTwo) {
+                    Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation());
+                }
+
         } else {
             C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName);
             Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
@@ -322,14 +332,25 @@ public class DuelMethods {
                 Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,spawn).getLocation());
             }
         }
-        for (UUID p : players) {
-            try {
-                KitMethods.loadSelectedKitSlot(Bukkit.getPlayer(p));
-            } catch (IOException err) {
-                err.printStackTrace();
+        for (UUID uuid : players) {
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null) {
+                try {
+                    KitMethods.loadSelectedKitSlot(p,kitType);
+                    preDuel.add(p);
+                    preDuelCountdown(p);
+                    p.setSaturation(5);
+                    p.setFoodLevel(20);
+                    p.setHealth(20);
+                    p.setGameMode(GameMode.SURVIVAL);
+                    for (PotionEffect potionEffect : p.getActivePotionEffects()) {
+                        p.removePotionEffect(potionEffect.getType());
+                    }
+                } catch (IOException err) {
+                    err.printStackTrace();
+                }
             }
-            preDuel.add(Bukkit.getPlayer(p));
-            preDuelCountdown(Bukkit.getPlayer(p));
+
         }
 
     }
@@ -352,6 +373,7 @@ public class DuelMethods {
         Map<UUID, Integer> loserScoreboard = new HashMap<>();
         Map<UUID, Integer> winnerScoreboard = new HashMap<>();
         Map<UUID, Integer> eloChange = new HashMap<>();
+        String eloType = (String) DuelListeners.duelStatistics.get(losingTeam.get(0)).get("type");
 
         // Setup
         for (UUID uuid : losingTeam) {
@@ -367,13 +389,13 @@ public class DuelMethods {
 
         // Calculate Elo change for the winning team
         for (UUID uuid : winningTeam) {
-            int elo = (int) StatDB.readPlayer(uuid, "stat_elo");
+            int elo = (int) StatDB.readPlayer(uuid, "stat_elo_"+eloType);
             int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
 
             for (UUID playedAgainst : winnerScoreboard.keySet()) {
                 if (playedAgainst.equals(uuid)) continue;
 
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int outcome = damageDealt > winnerScoreboard.get(playedAgainst) ? 1 : 0;
                 int change = (int) (C.K * (outcome - expected));
@@ -381,7 +403,7 @@ public class DuelMethods {
             }
 
             for (UUID playedAgainst : losingTeam) {
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int change = (int) (C.K * (1 - expected));
                 eloChange.put(uuid, eloChange.get(uuid) + change);
@@ -393,18 +415,18 @@ public class DuelMethods {
             }
 
             DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
-            StatDB.writePlayer(uuid, "stat_elo", newElo);
+            StatDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
         }
 
         // Calculate Elo change for the losing team
         for (UUID uuid : losingTeam) {
-            int elo = (int) StatDB.readPlayer(uuid, "stat_elo");
+            int elo = (int) StatDB.readPlayer(uuid, "stat_elo_"+eloType);
             int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
 
             for (UUID playedAgainst : loserScoreboard.keySet()) {
                 if (playedAgainst.equals(uuid)) continue;
 
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int outcome = damageDealt > loserScoreboard.get(playedAgainst) ? 1 : 0;
                 int change = (int) (C.K * (outcome - expected));
@@ -412,7 +434,7 @@ public class DuelMethods {
             }
 
             for (UUID playedAgainst : winningTeam) {
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo");
+                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int change = (int) (C.K * -expected);
                 eloChange.put(uuid, eloChange.get(uuid) + change);
@@ -424,7 +446,7 @@ public class DuelMethods {
             }
 
             DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
-            StatDB.writePlayer(uuid, "stat_elo", newElo);
+            StatDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
         }
     }
 
@@ -432,6 +454,22 @@ public class DuelMethods {
         String losingTeamMembers = "";
         String winningTeamMembers = "";
         String comma = ", ";
+        String type = (String) DuelListeners.duelStatistics.get(losingTeam.get(0)).get("type");
+        String typeText = "";
+        String victory = "&a&lVICTORY &7vs. ";
+        String defeat = "&c&lDEFEAT &7vs. ";
+//        [🗡] [🪓] [🔱]
+        switch (type) {
+            case "smp":
+                typeText = "&#FBE108&l[&#FBE108&l\uD83D\uDDE1&#F8FB08&l] ";
+                break;
+            case "shield":
+                typeText = "&#2623FA&l[&#425EFF&l\uD83E\uDE93&#425EFF&l] ";
+                break;
+            case "crystal":
+                typeText = "&#FF40F2&l[&#E95FFF&l\uD83D\uDD31O&#E95FFF&l] ";
+                break;
+        }
         for (int i = 0; i < losingTeam.size(); i++) {
             if (i == losingTeam.size()-1) {
                 comma = "";
@@ -470,7 +508,7 @@ public class DuelMethods {
             if (Userdata.get().get(uuid+".career") != null) {
                 career = (ArrayList<String>) Userdata.get().get(uuid+".career");
             }
-            career.add(C.t(losingTeamMembers + " &c☠&r " + winningTeamMembers + playerElo));
+            career.add(C.t(  typeText + defeat + winningTeamMembers + playerElo));
             if (career.size() > 10) {
                 career.remove(10);
             }
@@ -490,7 +528,7 @@ public class DuelMethods {
             if (Userdata.get().get(uuid+".career") != null) {
                 career = (ArrayList<String>) Userdata.get().get(uuid+".career");
             }
-            career.add(C.t(losingTeamMembers + " &e★&r " + winningTeamMembers + playerElo));
+            career.add(C.t( typeText + victory + losingTeamMembers + playerElo));
             if (career.size() > 10) {
                 career.remove(10);
             }

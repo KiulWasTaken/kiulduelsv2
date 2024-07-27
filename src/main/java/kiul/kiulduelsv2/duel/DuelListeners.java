@@ -386,7 +386,7 @@ public class DuelListeners implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if(DuelMethods.preDuel.contains(e.getPlayer()) || ClickMethods.inEditor.contains(e.getPlayer())) {
+        if(DuelMethods.preDuel.contains(e.getPlayer()) || ClickMethods.inEditor.containsKey(e.getPlayer())) {
             Location to = e.getFrom();
             to.setPitch(e.getTo().getPitch());
             to.setYaw(e.getTo().getYaw());

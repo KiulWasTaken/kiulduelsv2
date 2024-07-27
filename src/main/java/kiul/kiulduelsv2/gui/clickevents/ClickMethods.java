@@ -21,31 +21,31 @@ import java.util.*;
 
 public class ClickMethods {
 
-    public static ArrayList<Player> inEditor = new ArrayList<>();
+    public static HashMap<Player,String> inEditor = new HashMap<>();
 
-    public static Map<Material,Integer> limitedItems = new HashMap() {{
+    static Map<Material,Integer> limitedItems = new HashMap() {{
        put(Material.ENCHANTED_GOLDEN_APPLE,2);
        put(Material.END_CRYSTAL,0);
        put(Material.RESPAWN_ANCHOR,0);
     }};
-    public static Set<PotionEffectType> limitedEffects = new HashSet<>() {{
+    static Set<PotionEffectType> limitedEffects = new HashSet<>() {{
         add(PotionEffectType.SLOW_FALLING);
     }};
 
 
 
 
-    public static void enterKitEditor (Player p) {
-        inEditor.add(p);
+    public static void enterKitEditor (Player p,String type) {
+        inEditor.put(p,type);
         ItemInventory.itemInventory(p);
         p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,200000,1,false,false));
         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
             onlinePlayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),p);
         }
         p.getInventory().clear();
-        if (Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + KitMethods.kitSlot.get(p)) != null) {
+        if (Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
             try {
-                KitMethods.loadSelectedKitSlot(p);
+                KitMethods.loadSelectedKitSlot(p,type);
             } catch (IOException e) {
                 e.printStackTrace();
             }

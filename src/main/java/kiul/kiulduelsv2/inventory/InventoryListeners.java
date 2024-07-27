@@ -3,6 +3,7 @@ package kiul.kiulduelsv2.inventory;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.StatDB;
+import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.EnchantEnum;
 import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.gui.ItemEnum;
@@ -24,7 +25,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
@@ -238,9 +241,7 @@ public class InventoryListeners implements Listener {
         public void setSlotonPlayerJoin (PlayerJoinEvent e){
         e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
         e.getPlayer().setGameMode(GameMode.SURVIVAL);
-        if (StatDB.readPlayer(e.getPlayer().getUniqueId(),"stat_elo") == null) {
-            StatDB.writePlayer(e.getPlayer().getUniqueId(),"stat_elo",700);
-        }
+
         if (Userdata.get().get(e.getPlayer().getUniqueId()+".stats.wins") == null) {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.wins", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.losses", 0);
@@ -249,13 +250,31 @@ public class InventoryListeners implements Listener {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.kills", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.deaths", 0);
         }
-            if (!e.getPlayer().hasPlayedBefore() ||  Userdata.get().get("selected-slot." + e.getPlayer().getUniqueId()) == null) {
-                Userdata.get().set("selected-slot." + e.getPlayer().getUniqueId(), 1);
+            List<String> types = new ArrayList<>();
+            for (String key : Queue.queue.keySet()) {
+                String[] keys = key.split("-");
+                types.add(keys[0].toLowerCase());
+            }
+            for (String type : types) {
+                if (StatDB.readPlayer(e.getPlayer().getUniqueId(),"stat_elo_"+type) == null) {
+                    StatDB.writePlayer(e.getPlayer().getUniqueId(),"stat_elo_"+type,700);
+                }
+            }
+            if (!e.getPlayer().hasPlayedBefore() ||  Userdata.get().get(e.getPlayer().getUniqueId()+ ".selected-slot." +types.get(0)) == null) {
+                for (String type : types) {
+                    Userdata.get().set(e.getPlayer().getUniqueId()+".selected-slot." +type,1);
+                }
                 Userdata.save();
-                kitSlot.put(e.getPlayer(), 1);
+                for (String type : types) {
+                    kitSlot.get(e.getPlayer()).put(type,Userdata.get().getInt(e.getPlayer().getUniqueId()+".selected-slot."+type));
+                }
+
                 try {KitMethods.lobbyKit(e.getPlayer());} catch (IOException er) {er.printStackTrace();}
             } else {
-                kitSlot.put(e.getPlayer(), (int) Userdata.get().get("selected-slot." + e.getPlayer().getUniqueId()));
+                kitSlot.put(e.getPlayer(),new HashMap<>());
+                for (String type : types) {
+                    kitSlot.get(e.getPlayer()).put(type,Userdata.get().getInt(e.getPlayer().getUniqueId()+".selected-slot."+type));
+                }
             }
             try {
                 KitMethods.lobbyKit(e.getPlayer());
@@ -266,7 +285,14 @@ public class InventoryListeners implements Listener {
 
         @EventHandler
         public void saveSlotonPlayerLeave (PlayerQuitEvent e){
-            Userdata.get().set("selected-slot." + e.getPlayer().getUniqueId(), kitSlot.get(e.getPlayer()));
+            List<String> types = new ArrayList<>();
+            for (String key : Queue.queue.keySet()) {
+                String[] keys = key.split("-");
+                types.add(keys[0].toLowerCase());
+            }
+            for (String type : types) {
+                Userdata.get().set(e.getPlayer().getUniqueId()+".selected-slot." + type, kitSlot.get(e.getPlayer()).get(type));
+            }
             Userdata.save();
         }
 }

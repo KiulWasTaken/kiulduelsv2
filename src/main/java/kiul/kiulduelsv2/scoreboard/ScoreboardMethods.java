@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.scoreboard;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,6 +47,12 @@ public class ScoreboardMethods {
         int best_streak = Userdata.get().getInt(p.getUniqueId()+".stats.best_streak");
         int kills = Userdata.get().getInt(p.getUniqueId()+".stats.kills");
         int deaths = Userdata.get().getInt(p.getUniqueId()+".stats.deaths");
+        int crystalElo = (int) StatDB.readPlayer(p.getUniqueId(),"stat_elo_crystal");
+        int smpElo = (int) StatDB.readPlayer(p.getUniqueId(),"stat_elo_smp");
+        int shieldElo = (int) StatDB.readPlayer(p.getUniqueId(),"stat_elo_shield");
+        String crystalPlacement = " &8(#"+StatDB.readPlayer(p.getUniqueId(),"stat_elo_crystal_placement")+")";
+        String smpPlacement = " &8(#"+StatDB.readPlayer(p.getUniqueId(),"stat_elo_smp_placement")+")";
+        String shieldPlacement = " &8(#"+StatDB.readPlayer(p.getUniqueId(),"stat_elo_shield_placement")+")";
         double winRate = C.safeDivide(wins,(wins+losses))*100;
         double kdRatio = C.safeDivide(kills,deaths);
 
@@ -56,13 +63,15 @@ public class ScoreboardMethods {
         Score fifth = objective.getScore("  " + C.t("&7Winrate&8 » &f"+df.format(winRate)+"%"));
         Score sixth = objective.getScore("  " + C.t("&7Winstreak&8 » &f"+streak));
         Score seventh = objective.getScore("  " + C.t("&7Best Streak&8 » &f"+best_streak));
-        Score eighth = objective.getScore("  " + C.t("&7Kills&8 » &f"+kills));
-        Score ninth = objective.getScore("  " + C.t("&7Deaths&8 » &f"+deaths));
-        Score tenth = objective.getScore("  " + C.t("&7K/D&8 » &f"+df.format(kdRatio)));
-        Score eleventh = objective.getScore("  " + C.t(" "));
-        Score twelfth = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&c"));
-        Score thirteenth = objective.getScore("  " + C.t("&7» &fUnranked &7«"));
-        Score fourteenth = objective.getScore("  " + C.t("&7||||||||||||||||||||||||||||| &f0%"));
+//        Score eighth = objective.getScore("  " + C.t("&7Kills&8 » &f"+kills));
+//        Score ninth = objective.getScore("  " + C.t("&7Deaths&8 » &f"+deaths));
+        Score eighth = objective.getScore("  " + C.t("&7K/D&8 » &f"+df.format(kdRatio)));
+        Score ninth = objective.getScore("  " + C.t(" "));
+        Score tenth = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&c"));
+        Score eleventh = objective.getScore("  " + C.t("&7Crystal&8 » &f" + crystalElo + crystalPlacement));
+        Score twelfth = objective.getScore("  " + C.t("&7SMP&8 » &f" + smpElo + smpPlacement));
+        Score thirteenth = objective.getScore("  " + C.t("&7Shield&8 » &f" + shieldElo + shieldPlacement));
+        Score fourteenth = objective.getScore("  " + C.t(" "));
         Score fifteenth = objective.getScore("  " + C.t(" "));
         Score sixteenth = objective.getScore(C.t("&7kiul.net &8("+p.getPing()+"ms)"));
 
@@ -114,34 +123,42 @@ public class ScoreboardMethods {
         return scoreboard;
     }
 
-    public static Sidebar duelSidebar (Player p, List<Player> duelMembers, String rating, long duelStartTime) {
+    public static Scoreboard duelSidebar(Player p, List<Player> duelMembers, String rating, long duelStartTime) {
         int[] times = C.splitTimestampSince(duelStartTime);
 
-        Component ping = Component.empty();
+        StringBuilder ping = new StringBuilder();
         for (int i = 0; i < duelMembers.size(); i++) {
-            Player members = duelMembers.get(i);
-            if (members == p) {
-                ping.append(Component.text( members.getPing()+"ms ").color(NamedTextColor.GREEN));
+            Player member = duelMembers.get(i);
+            if (member == p) {
+                ping.append(ChatColor.GREEN).append(member.getPing()).append("ms ");
             } else {
-                ping.append(Component.text( members.getPing()+"ms ").color(NamedTextColor.RED));
+                ping.append(ChatColor.RED).append(member.getPing()).append("ms ");
             }
-            if (i != duelMembers.size()-1) {
-                ping.append(Component.text("- ").color(NamedTextColor.WHITE));
+            if (i != duelMembers.size() - 1) {
+                ping.append(ChatColor.WHITE).append("- ");
             }
-
         }
 
-        MiniMessage miniMessage = MiniMessage.miniMessage();
-        SidebarComponent lines = SidebarComponent.builder()
-                .addComponent(SidebarComponent.staticLine(miniMessage.deserialize("Duel - " + rating)))
-                .addDynamicLine(() -> miniMessage.deserialize(" <gray>Duration  <dark_gray>» <white>" + String.format("%02d:%02d:%02d",times[0],times[1],times[2])))
-                .addDynamicLine(() ->  miniMessage.deserialize(" <gray>Latency <dark_gray>» <white>").append(ping))
-                .build();
-        ComponentSidebarLayout layout = new ComponentSidebarLayout(
-                SidebarComponent.staticLine(miniMessage.deserialize("<#256A05><bold>K<#2C6E06><bold>I<#347307><bold>U<#3B7707><bold>L<#427B08><bold>.<#4A7F09><bold>N<#51840A><bold>E<#58880B><bold>T <#608E0C><bold>P<#67950D><bold>R<#6E9C0E><bold>A<#76A310><bold>C<#7DAA11><bold>T<#84B112><bold>I<#8CB814><bold>C<#93BF15><bold>E")),
-                lines
-        );
-        Sidebar sidebar = C.scoreboardLibrary.createSidebar();
-        layout.apply(sidebar);
-    return sidebar;}
+        // Create a new scoreboard
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+
+        // Create a new objective to display the sidebar
+        Objective objective = scoreboard.registerNewObjective("duelSidebar", "dummy", ChatColor.translateAlternateColorCodes('&', "&a&lK&b&lI&c&lU&d&lL&e&l.&f&lN&g&lE&h&lT &i&lP&j&lR&k&lA&l&lC&m&lT&n&lI&o&lC&p&lE"));
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        // Add lines to the sidebar
+        Score title = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&7Duel - " + rating));
+        title.setScore(3);
+
+        String duration = String.format("%02d:%02d:%02d", times[0], times[1], times[2]);
+        Score durationLine = objective.getScore(ChatColor.GRAY + " Duration " + ChatColor.DARK_GRAY + "» " + ChatColor.WHITE + duration);
+        durationLine.setScore(2);
+
+        Score latencyLine = objective.getScore(ChatColor.GRAY + " Latency " + ChatColor.DARK_GRAY + "» " + ping.toString());
+        latencyLine.setScore(1);
+
+        p.setScoreboard(scoreboard);
+
+        return scoreboard;
+    }
 }

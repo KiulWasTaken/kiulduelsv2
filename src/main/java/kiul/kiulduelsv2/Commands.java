@@ -35,6 +35,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 import static kiul.kiulduelsv2.C.partyManager;
+import static kiul.kiulduelsv2.C.t;
 import static kiul.kiulduelsv2.inventory.KitMethods.*;
 import static kiul.kiulduelsv2.config.Userdata.*;
 
@@ -43,11 +44,11 @@ public class Commands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command cmd, String label, String[] args) {
         Player p = (Player) commandSender;
-
+        Party party = partyManager.findPartyForMember(p.getUniqueId());
         switch (label) {
             case "kit":
                 switch (args[0]) {
-                    case "save":
+                    /*case "save":
                         saveInventoryToSelectedKitSlot(p);
                         break;
                     case "load":
@@ -60,10 +61,7 @@ public class Commands implements CommandExecutor {
                         } else {
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cAre you sure? &7Type &6/kit delete confirm &7to permanently delete the contents of your selected kit slot"));
                         }
-                        break;
-                    case "slot":
-                        kitSlot.put(p,Integer.parseInt(args[1]));
-                        break;
+                        break;*/
                     case "loadglobal":
                         try {
                             ItemStack[] armourContents;
@@ -161,8 +159,9 @@ public class Commands implements CommandExecutor {
                 break;
             case "previewinv":
                 Player target = Bukkit.getPlayer(args[0]);
+                String type = args[1];
                 if (target != null) {
-                    Recap.open(p, target,true);
+                    Recap.open(p, target,true,type);
                 } else {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "player is offline or does not exist");
                 }
@@ -218,7 +217,7 @@ public class Commands implements CommandExecutor {
                 EnchantInventory.itemEnchantInventory(p);
                 break;
             case "cancel":
-                if (ClickMethods.inEditor.contains(p)) {
+                if (ClickMethods.inEditor.containsKey(p)) {
                     p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Exiting kit editor..");
                     ClickMethods.inEditor.remove(p);
                     p.getActivePotionEffects().clear();
@@ -235,11 +234,11 @@ public class Commands implements CommandExecutor {
                     }
                 }
             case "save":
-                if (ClickMethods.inEditor.contains(p)) {
+                if (ClickMethods.inEditor.containsKey(p)) {
                     p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Exiting kit editor..");
                     p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Saving kit..");
                     long timeMillis = System.currentTimeMillis();
-                    saveInventoryToSelectedKitSlot(p);
+                    saveInventoryToSelectedKitSlot(p,ClickMethods.inEditor.get(p));
                     long timeFinal = System.currentTimeMillis()-timeMillis;
                     p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Complete! (" + timeFinal + "ms)");
                     ClickMethods.inEditor.remove(p);
@@ -263,7 +262,6 @@ public class Commands implements CommandExecutor {
                 if (partyManager.findPartyForMember(p.getUniqueId()) == null && !args[0].equalsIgnoreCase("invite") && !args[0].equalsIgnoreCase("accept")) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are not in a party!");
                 } else if (args.length == 0 && partyManager.findPartyForMember(p.getUniqueId()) != null) {
-                    Party party = partyManager.findPartyForMember(p.getUniqueId());
                     List<String> partyMembers = new ArrayList<>();
                     partyMembers.add(Bukkit.getPlayer(party.getLeader()).getDisplayName());
                     if (party.getMembers() != null) {
@@ -281,19 +279,30 @@ public class Commands implements CommandExecutor {
                                     if (Bukkit.getPlayer(args[1]) != null) {
                                         Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
                                         PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
+                                        for (UUID members : party.getMembersInclusive()) {
+                                            if (Bukkit.getPlayer(members)!= null) {
+                                                Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName() + " has been invited to the party", Bukkit.getPlayer(members));
+                                            }
+                                        }
                                     }
                                 }
                             } else {
                                 if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
                                     Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
                                     PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
+                                    Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName()+" has been invited to the party",p);
                                 }
                             }
                             break;
                         case "leave":
                             if (partyManager.findPartyForMember(uuid) != null) {
                                 if (!partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                    Party party = partyManager.findPartyForMember(uuid);
+
+                                    for (UUID memberUUIDs : party.getMembersInclusive()) {
+                                        if (Bukkit.getPlayer(memberUUIDs) != null) {
+                                            Party.sendPartyMessage(Bukkit.getPlayer(uuid).getName() + " has left the party!", Bukkit.getPlayer(memberUUIDs));
+                                        }
+                                    }
                                     party.removeMember(uuid);
                                     try {
                                         KitMethods.lobbyKit(Bukkit.getPlayer(uuid));
@@ -304,19 +313,19 @@ public class Commands implements CommandExecutor {
                             }
                             break;
                         case "disband":
-                            if (partyManager.findPartyForMember(uuid) != null) {
-                                if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+                            if (party != null) {
+                                if (party.isLeader(uuid)) {
                                     ArrayList<Player> members = new ArrayList<>();
-                                    for (UUID memberUUIDs : partyManager.findPartyForMember(uuid).getMembers()) {
+                                    for (UUID memberUUIDs : party.getMembers()) {
                                         if (Bukkit.getPlayer(memberUUIDs) != null) {
                                             Player member = Bukkit.getPlayer(memberUUIDs);
-                                            member.sendMessage(C.t("&#e04aac&o" + Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).getDisplayName() + "'s party has been disbanded"));
+                                            Party.sendPartyMessage(Bukkit.getPlayer(party.getLeader()).getName()+"'s party has been disbanded",member);
                                             members.add(member);
                                         }
                                     }
-                                    members.add(Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()));
-                                    Bukkit.getPlayer(partyManager.findPartyForMember(uuid).getLeader()).sendMessage(C.t("&#e04aac&o" + "your party has been successfully disbanded"));
-                                    partyManager.disbandParty(partyManager.findPartyForMember(uuid));
+                                    members.add(Bukkit.getPlayer(party.getLeader()));
+                                    Party.sendPartyMessage("your party has been successfully disbanded",Bukkit.getPlayer(party.getLeader()));
+                                    partyManager.disbandParty(party);
                                     for (Player member : members) {
                                         try {
                                             KitMethods.lobbyKit(member);
@@ -329,12 +338,12 @@ public class Commands implements CommandExecutor {
                             break;
                         case "kick":
                             if (partyManager.findPartyForMember(uuid) != null) {
-                                Party party = partyManager.findPartyForMember(uuid);
+
                                 if (Bukkit.getPlayer(args[1]) != null) {
                                     Player removed = Bukkit.getPlayer(args[1]);
                                     party.removeMember(removed.getUniqueId());
-                                    p.sendMessage(C.t("&d" + "" + ChatColor.ITALIC + removed.getDisplayName() + " has been kicked from the party!"));
-                                    removed.sendMessage(C.t("&#e04aac&o" + "" + ChatColor.ITALIC + "You have been kicked from the party!"));
+                                    Party.sendPartyMessage(removed.getDisplayName() + " has been kicked from the party!",p);
+                                    Party.sendPartyMessage("You have been kicked from the party!",removed);
                                     try {
                                         KitMethods.lobbyKit(removed);
                                     } catch (IOException err) {
@@ -342,7 +351,7 @@ public class Commands implements CommandExecutor {
                                     }
                                     for (UUID partyMembers : party.getMembers()) {
                                         if (Bukkit.getPlayer(partyMembers) != null) {
-                                            Bukkit.getPlayer(partyMembers).sendMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + removed.getDisplayName() + " has been kicked from the party.");
+                                            Party.sendPartyMessage(removed.getDisplayName() + " has been kicked from the party.",Bukkit.getPlayer(partyMembers));
                                         }
                                     }
                                 }
@@ -352,22 +361,22 @@ public class Commands implements CommandExecutor {
                             if (partyManager.findPartyForMember(uuid) == null) {
                                 if (Bukkit.getPlayer(args[1]) != null) {
                                     if (Party.invitedPlayer.get(uuid) == Bukkit.getPlayer(args[1]).getUniqueId()) {
-                                        Party party;
+                                        Party newParty;
                                         if (partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId()) == null) {
-                                            party = partyManager.createParty(Bukkit.getPlayer(args[1]).getUniqueId());
+                                            newParty = partyManager.createParty(Bukkit.getPlayer(args[1]).getUniqueId());
                                         } else {
-                                            party = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
+                                            newParty = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
                                         }
-                                        for (UUID memberUUIDs : party.getMembers()) {
+                                        newParty.addMember(uuid);
+                                        for (UUID memberUUIDs : newParty.getMembersInclusive()) {
                                             if (Bukkit.getPlayer(memberUUIDs) != null) {
                                                 Player member = Bukkit.getPlayer(memberUUIDs);
-                                                member.sendMessage(C.t("&#b755ff" + p.getDisplayName() + " has joined the party!"));
+                                                Party.sendPartyMessage(p.getDisplayName() + " has joined the party!",member);
                                             }
                                         }
-                                        Bukkit.getPlayer(party.getLeader()).sendMessage(C.t("&#b755ff" + p.getDisplayName() + " has joined the party!"));
-                                        party.addMember(uuid);
+
                                         try {
-                                            KitMethods.lobbyKit(Bukkit.getPlayer(party.getLeader()));
+                                            KitMethods.lobbyKit(Bukkit.getPlayer(newParty.getLeader()));
                                         } catch (IOException err) {
                                             err.printStackTrace();
                                         }

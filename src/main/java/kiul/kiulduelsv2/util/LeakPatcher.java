@@ -19,7 +19,7 @@ public class LeakPatcher implements Listener {
     @EventHandler
     public void preventLeakOnQuit (PlayerQuitEvent e) {
         Player p = e.getPlayer();
-        if (ClickMethods.inEditor.contains(p)) {
+        if (ClickMethods.inEditor.containsKey(p)) {
             ClickMethods.inEditor.remove(p);
         }
         if (DuelListeners.duelStatistics.containsKey(p.getUniqueId())) {

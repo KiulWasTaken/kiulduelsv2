@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.party;
 
+import kiul.kiulduelsv2.C;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -10,6 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class Party {
+    public static void sendPartyMessage(String message,Player recipient) {
+
+        recipient.sendMessage(C.t("&d&m                                                                "));
+        recipient.sendMessage(C.t("&7&o"+message));
+        recipient.sendMessage(C.t("&d&m                                                                "));
+    }
     private UUID leader;
     private List<UUID> members;
     private List<UUID> teamOne;
@@ -31,6 +38,12 @@ public class Party {
 
     public List<UUID> getMembers() {
         return members;
+    }
+    public List<UUID> getMembersInclusive() {
+        List<UUID> membersInclusive = new ArrayList<>();
+        membersInclusive.add(leader);
+        membersInclusive.addAll(members);
+        return membersInclusive;
     }
 
     public List<Player> teamOnePlayers() {

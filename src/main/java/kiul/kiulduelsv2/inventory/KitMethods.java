@@ -15,10 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import static kiul.kiulduelsv2.C.partyManager;
+import static kiul.kiulduelsv2.C.t;
 
 public class KitMethods {
 
-    public static HashMap<Player,Integer> kitSlot = new HashMap<>();
+    public static HashMap<Player,HashMap<String,Integer>> kitSlot = new HashMap<>();
     public static void lobbyKit (Player p) throws IOException {
         ItemStack[] kitContents;
         List<String> lore = new ArrayList<>();
@@ -57,16 +58,16 @@ public class KitMethods {
         p.setFlying(true);
     }
 
-    public static void saveInventoryToSelectedKitSlot (Player p) {
-            Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
-            Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+    public static void saveInventoryToSelectedKitSlot (Player p,String type) {
+            Userdata.get().set("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".inventory", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
+            Userdata.get().set("kits." + p.getUniqueId() + "." + type +  ".kit-slot-" + kitSlot.get(p).get(type) + ".armour", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
             Userdata.save();
 
     }
 
-    public static void loadSelectedKitSlot (Player p) throws IOException {
-        ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".inventory"));
-        ItemStack[] armourContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p) + ".armour"));
+    public static void loadSelectedKitSlot (Player p,String type) throws IOException {
+        ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".inventory"));
+        ItemStack[] armourContents = InventoryToBase64.itemStackArrayFromBase64((String) Userdata.get().get("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".armour"));
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(armourContents);
     }
