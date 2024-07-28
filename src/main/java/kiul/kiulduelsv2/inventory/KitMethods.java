@@ -36,7 +36,7 @@ public class KitMethods {
         p.getInventory().setArmorContents(null);
         if (partyManager.findPartyForMember(p.getUniqueId()) != null) {
             Party party = partyManager.findPartyForMember(p.getUniqueId());
-            if (party.teamOne().contains(p)) {
+            if (party.teamOne().contains(p.getUniqueId())) {
                 lore.add(ChatColor.GRAY + "Right-Click to change party team");
                 p.getInventory().setItem(0, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "RED", Material.RED_WOOL, 1, lore, null, null, "partyteam"));
                 lore.clear();

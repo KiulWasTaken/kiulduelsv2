@@ -9,6 +9,7 @@ import kiul.kiulduelsv2.duel.DuelManager;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.DuelMethods.*;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -31,6 +32,7 @@ public class UtilMethods {
         p.setFoodLevel(20);
         p.setSaturation(5);
         p.setGameMode(GameMode.SURVIVAL);
+        ScoreboardMethods.startLobbyScoreboardTask(p);
         try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
     }
 

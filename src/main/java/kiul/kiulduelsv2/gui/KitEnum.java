@@ -21,7 +21,7 @@ public enum KitEnum {
             ChatColor.GRAY+"SMP Kit consistent with rules on Kiul SMP.",
             ChatColor.GRAY+"All forms of non-crystal PVP are allowed",
             ChatColor.GRAY+"includes mace & cart."}, 19,"smp"),
-    SHIELD("&#2623FA&lO&#2C2FFB&lN&#313BFC&lE&#3746FD&lS&#3C52FE&lH&#425EFF&lO&#425EFF&lT&#425EFF&lL&#425EFF&lE&#425EFF&lS&#425EFF&lS",null,null, Material.SHIELD,null, new String[]{
+    SHIELD("&#2623FA&lA&#2D32FB&lT&#3441FD&lT&#3B4FFE&lR&#425EFF&lI&#425EFF&lT&#425EFF&lI&#425EFF&lO&#425EFF&lN&#425EFF",null,null, Material.SHIELD,null, new String[]{
             ChatColor.GRAY+"SMP Kit designed for practice mains",
             ChatColor.GRAY+"restricted use of powerful SMP meta weapons",
             ChatColor.GRAY+"mace & cart disabled."}, 10,"shield"),

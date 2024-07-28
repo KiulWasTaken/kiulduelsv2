@@ -94,27 +94,25 @@ public class StatDB {
         }
         return true;
     }
+    public static Map<Integer,UUID> getPlacements (String stat) {
+        TreeMap<Integer,UUID> placements = new TreeMap<>();
+        for (OfflinePlayer offlinePlayers : Bukkit.getOfflinePlayers()) {
+            if (placements.size() > 10) {
+                break;
+            }
+            placements.put((int)readPlayer(offlinePlayers.getUniqueId(),stat+"_placement"),offlinePlayers.getUniqueId());
+        }
+        return placements;
+    }
     public static void setupPlayer (UUID uuid) {
         DBObject obj = new BasicDBObject("uuid", uuid.toString());
-        obj.put("stat_kills",0);
-        obj.put("stat_kills_odds",0);
-        obj.put("stat_kills_quick",0);
-        obj.put("stat_kills_drain",0);
-        obj.put("stat_trades",0);
-        obj.put("stat_run",0);
-        obj.put("stat_carts",0);
-        obj.put("stat_restocks",0);
-        obj.put("stat_elo",700);
+        obj.put("stat_elo_crystal",700);
+        obj.put("stat_elo_smp",700);
+        obj.put("stat_elo_shield",700);
         stats.insert(obj,WriteConcern.SAFE);
-        updatePlayerPlacement("stat_kills");
-        updatePlayerPlacement("stat_kills_odds");
-        updatePlayerPlacement("stat_kills_quick");
-        updatePlayerPlacement("stat_kills_drain");
-        updatePlayerPlacement("stat_trades");
-        updatePlayerPlacement("stat_run");
-        updatePlayerPlacement("stat_carts");
-        updatePlayerPlacement("stat_restocks");
-        updatePlayerPlacement("stat_elo");
+        updatePlayerPlacement("stat_elo_crystal");
+        updatePlayerPlacement("stat_elo_smp");
+        updatePlayerPlacement("stat_elo_shield");
     }
     public static void updatePlayerPlacement (String key) {
         new BukkitRunnable() {
@@ -157,16 +155,6 @@ public class StatDB {
 
             }
         }.runTaskAsynchronously(C.plugin);
-    }
-    public static Map<Integer,UUID> getPlacements (String stat) {
-        TreeMap<Integer,UUID> placements = new TreeMap<>();
-        for (OfflinePlayer offlinePlayers : Bukkit.getOfflinePlayers()) {
-            if (placements.size() > 10) {
-                break;
-            }
-            placements.put((int)readPlayer(offlinePlayers.getUniqueId(),stat+"_placement"),offlinePlayers.getUniqueId());
-        }
-        return placements;
     }
     public static Object readPlayer(UUID uuid, String objectPath){
         //Lets build a minimal object to get all objects in the
@@ -221,26 +209,33 @@ public class StatDB {
         return found.keySet();
     }
     public static void writePlayer (UUID uuid, String objectPath, Object objectToStore) {
-        // Query for the document with the specified UUID
-        DBObject query = new BasicDBObject("uuid", uuid.toString());
-        DBObject found = stats.findOne(query);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
 
-        // Create a new document with the UUID and specified object
-        DBObject document = new BasicDBObject("uuid", uuid.toString());
-        document.put(objectPath, objectToStore);
 
-        // If an existing document is found, update it; otherwise, insert a new document
+                // Query for the document with the specified UUID
+                DBObject query = new BasicDBObject("uuid", uuid.toString());
+                DBObject found = stats.findOne(query);
 
-        if (found != null) {
-            // Update the existing document with the new values
-            DBObject update = new BasicDBObject("$set", document);
-            stats.update(found, update);
-        } else {
-            // Insert a new document with the specified UUID and object
-            stats.insert(document);
-        }
-        if (objectPath.contains("stat") && !objectPath.contains("placement")) {
-            updatePlayerPlacement(objectPath);
-        }
+                // Create a new document with the UUID and specified object
+                DBObject document = new BasicDBObject("uuid", uuid.toString());
+                document.put(objectPath, objectToStore);
+
+                // If an existing document is found, update it; otherwise, insert a new document
+
+                if (found != null) {
+                    // Update the existing document with the new values
+                    DBObject update = new BasicDBObject("$set", document);
+                    stats.update(found, update);
+                } else {
+                    // Insert a new document with the specified UUID and object
+                    stats.insert(document);
+                }
+                if (objectPath.contains("stat") && !objectPath.contains("placement")) {
+                    updatePlayerPlacement(objectPath);
+                }
+            }
+        }.runTaskAsynchronously(C.plugin);
     }
 }

@@ -112,7 +112,6 @@ public class PartyQueueInventory implements Listener {
         Player p = (Player)e.getView().getPlayer();
         if (e.getView().getTitle().contains("Party Games") || e.getView().getTitle().contains("Select Gamemode")) {
             e.setCancelled(true);
-            Bukkit.broadcastMessage(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getLore().get(0)));
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                 String localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
                 switch (localName) {
@@ -127,7 +126,7 @@ public class PartyQueueInventory implements Listener {
                         }
                         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
                         boolean ffa = partyFightType.equalsIgnoreCase("ffa");
-                        DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(),party.getMembers(),party.teamOne(),party.teamTwo(),ffa,localName);
+                        DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(),party.getMembersInclusive(),party.teamOne(),party.teamTwo(),ffa,localName);
                         p.closeInventory();
                     default:
                         if (e.getCurrentItem().getType().equals(Material.PLAYER_HEAD)) {

@@ -10,10 +10,7 @@ import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,12 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
 
 public class Queue implements Listener {
 
-    public static HashMap<String,ArrayList<Player>> queue = new HashMap<>() {{
+    public final static HashMap<String,ArrayList<Player>> queue = new HashMap<>() {{
         put("SMP-RATED",new ArrayList<>());
         put("CRYSTAL-RATED",new ArrayList<>());
         put("SHIELD-RATED",new ArrayList<>());
@@ -61,37 +59,77 @@ public class Queue implements Listener {
         Player p = (Player) e.getWhoClicked();
         if (e.getView().getTitle().equalsIgnoreCase("queue")) {
             e.setCancelled(true);
-            String strings[] = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING).split("-");
-            String kitType = strings[0].toLowerCase();
-            if (Userdata.get().get("kits." + p.getUniqueId() + "." + kitType + ".kit-slot-" + kitSlot.get(p).get(kitType)) != null) {
-                // if (KitMethods.kitMatchesCriteria(String kit,int playerKitSlot,Player p) {
-                // proceed
-                // } else {
-                // "you dickhead!"
-                // }
+            if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING)) {
+                String type = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING);
+                if (!e.getCurrentItem().getType().equals(Material.NETHER_STAR)) {
+                    String strings[] = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).split("-");
+                    String kitType = strings[0].toLowerCase();
+                    if (Userdata.get().get("kits." + p.getUniqueId() + "." + kitType + ".kit-slot-" + kitSlot.get(p).get(kitType)) != null) {
+                        // if (KitMethods.kitMatchesCriteria(String kit,int playerKitSlot,Player p) {
+                        // proceed
+                        // } else {
+                        // "you dickhead!"
+                        // }
 
-                // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
+                        // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
 
+                        boolean rated = false;
+                        if (type.toLowerCase().contains("rated")) {
+                            rated = true;
+                        }
+                        p.closeInventory();
+                        Party party = C.partyManager.findPartyForMember(p.getUniqueId());
+                        if (party != null) {
+                            for (UUID partyMember : party.getMembers()) {
+                                if (Bukkit.getPlayer(partyMember) != null) {
+                                    Player pm = Bukkit.getPlayer(partyMember);
+                                    if (inEditor.containsKey(pm)) {
+                                        p.sendMessage(C.t("&c&oCannot enter queue whilst party member is editing their kit!"));
+                                        return;
+                                    }
+                                }
+                            }
+                            for (UUID partyMember : party.getMembers()) {
+                                if (Bukkit.getPlayer(partyMember) != null) {
+                                    Player pm = Bukkit.getPlayer(partyMember);
+                                    Party.sendPartyMessage(C.t("your party has joined queue for &d" + type.toUpperCase()),pm);
+                                    try {
+                                        loadGlobalKit(pm, "queue");
+                                    } catch (IOException err) {
+                                        err.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
 
-                if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
-                    String type = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
-                    boolean rated = false;
-                    if (type.toLowerCase().contains("rated")) {rated = true;}
-                    joinQueue(p,type,rated);
-                    p.playSound(p, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 1f, 0.4f);
-                    p.closeInventory();
+                        joinQueue(p, type, rated);
+                        p.playSound(p, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 1f, 0.4f);
+
+                        try {
+                            loadGlobalKit(p, "queue");
+                        } catch (IOException err) {
+                            err.printStackTrace();
+                        }
+
+                    } else {
+                        p.closeInventory();
+                        p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Selected kit slot (" + KitMethods.kitSlot.get(p).get(kitType) + ") is empty!");
+                    }
+                } else {
                     try {
                         loadGlobalKit(p, "queue");
                     } catch (IOException err) {
                         err.printStackTrace();
                     }
-
-                } else {
-                    p.playSound(p, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 0.3f, 0.4f);
+                    p.closeInventory();
+                    for (String queueType : queue.keySet()) {
+                        boolean rated = false;
+                        if (queueType.toLowerCase().contains("rated")) {
+                            rated = true;
+                        }
+                        joinQueue(p, queueType, rated);
+                    }
                 }
-            } else {
-                p.closeInventory();
-                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Selected kit slot (" + KitMethods.kitSlot.get(p).get(kitType) + ") is empty!");
             }
         }
     }
@@ -167,6 +205,14 @@ public class Queue implements Listener {
 
                     int[] times = C.splitTimestampSince(sinceJoined);
                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
+                    if (party != null) {
+                        for (UUID partyMember : party.getMembers()) {
+                            if (Bukkit.getPlayer(partyMember) != null) {
+                                Player pm = Bukkit.getPlayer(partyMember);
+                                pm.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
+                            }
+                        }
+                    }
 
                     if (rated) {
                         for (Player playersInQueue : getQueue(type)) {
@@ -176,7 +222,6 @@ public class Queue implements Listener {
                             if (difference < 0) {
                                 difference *= -1;
                             }
-                            Bukkit.broadcastMessage(difference + " " + ((System.currentTimeMillis() - sinceJoined) / 1000) * 10);
                             if (difference < ((double) (System.currentTimeMillis() - sinceJoined) / 1000) * 10) {
                                 Party eParty = C.partyManager.findPartyForMember(playersInQueue.getUniqueId());
                                 if (eParty != null) {
@@ -200,7 +245,7 @@ public class Queue implements Listener {
                         players.clear();
                         Party party1 = C.partyManager.findPartyForMember(getQueue(type).get(0).getUniqueId());
                         Party party2 = C.partyManager.findPartyForMember(getQueue(type).get(1).getUniqueId());
-                        if (party1 != null) {
+                        if (party1 != null && party2 != null) {
                             for (UUID memberUUIDs : party1.getMembers()) {
                                 if (Bukkit.getPlayer(memberUUIDs) != null) {
                                     players.add(Bukkit.getPlayer(memberUUIDs));
@@ -222,13 +267,21 @@ public class Queue implements Listener {
                         String arena = ArenaMethods.getSuitableArena();
                         if (arena != null) {
                             for (Player duelMembers : players) {
-                                getQueue(type).remove(duelMembers);
+                                for (String type : queue.keySet()) {
+                                    if (getQueue(type).contains(duelMembers)) {
+                                        getQueue(type).remove(duelMembers);
+                                    }
+                                }
                             }
                             DuelMethods.startRealisticDuel(players, arena, false, rated,kitType);
                             cancel();
                         } else {
                             for (Player duelMembers : players) {
-                                getQueue(type).remove(duelMembers);
+                                for (String type : queue.keySet()) {
+                                    if (getQueue(type).contains(duelMembers)) {
+                                        getQueue(type).remove(duelMembers);
+                                    }
+                                }
                             }
                             new BukkitRunnable() {
 

@@ -26,14 +26,7 @@ public class QueueInventory {
         emptylore.add("");
 
         for (int i = 0; i < inventory.getSize(); i++) {
-
-            if (i <= 14) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
-            } else if (i <= 17) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
-            } else {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
-            }
+            inventory.setItem(i, ItemStackMethods.createItemStack("", Material.BLACK_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
         }
         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
         boolean partyExists = false;
@@ -48,6 +41,7 @@ public class QueueInventory {
                 for (String itemLore : item.getLore()) {
                     lore.add((itemLore));
                 }
+                int amount = 1;
             String c = ChatColor.getLastColors(C.t(item.getDisplayName()));
                 if (item.getlocalName().contains("CASUAL") || item.getlocalName().contains("RATED") || item.getlocalName().contains("UNRATED")) {
                     lore.add("");
@@ -72,6 +66,7 @@ public class QueueInventory {
                     lore.add("");
                     String strings[] =  item.getlocalName().split("-");
                     String kitType = strings[0].toLowerCase();
+                    amount = Queue.queue.get(item.getlocalName()).size()+1;
                     Map<Integer, UUID> placements = StatDB.getPlacements("stat_elo_"+kitType);
                     int numEntries = 10;
                     if (placements.keySet().size() < 10) {
@@ -96,8 +91,8 @@ public class QueueInventory {
                     }
                 }
                 String itemName = C.t(item.getDisplayName());
-
-                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null,item.getlocalName()));
+                String[] realLore = lore.toArray(new String[0]);
+                inventory.setItem(item.getInventorySlot(), C.createItemStack(itemName, item.getMaterial(), amount, realLore, null, null,item.getlocalName(),null));
         }
 
         p.openInventory(inventory);

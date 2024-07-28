@@ -16,9 +16,7 @@ import java.util.List;
 public class GlobalKits {
 
     public static void instantiate () {
-        ArrayList<String> lore = new ArrayList<>() {{
-            add(" ");
-        }};
+        ArrayList<String> lore = new ArrayList<>();
         Inventory lobbyKit = Bukkit.createInventory(null,36,"lobby");
         lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
         lobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "KIT EDITOR", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));

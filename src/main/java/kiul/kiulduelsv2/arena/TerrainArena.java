@@ -440,7 +440,6 @@ public class TerrainArena extends ChunkGenerator {
                                 if (Arenadata.get().getLocation("arenas." + arenaName + ".center") == targetLocation) {
                                     if (ArenaMethods.arenasInUse.contains(arenaName)) {
                                         ArenaMethods.arenasInUse.remove(arenaName);
-                                        Bukkit.broadcastMessage(ChatColor.GOLD + "+" + ChatColor.GRAY+arenaName);
                                     }
                                 }
                             }

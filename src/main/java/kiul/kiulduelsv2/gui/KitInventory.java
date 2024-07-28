@@ -21,9 +21,6 @@ public class KitInventory implements Listener {
 
 
     public static void kitInventory(Player p) {
-
-        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.2F, 0.5F);
-
         Inventory inventory = Bukkit.createInventory(p, 45, "Kit Selector");
         List<String> emptylore = new ArrayList<>();
         emptylore.add("");
@@ -81,7 +78,6 @@ public class KitInventory implements Listener {
         Player p = (Player)e.getView().getPlayer();
         if (e.getView().getTitle().equals("Kit Selector")) {
             e.setCancelled(true);
-            Bukkit.broadcastMessage(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getLore().get(0)));
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                 String name = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
                 int num = Integer.parseInt(name);
@@ -89,11 +85,14 @@ public class KitInventory implements Listener {
                 String type = strings[strings.length-1].toLowerCase();
                 KitMethods.kitSlot.get(p).put(type,num);
                 KitInventory.kitInventory(p);
+                p.playSound(p,Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE,1f,1f);
             }
             if (e.getCurrentItem().getItemMeta().getLore().get(0).trim().equals(ChatColor.GOLD + "⏵ " + ChatColor.GRAY + "Click to Edit")) {
                 String[] strings = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING).split("-");
                 String type = strings[strings.length-1].toLowerCase();
                 ClickMethods.enterKitEditor(p,type);
+                p.closeInventory();
+                p.playSound(p,Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE,1f,1.5f);
             }
         }
     }

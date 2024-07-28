@@ -12,6 +12,6 @@ public class ScoreboardListeners implements Listener {
 
     @EventHandler
     public void applyScoreboardOnLogin (PlayerJoinEvent e) {
-        e.getPlayer().setScoreboard(ScoreboardMethods.lobbyScoreboard(e.getPlayer()));
+        ScoreboardMethods.startLobbyScoreboardTask(e.getPlayer());
     }
 }

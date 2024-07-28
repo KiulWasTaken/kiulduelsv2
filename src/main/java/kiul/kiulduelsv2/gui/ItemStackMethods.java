@@ -11,7 +11,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.io.IOException;
@@ -61,13 +60,14 @@ public class ItemStackMethods {
         return item;
     }
 
-    public static ItemStack createPotion(String displayName, Material mat, int amount, PotionData potionData) {
+    public static ItemStack createPotion(String displayName, Material mat, int amount, PotionType potionType) {
         ItemStack itemStack = new ItemStack(mat);
         itemStack.setAmount(amount);
         PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
-        potionMeta.setBasePotionData(potionData);
-        potionMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        potionMeta.setBasePotionType(potionType);
+        potionMeta.setItemName(displayName);
         itemStack.setItemMeta(potionMeta);
+
         return itemStack;
     }
 

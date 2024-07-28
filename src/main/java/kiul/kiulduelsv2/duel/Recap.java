@@ -60,12 +60,9 @@ public class Recap implements Listener {
             e.setCancelled(true);
         if (!e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {return;}
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING) == "swap") {
-                Bukkit.broadcastMessage("1");
                     Player viewing = ((SkullMeta) e.getCurrentItem().getItemMeta()).getOwningPlayer().getPlayer();
-                Bukkit.broadcastMessage("2");
                     boolean post = e.getView().getTitle().contains("Post-Game Inventory");
                     if (viewing == null) {return;}
-                Bukkit.broadcastMessage("3");
                     String[] strings = e.getView().getTitle().split("\\|");
                     String type = strings[1].toLowerCase().trim();
                     open(p,viewing,!post,type);

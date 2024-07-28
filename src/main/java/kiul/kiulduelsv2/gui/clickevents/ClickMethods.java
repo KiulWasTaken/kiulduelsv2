@@ -1,5 +1,7 @@
 package kiul.kiulduelsv2.gui.clickevents;
 
+import it.unimi.dsi.fastutil.Hash;
+import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
@@ -23,10 +25,26 @@ public class ClickMethods {
 
     public static HashMap<Player,String> inEditor = new HashMap<>();
 
-    static Map<Material,Integer> limitedItems = new HashMap() {{
-       put(Material.ENCHANTED_GOLDEN_APPLE,2);
-       put(Material.END_CRYSTAL,0);
-       put(Material.RESPAWN_ANCHOR,0);
+    static Map<String,HashMap<Material,Integer>> limitedItems = new HashMap() {{
+       put("smp", new HashMap<Material,Integer>() {{
+           put(Material.EXPERIENCE_BOTTLE,128);
+           put(Material.ENCHANTED_GOLDEN_APPLE,3);
+           put(Material.END_CRYSTAL,0);
+           put(Material.RESPAWN_ANCHOR,0);
+       }});
+        put("crystal", new HashMap<Material,Integer>() {{
+            put(Material.ENCHANTED_GOLDEN_APPLE,5);
+        }});
+        put("shield", new HashMap<Material,Integer>() {{
+            put(Material.EXPERIENCE_BOTTLE,128);
+            put(Material.ENCHANTED_GOLDEN_APPLE,3);
+            put(Material.END_CRYSTAL,0);
+            put(Material.RESPAWN_ANCHOR,0);
+            put(Material.MACE,0);
+            put(Material.TNT_MINECART,0);
+            put(Material.TNT,0);
+
+        }});
     }};
     static Set<PotionEffectType> limitedEffects = new HashSet<>() {{
         add(PotionEffectType.SLOW_FALLING);
@@ -37,12 +55,23 @@ public class ClickMethods {
 
     public static void enterKitEditor (Player p,String type) {
         inEditor.put(p,type);
-        ItemInventory.itemInventory(p);
+
         p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,200000,1,false,false));
         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
             onlinePlayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),p);
         }
         p.getInventory().clear();
+
+        p.closeInventory();
+        p.sendMessage(C.t("&#4DBA4B&m                                                                "));
+        p.sendMessage(C.t("&7Welcome to the Kit Editor!"));
+        p.sendMessage(C.t("&7To create/edit your kit, first open your inventory."));
+        p.sendMessage(C.t("&7You can add items to your kit by &#4DBA4BSHIFT-LEFT-CLICKING"));
+        p.sendMessage(C.t("&7anywhere in your inventory."));
+        p.sendMessage(C.t("&7likewise, you can enchant & customize items in your kit"));
+        p.sendMessage(C.t("&7by &#4DBA4BSHIFT-RIGHT-CLICKING &7on the item that you want to edit."));
+        p.sendMessage(C.t(""));
+        p.sendMessage(C.t("&#4DBA4B&m                                                                "));
         if (Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
             try {
                 KitMethods.loadSelectedKitSlot(p,type);
@@ -50,12 +79,12 @@ public class ClickMethods {
                 e.printStackTrace();
             }
         }
-        p.sendMessage(ChatColor.GRAY + " " + ChatColor.ITALIC + "Left-Click to open the item menu / Right-Click to open the enchant menu");
     }
 
-    public static boolean itemAmountIsWithinLimit (Player p, ItemStack itemStack) {
-        if (limitedItems.containsKey(itemStack.getType())) {
-            if (p.getInventory().containsAtLeast(itemStack,limitedItems.get(itemStack.getType())) || itemStack.getAmount() > limitedItems.get(itemStack.getType())) {
+    public static boolean itemAmountIsWithinLimit (Player p, ItemStack itemStack,String type) {
+        if (limitedItems.get(type).containsKey(itemStack.getType())) {
+
+            if (p.getInventory().containsAtLeast(itemStack,limitedItems.get(type).get(itemStack.getType())) || itemStack.getAmount() > limitedItems.get(type).get(itemStack.getType())) {
 //                if (itemStack.getType() == Material.POTION || itemStack.getType() == Material.SPLASH_POTION || itemStack.getType() == Material.TIPPED_ARROW) {
 //                    PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
 //                    for (PotionEffect potionEffect : potionMeta.getCustomEffects()) {
@@ -65,7 +94,7 @@ public class ClickMethods {
 //                        }
 //                    }
 //                }
-                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "The limit for this item is " + ChatColor.YELLOW + ChatColor.ITALIC + limitedItems.get(itemStack.getType()));
+                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "The limit for this item is " + ChatColor.YELLOW + ChatColor.ITALIC + limitedItems.get(type).get(itemStack.getType()));
                 return false;
             }
         }

@@ -8,6 +8,8 @@ import kiul.kiulduelsv2.database.StatDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Recap;
+import kiul.kiulduelsv2.gui.EnchantInventory;
+import kiul.kiulduelsv2.gui.ItemInventory;
 import kiul.kiulduelsv2.gui.KitInventory;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.PartyQueueInventory;
@@ -18,9 +20,6 @@ import kiul.kiulduelsv2.scoreboard.ScoreboardListeners;
 import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import kiul.kiulduelsv2.util.LeakPatcher;
 import kiul.kiulduelsv2.util.TabCompleter;
-import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
-import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
-import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,6 +42,9 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LeakPatcher(), this);
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
+        getServer().getPluginManager().registerEvents(new ItemInventory(),this);
+        getServer().getPluginManager().registerEvents(new EnchantInventory(),this);
+
         getServer().getPluginManager().registerEvents(new Queue(),this);
         getServer().getPluginManager().registerEvents(new KitInventory(),this);
         getServer().getPluginManager().registerEvents(new InteractListeners(),this);
@@ -84,13 +86,6 @@ public final class Kiulduelsv2 extends JavaPlugin {
         }
         Userdata.save();
 
-        try {
-            C.scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(this);
-        } catch (NoPacketAdapterAvailableException e) {
-            // If no packet adapter was found, you can fall back to the no-op implementation:
-            C.scoreboardLibrary = new NoopScoreboardLibrary();
-            this.getLogger().warning("No scoreboard packet adapter available!");
-        }
 
         // Database
         StatDB.connect();
@@ -113,6 +108,5 @@ public final class Kiulduelsv2 extends JavaPlugin {
             }
         }
         Userdata.save();
-        C.scoreboardLibrary.close();
     }
 }

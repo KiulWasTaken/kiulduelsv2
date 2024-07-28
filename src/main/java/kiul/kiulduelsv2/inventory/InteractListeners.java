@@ -8,10 +8,7 @@ import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.util.UtilMethods;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,38 +29,6 @@ public class InteractListeners implements Listener {
     @EventHandler
     public void hotbarInteractListener (PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (ClickMethods.inEditor.containsKey(e.getPlayer())) {
-            if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                e.setCancelled(true);
-                ItemInventory.itemInventory(p);
-                return;
-            }
-            if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                e.setCancelled(true);
-                EnchantInventory.itemEnchantInventory(p);
-                return;
-            }
-        }
-        if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-            if (e.getPlayer().getInventory().getItemInMainHand() != null) {
-                if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
-                    if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
-                        switch (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
-                            case "partysplit":
-                                e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setDisplayName(ChatColor.LIGHT_PURPLE + "Party FFA");
-                                e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partyffa");
-                                e.getPlayer().getInventory().getItemInMainHand().setType(Material.PINK_DYE);
-                                break;
-                            case "partyffa":
-                                e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setDisplayName(ChatColor.LIGHT_PURPLE + "Party Split");
-                                e.getPlayer().getInventory().getItemInMainHand().getItemMeta().setLocalizedName("partysplit");
-                                e.getPlayer().getInventory().getItemInMainHand().setType(Material.MAGENTA_DYE);
-                                break;
-                        }
-                    }
-                }
-            }
-        }
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getPlayer().getInventory().getItemInMainHand() != null) {
                 if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
@@ -80,6 +45,7 @@ public class InteractListeners implements Listener {
                                 break;
                             case "kiteditor":
                                 e.setCancelled(true);
+                                p.playSound(p, Sound.ENTITY_VILLAGER_WORK_LIBRARIAN,0.8f,1f);
                                 KitInventory.kitInventory(e.getPlayer());
                                 break;
                             case "partyqueue":
@@ -91,7 +57,7 @@ public class InteractListeners implements Listener {
                                 party.changeTeam(p.getUniqueId());
                                 List<String> lore = new ArrayList<>();
                                 lore.add(ChatColor.GRAY + "Right-Click to change party team");
-                                if (party.teamOne().contains(p)) {
+                                if (party.teamOne().contains(p.getUniqueId())) {
                                     p.getInventory().setItemInMainHand(ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "RED", Material.RED_WOOL, 1, lore, null, null, "partyteam"));
                                 } else {
                                     p.getInventory().setItemInMainHand(ItemStackMethods.createItemStack(ChatColor.BLUE + "" + ChatColor.BOLD + "BLUE", Material.BLUE_WOOL, 1, lore, null, null, "partyteam"));
@@ -99,6 +65,25 @@ public class InteractListeners implements Listener {
                                 break;
                             case "leavequeue":
                                 e.setCancelled(true);
+                                if (party != null) {
+                                        for (UUID memberUUIDs : party.getMembersInclusive()) {
+                                            if (Bukkit.getPlayer(memberUUIDs) != null) {
+                                                Player pm = Bukkit.getPlayer(memberUUIDs);
+                                                Party.sendPartyMessage("party queue has been cancelled by " + ChatColor.LIGHT_PURPLE+ e.getPlayer().getName(),pm);
+                                                try {
+                                                    KitMethods.lobbyKit(pm);
+                                                    for (String types : Queue.queue.keySet()) {
+                                                        if (Queue.queue.get(types).contains(pm)) {
+                                                            Queue.queue.get(types).remove(pm);
+                                                        }
+                                                    }
+                                                } catch (IOException r) {
+                                                    r.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                        return;
+                                }
                                 try {
                                     KitMethods.lobbyKit(e.getPlayer());
                                     for (String types : Queue.queue.keySet()) {

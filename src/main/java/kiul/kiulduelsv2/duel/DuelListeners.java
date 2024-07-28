@@ -446,7 +446,6 @@ public class DuelListeners implements Listener {
                 if (damagerDuel != null && damagedDuel != null) {
 
                     int getDamagerHitsDealt = (int) duelStatistics.get(damager.getUniqueId()).get("hits_dealt");
-                    damager.sendMessage(getDamagerHitsDealt + "");
 
                     int getDamagerCombo = (int) duelStatistics.get(damager.getUniqueId()).get("combo");
                     int getDamagerDamageDealt = (int) duelStatistics.get(damager.getUniqueId()).get("damage_dealt");
@@ -462,9 +461,7 @@ public class DuelListeners implements Listener {
                         duelStatistics.get(damager.getUniqueId()).put("longest_combo", duelStatistics.get(damager.getUniqueId()).get("combo"));
                     }
                     duelStatistics.get(damaged.getUniqueId()).put("combo", 0);
-                    Bukkit.broadcastMessage(damaged.getHealth() + " > " + e.getFinalDamage());
                     if (damaged.getHealth() <= e.getFinalDamage() && damaged.getInventory().getItemInMainHand().getType() != Material.TOTEM_OF_UNDYING && damaged.getInventory().getItemInOffHand().getType() != Material.TOTEM_OF_UNDYING) {
-                        Bukkit.broadcastMessage("that is a lie!");
                         int kills = Userdata.get().getInt(damager.getUniqueId()+".stats.kills");
                         Userdata.get().set(damager.getUniqueId()+".stats.kills",kills+1);
                         Userdata.save();

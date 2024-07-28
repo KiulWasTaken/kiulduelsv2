@@ -18,7 +18,7 @@ public enum QueueEnum {
             ChatColor.GRAY+"Vanilla PVP (crystal meta) kit",
             ChatColor.GRAY+"no restrictions on weapons or gear."}, 17,"CRYSTAL-RATED",null),
     //    CRYSTAL_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-UNRATED",null),
-    ONESHOTLESS_RATED("&#2623FA&lO&#2C2FFB&lN&#313BFC&lE&#3746FD&lS&#3C52FE&lH&#425EFF&lO&#425EFF&lT&#425EFF&lL&#425EFF&lE&#425EFF&lS&#425EFF&lS&r&#425EFF", Material.SHIELD, new String[]{
+    ATTRITION_RATED("&#2623FA&lA&#2D32FB&lT&#3441FD&lT&#3B4FFE&lR&#425EFF&lI&#425EFF&lT&#425EFF&lI&#425EFF&lO&#425EFF&lN&#425EFF", Material.SHIELD, new String[]{
             ChatColor.GRAY+"SMP Kit designed for practice mains",
             ChatColor.GRAY+"restricted use of SMP meta weapons",
             ChatColor.GRAY+"mace & cart disabled."}, 16,"SHIELD-RATED",null),

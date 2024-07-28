@@ -3,12 +3,21 @@ package kiul.kiulduelsv2;
 import kiul.kiulduelsv2.duel.DuelManager;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
-import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.profile.PlayerProfile;
 
-import java.util.Map;
-import java.util.Objects;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +62,6 @@ public class C {
 
     public static PartyManager partyManager = new PartyManager();
     public static DuelManager duelManager = new DuelManager();
-    public static ScoreboardLibrary scoreboardLibrary;
 
     public static int[] splitTimestampSince(long pastTimeStamp) {
         long millisecondsRemaining = System.currentTimeMillis() - pastTimeStamp;
@@ -79,6 +87,51 @@ public class C {
         return null;
     }
 
+    public static ItemStack createItemStack (String itemName, Material material, int amount, String[] lore, Enchantment enchantment, Integer enchantLvl, String localizedName, URL URL) {
+        ItemStack i = new ItemStack(material);
+        if (material == Material.PLAYER_HEAD) {
+            if (URL != null) {
+                i = C.getHeadFromURL(URL);
+            }
+        }
+        ItemMeta iM = i.getItemMeta();
+        iM.setMaxStackSize(amount);
+        List<String> adjustedLore = new ArrayList<>();
+        for (String oldLore : lore) {
+            adjustedLore.add(C.t(oldLore));
+        }
+        iM.setLore(adjustedLore);
+        if (localizedName != null) {
+            iM.getPersistentDataContainer().set(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING,localizedName);
+        }
 
+        i.setAmount(amount);
+        iM.setDisplayName(C.t(itemName));
+        if (enchantment != null) {
+            iM.addEnchant(enchantment, enchantLvl, true);
+        }
+
+        i.setItemMeta(iM);
+        return i;
+    }
+
+    public static ItemStack getHeadFromURL(URL value) {
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1, (short)3);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
+        profile.getTextures().setSkin(value);
+        meta.setOwnerProfile(profile);
+        head.setItemMeta(meta);
+
+        return head;
+    }
+
+    public static URL getURL (String URL) {
+        URL url = null;
+        try {
+            url = new URL(URL);
+        } catch (MalformedURLException err) {err.printStackTrace();}
+        return url;
+    }
 
 }

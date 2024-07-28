@@ -23,7 +23,6 @@ public class ArenaMethods {
         Set<String> arenaList = getArenas();
 
         for (String arena : arenaList) {
-            Bukkit.broadcastMessage(arena+" - "+arenasInUse.contains(arena));
             if (!arenasInUse.contains(arena)) {
                 return arena;
             }

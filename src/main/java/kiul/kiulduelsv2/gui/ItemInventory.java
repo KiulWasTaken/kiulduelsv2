@@ -1,17 +1,27 @@
 package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
+import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemInventory {
+import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
+
+public class ItemInventory implements Listener {
 
     public static String itemInvTitle = C.t("&#238332&lI&#29983a&lt&#2eac42&le&#34c14a&lm &#39d651&lI&#3fea59&ln&#44ff61&lv&#3fea59&le&#39d651&ln&#34c14a&lt&#2eac42&lo&#29983a&lr&#238332&ly");
 
@@ -65,14 +75,14 @@ public class ItemInventory {
                     List<String> lore = new ArrayList<>();
                     lore.add(C.t("&6⏵ &7Click to take " + amount + "x " + item.getMaterial()));
 
-                    String displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionData().getType():"") + " &7x" + amount).toLowerCase().replaceAll("_", " ");
+                    String displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionType():"") + " &7x" + amount).toLowerCase().replaceAll("_", " ");
                     displayName = "&r&l" + displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
 
                     if (potion == false) {
                         inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), amount, lore, null, null,null));
                     } else {
-                        displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionData().getType():"") + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
-                        inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, itemType, itemAmount, item.getPotionData()));
+                        displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionType():"") + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
+                        inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, itemType, itemAmount, item.getPotionType()));
                     }
                 }
             }
@@ -82,4 +92,143 @@ public class ItemInventory {
 
     }
 
+
+    @EventHandler
+    public void itemInventoryClickEvent (InventoryClickEvent e) {
+        Player p = (Player) e.getWhoClicked();
+        if (e.getView().getTitle().equalsIgnoreCase(ItemInventory.itemInvTitle)) {
+
+            if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory() || e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
+                e.setCancelled(true);
+                if (e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
+                    e.getCursor().setAmount(0);
+                    return;
+                }
+                for (ItemEnum item : ItemEnum.values()) {
+                    if (e.getCurrentItem() == null)
+                        break;
+                    if (item.getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(item.getDisplayName()))) {
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
+                            ItemInventory.itemInventory(p);
+                            break;
+                        }
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.clearinventory.getDisplayName()))) {
+                            for (ItemStack items : p.getInventory().getContents()) {
+                                if (items != null && items.getType() != Material.AIR) {
+                                    items.setAmount(0);
+                                }
+                            }
+                            return;
+                        }
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemType.getDisplayName()))) {
+                            int amount = 1;
+                            Material itemType = Material.POTION;
+                            if (e.getClick() == ClickType.LEFT) {
+                                switch (e.getCurrentItem().getType()) {
+                                    case POTION:
+                                        itemType = Material.SPLASH_POTION;
+                                        break;
+                                    case SPLASH_POTION:
+                                        itemType = Material.TIPPED_ARROW;
+                                        amount = 64;
+                                        break;
+                                    case TIPPED_ARROW:
+                                        itemType = Material.POTION;
+                                        break;
+                                }
+                            } else if (e.getClick() == ClickType.RIGHT) {
+                                switch (e.getCurrentItem().getType()) {
+                                    case POTION:
+                                        itemType = Material.TIPPED_ARROW;
+                                        amount = 64;
+                                        break;
+                                    case SPLASH_POTION:
+                                        itemType = Material.POTION;
+                                        break;
+                                    case TIPPED_ARROW:
+                                        itemType = Material.SPLASH_POTION;
+                                        break;
+                                }
+                            }
+                            ItemInventory.subItemInventory(p, p.getOpenInventory().getTopInventory().getSize(), "potions", amount, itemType);
+                            break;
+                        }
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemamount.getDisplayName()))) {
+                            int amount = 0;
+                            if (e.getClick() == ClickType.LEFT) {
+                                switch (e.getCurrentItem().getAmount()) {
+                                    case 1:
+                                        amount = 4;
+                                        break;
+                                    case 4:
+                                        amount = 8;
+                                        break;
+                                    case 8:
+                                        amount = 16;
+                                        break;
+                                    case 16:
+                                        amount = 32;
+                                        break;
+                                    case 32:
+                                        amount = 64;
+                                        break;
+                                    case 64:
+                                        amount = 1;
+                                        break;
+                                }
+                            } else if (e.getClick() == ClickType.RIGHT) {
+                                switch (e.getCurrentItem().getAmount()) {
+                                    case 1:
+                                        amount = 64;
+                                        break;
+                                    case 4:
+                                        amount = 1;
+                                        break;
+                                    case 8:
+                                        amount = 4;
+                                        break;
+                                    case 16:
+                                        amount = 8;
+                                        break;
+                                    case 32:
+                                        amount = 16;
+                                        break;
+                                    case 64:
+                                        amount = 32;
+                                        break;
+                                }
+                            }
+                            for (ItemEnum subItem : ItemEnum.values()) {
+                                if (p.getOpenInventory().getTopInventory().getItem(0).getType() == subItem.getMaterial()) {
+                                    ItemInventory.subItemInventory(p, p.getOpenInventory().getTopInventory().getSize(), subItem.getInventory(), amount, null);
+                                    break;
+                                }
+                            }
+                            break;
+                        } else if (item.getInventorySize() != null) {
+                            ItemInventory.subItemInventory(p, item.getInventorySize(), item.getInventory(), 1, null);
+                            break;
+                        }
+                    } else {
+                        if (e.getClickedInventory() != null && e.getClickedInventory().equals(p.getOpenInventory().getTopInventory())) {
+                            if (e.getCurrentItem() != null) {
+                                if (ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).endsWith("x" + e.getCurrentItem().getAmount())) {
+                                    ItemStack itemStack = e.getCurrentItem().clone();
+                                    ItemMeta itemMeta = itemStack.getItemMeta();
+                                    itemMeta.setDisplayName("");
+                                    itemMeta.setLore(null);
+                                    itemStack.setAmount(e.getCurrentItem().getAmount());
+                                    itemStack.setItemMeta(itemMeta);
+                                    if (ClickMethods.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                                        p.getInventory().addItem(itemStack);
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
