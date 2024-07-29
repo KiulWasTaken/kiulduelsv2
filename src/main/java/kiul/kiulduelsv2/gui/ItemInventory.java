@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,11 @@ public class ItemInventory implements Listener {
                     if (potion == false) {
                         inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(displayName, item.getMaterial(), amount, lore, null, null,null));
                     } else {
-                        displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionType():"") + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
+                        ItemStack i = new ItemStack(itemType);
+                        PotionMeta iM = (PotionMeta) i.getItemMeta();
+                        iM.setBasePotionType(item.getPotionType());
+                        i.setItemMeta(iM);
+                        displayName = C.t(iM.getItemName() + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
                         inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, itemType, itemAmount, item.getPotionType()));
                     }
                 }

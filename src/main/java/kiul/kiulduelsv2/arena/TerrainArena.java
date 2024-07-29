@@ -38,7 +38,7 @@ import static org.bukkit.Bukkit.getScheduler;
 import static org.bukkit.Bukkit.getServer;
 
 public class TerrainArena extends ChunkGenerator {
-    static ArrayList<Biome> disallowedBiomes = new ArrayList<>() {{
+    private final static Set<Biome> disallowedBiomes = new HashSet<>() {{
         add(Biome.OCEAN);
         add(Biome.DEEP_OCEAN);
         add(Biome.COLD_OCEAN);
@@ -47,7 +47,6 @@ public class TerrainArena extends ChunkGenerator {
         add(Biome.DEEP_FROZEN_OCEAN);
         add(Biome.LUKEWARM_OCEAN);
         add(Biome.DEEP_LUKEWARM_OCEAN);
-
     }};
 
     private static Random random = new Random();
@@ -368,58 +367,46 @@ public class TerrainArena extends ChunkGenerator {
     }
 
     public static void generateTerrainPerformant(Location targetLocation, int size) {
-//        long timeMillis = System.currentTimeMillis();
         String worldName = "arenaTerrain";
         BukkitScheduler scheduler = getServer().getScheduler();
-        // Check if the world is already loaded
         World world = Bukkit.getWorld(worldName);
 
-
-        // If the world is not loaded, load it
         if (world == null) {
             WorldCreator worldCreator = new WorldCreator(worldName);
-            worldCreator = worldCreator.environment(World.Environment.NORMAL); // Adjust the environment if needed
-            worldCreator = worldCreator.generateStructures(true); // Enable or disable structures as needed
+            worldCreator = worldCreator.environment(World.Environment.NORMAL);
+            worldCreator = worldCreator.generateStructures(true);
             worldCreator.createWorld();
-
         }
+
         scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-            double Rx = random.nextDouble(0,1);
-            double Rz = random.nextDouble(0,1);
-            double Lx = (Rx-0.5)*8000;
-            double Lz = (Rz-0.5)*8000;
+            double Rx = random.nextDouble(0, 1);
+            double Rz = random.nextDouble(0, 1);
+            double Lx = (Rx - 0.5) * 8000;
+            double Lz = (Rz - 0.5) * 8000;
+
             scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-//                Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"math.random operation complete (" + Lx + ", " + Lz + ")");
-
-
-                 Location center = new Location(world,Lx,0,Lz);
-
+                Location center = new Location(world, Lx, 0, Lz);
                 Chunk ch = center.getChunk();
-
                 Location retrieveCenter = new Location(ch.getWorld(), ch.getX() << 4, 64, ch.getZ() << 4).add(8, 0, 8);
 
-
                 Chunk SEChunk = world.getChunkAt(center.getChunk().getX() + size, center.getChunk().getZ() + size);
-                Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - (size-1), center.getChunk().getZ() - (size-1));
+                Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - (size - 1), center.getChunk().getZ() - (size - 1));
 
                 Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(15, 0, 15);
                 Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+
+                if (!isBiomeAllowed(world, SECorner, NWCorner, size)) {
+                    generateTerrainPerformant(targetLocation, size); // Recursively retry
+                    return;
+                }
 
                 scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
                     CuboidRegion region = new CuboidRegion(BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()), BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ()));
                     com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(world);
                     BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
                     clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
-                    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
-                            faweWorld, region, clipboard, region.getMinimumPoint()
-                    );
+                    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(faweWorld, region, clipboard, region.getMinimumPoint());
                     Operations.complete(forwardExtentCopy);
-//                    scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-//                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"copy operation complete");
-//                    });
-// configure here
-
-
 
                     Chunk c = targetLocation.getChunk();
                     Location targetCenter = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
@@ -434,8 +421,6 @@ public class TerrainArena extends ChunkGenerator {
 
                         editSession.close();
                         scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-//                            long finalTime = (System.currentTimeMillis()-timeMillis)/1000;
-//                        Bukkit.broadcastMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"paste operation complete (finished in " + finalTime + "s)");
                             for (String arenaName : ArenaMethods.getArenas()) {
                                 if (Arenadata.get().getLocation("arenas." + arenaName + ".center") == targetLocation) {
                                     if (ArenaMethods.arenasInUse.contains(arenaName)) {
@@ -448,6 +433,26 @@ public class TerrainArena extends ChunkGenerator {
                 });
             });
         });
+    }
+
+    private static boolean isBiomeAllowed(World world, Location SECorner, Location NWCorner, int size) {
+        Set<Biome> disallowedBiomes = TerrainArena.disallowedBiomes; // Add disallowed biomes here
+        int disallowedCount = 0;
+        int totalChunks = size * size;
+
+        for (int x = SECorner.getChunk().getX(); x <= NWCorner.getChunk().getX(); x++) {
+            for (int z = SECorner.getChunk().getZ(); z <= NWCorner.getChunk().getZ(); z++) {
+                Chunk chunk = world.getChunkAt(x, z);
+                Biome biome = chunk.getBlock(0, 0, 0).getBiome(); // Checking one block per chunk
+
+                if (disallowedBiomes.contains(biome)) {
+                    disallowedCount++;
+                }
+            }
+        }
+
+        double disallowedPercentage = (double) disallowedCount / totalChunks;
+        return disallowedPercentage <= 0.2;
     }
 }
 

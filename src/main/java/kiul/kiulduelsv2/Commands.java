@@ -28,6 +28,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.StringUtil;
 
 import java.io.IOException;
@@ -276,14 +277,29 @@ public class Commands implements CommandExecutor {
                         case "invite":
                             if (partyManager.findPartyForMember(uuid) != null) {
                                 if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                    if (Bukkit.getPlayer(args[1]) != null) {
-                                        Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
-                                        PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
-                                        for (UUID members : party.getMembersInclusive()) {
-                                            if (Bukkit.getPlayer(members)!= null) {
-                                                Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName() + " has been invited to the party", Bukkit.getPlayer(members));
+                                    if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
+                                        if (Party.invitedPlayer.get(Bukkit.getPlayer(args[1]).getUniqueId()) != uuid) {
+                                            Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
+                                            PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
+                                            for (UUID members : party.getMembersInclusive()) {
+                                                if (Bukkit.getPlayer(members) != null) {
+                                                    Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName() + " has been invited to the party", Bukkit.getPlayer(members));
+                                                }
                                             }
+                                            new BukkitRunnable() {
+                                                @Override
+                                                public void run() {
+                                                    Party.invitedPlayer.remove(Bukkit.getPlayer(args[1]).getUniqueId());
+                                                    if (partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId()) == null) {
+                                                        Party.sendPartyMessage(C.t("party invite from &d"+p.getName()+"&7&o has expired."),Bukkit.getPlayer(args[1]));
+                                                    }
+                                                }
+                                            }.runTaskLater(C.plugin,600);
+                                        } else {
+                                            Party.sendPartyMessage(C.t("&d"+args[1]+" &7&ois already invited to this party"),p);
                                         }
+                                    } else {
+                                        Party.sendPartyMessage(args[1].equalsIgnoreCase(p.getName()) ?  "that's you! your name is &d" + args[1] + "!" : "&d"+args[1]+" &7&odoes not exist or is not online",p);
                                     }
                                 }
                             } else {
@@ -291,6 +307,8 @@ public class Commands implements CommandExecutor {
                                     Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
                                     PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
                                     Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName()+" has been invited to the party",p);
+                                } else {
+                                    Party.sendPartyMessage("player does not exist (or is you!)",p);
                                 }
                             }
                             break;
@@ -386,7 +404,7 @@ public class Commands implements CommandExecutor {
                                             err.printStackTrace();
                                         }
                                     } else {
-                                        p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are not invited to this party or it does not exist");
+                                        p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Party invite expired or does not exist");
                                     }
                                 } else {
                                     p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Player is offline or does not exist");
