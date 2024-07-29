@@ -2,14 +2,12 @@ package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.database.StatDB;
-import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
@@ -67,13 +65,13 @@ public class QueueInventory {
                     String strings[] =  item.getlocalName().split("-");
                     String kitType = strings[0].toLowerCase();
                     amount = Queue.queue.get(item.getlocalName()).size()+1;
-                    Map<Integer, UUID> placements = StatDB.getPlacements("stat_elo_"+kitType);
+                    Map<Integer, UUID> placements = DuelsDB.getPlacements("stat_elo_"+kitType);
                     int numEntries = 10;
                     if (placements.keySet().size() < 10) {
                         numEntries = placements.keySet().size();
                     }
                     for (int i = 0; i < numEntries; i++) {
-                        lore.add(C.t("&7#"+(i+1)+"&8⏵ &f"+Bukkit.getOfflinePlayer(placements.get(i+1)).getName() + " &7["+c+StatDB.readPlayer(placements.get(i+1),"stat_elo_"+kitType)+"&7]"));
+                        lore.add(C.t("&7#"+(i+1)+"&8⏵ &f"+Bukkit.getOfflinePlayer(placements.get(i+1)).getName() + " &7["+c+ DuelsDB.readPlayer(placements.get(i+1),"stat_elo_"+kitType)+"&7]"));
                     }
 
                 }

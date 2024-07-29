@@ -6,9 +6,7 @@ import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.database.StatDB;
-import kiul.kiulduelsv2.gui.ItemStackMethods;
-import kiul.kiulduelsv2.inventory.InventoryToBase64;
+import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
@@ -19,14 +17,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
-import java.lang.reflect.WildcardType;
 import java.util.*;
 
 
@@ -390,13 +384,13 @@ public class DuelMethods {
 
         // Calculate Elo change for the winning team
         for (UUID uuid : winningTeam) {
-            int elo = (int) StatDB.readPlayer(uuid, "stat_elo_"+eloType);
+            int elo = (int) DuelsDB.readPlayer(uuid, "stat_elo_"+eloType);
             int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
 
             for (UUID playedAgainst : winnerScoreboard.keySet()) {
                 if (playedAgainst.equals(uuid)) continue;
 
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
+                int Eelo = (int) DuelsDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int outcome = damageDealt > winnerScoreboard.get(playedAgainst) ? 1 : 0;
                 int change = (int) (C.K * (outcome - expected));
@@ -404,7 +398,7 @@ public class DuelMethods {
             }
 
             for (UUID playedAgainst : losingTeam) {
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
+                int Eelo = (int) DuelsDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int change = (int) (C.K * (1 - expected));
                 eloChange.put(uuid, eloChange.get(uuid) + change);
@@ -416,18 +410,18 @@ public class DuelMethods {
             }
 
             DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
-            StatDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
+            DuelsDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
         }
 
         // Calculate Elo change for the losing team
         for (UUID uuid : losingTeam) {
-            int elo = (int) StatDB.readPlayer(uuid, "stat_elo_"+eloType);
+            int elo = (int) DuelsDB.readPlayer(uuid, "stat_elo_"+eloType);
             int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
 
             for (UUID playedAgainst : loserScoreboard.keySet()) {
                 if (playedAgainst.equals(uuid)) continue;
 
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
+                int Eelo = (int) DuelsDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int outcome = damageDealt > loserScoreboard.get(playedAgainst) ? 1 : 0;
                 int change = (int) (C.K * (outcome - expected));
@@ -435,7 +429,7 @@ public class DuelMethods {
             }
 
             for (UUID playedAgainst : winningTeam) {
-                int Eelo = (int) StatDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
+                int Eelo = (int) DuelsDB.readPlayer(playedAgainst, "stat_elo_"+eloType);
                 double expected = 1.0 / (1.0 + Math.pow(10.0, (Eelo - elo) / 400.0));
                 int change = (int) (C.K * -expected);
                 eloChange.put(uuid, eloChange.get(uuid) + change);
@@ -447,7 +441,7 @@ public class DuelMethods {
             }
 
             DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
-            StatDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
+            DuelsDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
         }
     }
 

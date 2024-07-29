@@ -3,8 +3,7 @@ package kiul.kiulduelsv2.duel;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.database.StatDB;
-import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.gui.QueueInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
@@ -183,7 +182,7 @@ public class Queue implements Listener {
         String strings[] = type.split("-");
         String kitType = strings[0].toLowerCase();
         long sinceJoined = System.currentTimeMillis();
-         int pElo = (int) StatDB.readPlayer(p.getUniqueId(),"stat_elo");
+         int pElo = (int) DuelsDB.readPlayer(p.getUniqueId(),"stat_elo");
         List<Player> players = new ArrayList<>();
         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
         if (party != null) {
@@ -217,7 +216,7 @@ public class Queue implements Listener {
                     if (rated) {
                         for (Player playersInQueue : getQueue(type)) {
                             if (playersInQueue == p) {continue;}
-                            int eElo = (int) StatDB.readPlayer(playersInQueue.getUniqueId(), "stat_elo");
+                            int eElo = (int) DuelsDB.readPlayer(playersInQueue.getUniqueId(), "stat_elo");
                             double difference = pElo - eElo;
                             if (difference < 0) {
                                 difference *= -1;

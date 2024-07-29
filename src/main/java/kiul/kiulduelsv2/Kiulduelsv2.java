@@ -4,9 +4,8 @@ import kiul.kiulduelsv2.arena.ArenaListeners;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.ConfigListeners;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.database.StatDB;
+import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
-import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Recap;
 import kiul.kiulduelsv2.gui.EnchantInventory;
 import kiul.kiulduelsv2.gui.ItemInventory;
@@ -17,13 +16,11 @@ import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
 import kiul.kiulduelsv2.scoreboard.ScoreboardListeners;
-import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import kiul.kiulduelsv2.util.LeakPatcher;
 import kiul.kiulduelsv2.util.TabCompleter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,7 +85,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
 
 
         // Database
-        StatDB.connect();
+        DuelsDB.connect();
     }
 
     @Override

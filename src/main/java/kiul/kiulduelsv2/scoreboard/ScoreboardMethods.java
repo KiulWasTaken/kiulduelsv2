@@ -2,21 +2,15 @@ package kiul.kiulduelsv2.scoreboard;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.database.StatDB;
-import kiul.kiulduelsv2.duel.DuelListeners;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import kiul.kiulduelsv2.database.DuelsDB;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,12 +48,12 @@ public class ScoreboardMethods {
                     int best_streak = Userdata.get().getInt(p.getUniqueId() + ".stats.best_streak");
                     int kills = Userdata.get().getInt(p.getUniqueId() + ".stats.kills");
                     int deaths = Userdata.get().getInt(p.getUniqueId() + ".stats.deaths");
-                    int crystalElo = (int) StatDB.readPlayer(p.getUniqueId(), "stat_elo_crystal");
-                    int smpElo = (int) StatDB.readPlayer(p.getUniqueId(), "stat_elo_smp");
-                    int shieldElo = (int) StatDB.readPlayer(p.getUniqueId(), "stat_elo_shield");
-                    String crystalPlacement = " &8(#" + StatDB.readPlayer(p.getUniqueId(), "stat_elo_crystal_placement") + ")";
-                    String smpPlacement = " &8(#" + StatDB.readPlayer(p.getUniqueId(), "stat_elo_smp_placement") + ")";
-                    String shieldPlacement = " &8(#" + StatDB.readPlayer(p.getUniqueId(), "stat_elo_shield_placement") + ")";
+                    int crystalElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_crystal");
+                    int smpElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_smp");
+                    int shieldElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_shield");
+                    String crystalPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_crystal_placement") + ")";
+                    String smpPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_smp_placement") + ")";
+                    String shieldPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_shield_placement") + ")";
                     double winRate = C.safeDivide(wins, (wins + losses)) * 100;
                     double kdRatio = C.safeDivide(kills, deaths);
 

@@ -2,14 +2,15 @@ package kiul.kiulduelsv2.database;
 
 import com.mongodb.*;
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.duel.Queue;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class StatDB {
-    public static DBCollection stats;
+public class DuelsDB {
+    public static DBCollection duels;
     public static DB kiulnetDB;
     public static MongoClient client;
     public static void connect() {
@@ -26,7 +27,7 @@ public class StatDB {
         kiulnetDB = client.getDB("kiulnet");
         //Get the collection called "players" in the database "mcserver"
         //Equivalent to the table in MySQL, you can store objects in here
-        stats = kiulnetDB.getCollection("stats");
+        duels = kiulnetDB.getCollection("duels");
 
     }
 
@@ -35,7 +36,7 @@ public class StatDB {
         DBObject r = new BasicDBObject("uuid", "server");
         DBObject found = null;
         // try-with-resources will handle the closing of the resources
-        try (DBCursor cursor = stats.find(r)){
+        try (DBCursor cursor = duels.find(r)){
             while(cursor.hasNext()) {
                 found = cursor.next();
             }
@@ -44,11 +45,11 @@ public class StatDB {
         obj.put(objectPath, objectToStore);
 
         if (found == null) {
-            stats.insert(obj,WriteConcern.SAFE);
+            duels.insert(obj,WriteConcern.SAFE);
             return;
         }
 
-        stats.update(found, obj,true,false,WriteConcern.SAFE);
+        duels.update(found, obj,true,false,WriteConcern.SAFE);
 
     }
     public static Object readGlobal(String objectPath){
@@ -61,7 +62,7 @@ public class StatDB {
         //Lets get all the objects and get the one object that we are searching for
         DBObject found = null;
         // try-with-resources will handle the closing of the resources
-        try (DBCursor cursor = stats.find(r)){
+        try (DBCursor cursor = duels.find(r)){
             while(cursor.hasNext()) {
                 found = cursor.next();
             }
@@ -82,7 +83,7 @@ public class StatDB {
         DBObject found = null;
         boolean exists = false;
         // try-with-resources will handle the closing of the resources
-        try (DBCursor cursor = stats.find(r)){
+        try (DBCursor cursor = duels.find(r)){
             while(cursor.hasNext()) {
                 found = cursor.next();
             }
@@ -93,6 +94,14 @@ public class StatDB {
             return false;
         }
         return true;
+    }
+
+    public static void checkIntegrity (UUID uuid) {
+        for (String type : Queue.queueTypesLowercase()) {
+            if ((readPlayer(uuid, "stat_elo_" + type) == null)) {
+                writePlayer(uuid,"stat_elo_"+type,700);
+            }
+        }
     }
     public static Map<Integer,UUID> getPlacements (String stat) {
         TreeMap<Integer,UUID> placements = new TreeMap<>();
@@ -106,13 +115,13 @@ public class StatDB {
     }
     public static void setupPlayer (UUID uuid) {
         DBObject obj = new BasicDBObject("uuid", uuid.toString());
-        obj.put("stat_elo_crystal",700);
-        obj.put("stat_elo_smp",700);
-        obj.put("stat_elo_shield",700);
-        stats.insert(obj,WriteConcern.SAFE);
-        updatePlayerPlacement("stat_elo_crystal");
-        updatePlayerPlacement("stat_elo_smp");
-        updatePlayerPlacement("stat_elo_shield");
+        for (String type : Queue.queueTypesLowercase()) {
+            obj.put("stat_elo_"+type, 700);
+        }
+        duels.insert(obj,WriteConcern.SAFE);
+        for (String type : Queue.queueTypesLowercase()) {
+            updatePlayerPlacement("stat_elo_"+type);
+        }
     }
     public static void updatePlayerPlacement (String key) {
         new BukkitRunnable() {
@@ -125,7 +134,11 @@ public class StatDB {
                     if (!key.contains("id")) {
                         key.replaceAll(" ", "");
                         if (readPlayer(offlinePlayer.getUniqueId(), key) == null) {
-                            writePlayer(offlinePlayer.getUniqueId(), key, 0);
+                            int amount = 0;
+                            if (key.contains("elo")) {
+                                amount = 700;
+                            }
+                            writePlayer(offlinePlayer.getUniqueId(), key, amount);
                         }
                         map.put(offlinePlayer.getUniqueId().toString(), (int) readPlayer(offlinePlayer.getUniqueId(), key));
                     }
@@ -166,7 +179,7 @@ public class StatDB {
         //Lets get all the objects and get the one object that we are searching for
         DBObject found = null;
         // try-with-resources will handle the closing of the resources
-        try (DBCursor cursor = stats.find(r)){
+        try (DBCursor cursor = duels.find(r)){
             while(cursor.hasNext()) {
                 found = cursor.next();
             }
@@ -192,7 +205,7 @@ public class StatDB {
         //Lets get all the objects and get the one object that we are searching for
         DBObject found = null;
         // try-with-resources will handle the closing of the resources
-        try (DBCursor cursor = stats.find(r)){
+        try (DBCursor cursor = duels.find(r)){
             while(cursor.hasNext()) {
                 found = cursor.next();
             }
@@ -216,7 +229,7 @@ public class StatDB {
 
                 // Query for the document with the specified UUID
                 DBObject query = new BasicDBObject("uuid", uuid.toString());
-                DBObject found = stats.findOne(query);
+                DBObject found = duels.findOne(query);
 
                 // Create a new document with the UUID and specified object
                 DBObject document = new BasicDBObject("uuid", uuid.toString());
@@ -227,10 +240,10 @@ public class StatDB {
                 if (found != null) {
                     // Update the existing document with the new values
                     DBObject update = new BasicDBObject("$set", document);
-                    stats.update(found, update);
+                    duels.update(found, update);
                 } else {
                     // Insert a new document with the specified UUID and object
-                    stats.insert(document);
+                    duels.insert(document);
                 }
                 if (objectPath.contains("stat") && !objectPath.contains("placement")) {
                     updatePlayerPlacement(objectPath);
