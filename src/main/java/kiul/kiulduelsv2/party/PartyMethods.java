@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.util.UUID;
 
 public class PartyMethods {
@@ -18,7 +19,7 @@ public class PartyMethods {
         player.sendMessage(C.t("&d&m                                                                "));
         player.sendMessage(ChatColor.GRAY+ "" + ChatColor.ITALIC+ inviter.getName() + " has invited you to their party!");
         ComponentBuilder message = new ComponentBuilder("click this message to accept the invitation!");
-        message.color(net.md_5.bungee.api.ChatColor.YELLOW).italic(true);
+        message.color(net.md_5.bungee.api.ChatColor.of(Color.PINK)).italic(true);
 
         // Add the first clickable component
         message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept " + inviter.getName()));

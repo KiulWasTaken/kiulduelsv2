@@ -182,7 +182,7 @@ public class Queue implements Listener {
         String strings[] = type.split("-");
         String kitType = strings[0].toLowerCase();
         long sinceJoined = System.currentTimeMillis();
-         int pElo = (int) DuelsDB.readPlayer(p.getUniqueId(),"stat_elo");
+         int pElo = (int) DuelsDB.readPlayer(p.getUniqueId(),"stat_elo_"+kitType);
         List<Player> players = new ArrayList<>();
         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
         if (party != null) {
@@ -216,7 +216,7 @@ public class Queue implements Listener {
                     if (rated) {
                         for (Player playersInQueue : getQueue(type)) {
                             if (playersInQueue == p) {continue;}
-                            int eElo = (int) DuelsDB.readPlayer(playersInQueue.getUniqueId(), "stat_elo");
+                            int eElo = (int) DuelsDB.readPlayer(playersInQueue.getUniqueId(), "stat_elo_"+kitType);
                             double difference = pElo - eElo;
                             if (difference < 0) {
                                 difference *= -1;
@@ -305,6 +305,7 @@ public class Queue implements Listener {
                                     String arena = ArenaMethods.getSuitableArena();
                                     if (arena != null) {
                                         DuelMethods.startRealisticDuel(players, arena, false, rated,kitType);
+                                        cancel();
                                     }
                                 }
                             }.runTaskTimer(C.plugin, 0, 20);

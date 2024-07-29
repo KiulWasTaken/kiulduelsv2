@@ -79,7 +79,7 @@ public class KitInventory implements Listener {
         if (e.getView().getTitle().equals("Kit Selector")) {
             e.setCancelled(true);
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
-                String name = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+                String name = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getItemName());
                 int num = Integer.parseInt(name);
                 String[] strings = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING).split("-");
                 String type = strings[strings.length-1].toLowerCase();

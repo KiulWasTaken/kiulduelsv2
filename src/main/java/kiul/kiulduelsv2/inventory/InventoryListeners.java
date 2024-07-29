@@ -52,7 +52,9 @@ public class InventoryListeners implements Listener {
             } else {
                 DuelsDB.checkIntegrity(e.getPlayer().getUniqueId());
             }
+            kitSlot.put(e.getPlayer(),new HashMap<>());
             if (!e.getPlayer().hasPlayedBefore() ||  Userdata.get().get(e.getPlayer().getUniqueId()+ ".selected-slot." +types.get(0)) == null) {
+
                 for (String type : types) {
                     Userdata.get().set(e.getPlayer().getUniqueId()+".selected-slot." +type,1);
                 }
@@ -63,7 +65,6 @@ public class InventoryListeners implements Listener {
 
                 try {KitMethods.lobbyKit(e.getPlayer());} catch (IOException er) {er.printStackTrace();}
             } else {
-                kitSlot.put(e.getPlayer(),new HashMap<>());
                 for (String type : types) {
                     kitSlot.get(e.getPlayer()).put(type,Userdata.get().getInt(e.getPlayer().getUniqueId()+".selected-slot."+type));
                 }

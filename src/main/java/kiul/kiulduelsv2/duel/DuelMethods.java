@@ -471,10 +471,10 @@ public class DuelMethods {
             }
             if (i > 2) {
                 comma = "..";
-                losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getDisplayName() + comma;
+                losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getName() + comma;
                 break;
             }
-            losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getDisplayName() + comma;
+            losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getName() + comma;
         }
         comma = ", ";
         for (int i = 0; i < winningTeam.size(); i++) {
@@ -483,10 +483,10 @@ public class DuelMethods {
             }
             if (i > 2) {
                 comma = "..";
-                losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getDisplayName() + comma;
+                losingTeamMembers += Bukkit.getPlayer(losingTeam.get(i)).getName() + comma;
                 break;
             }
-            winningTeamMembers += Bukkit.getPlayer(winningTeam.get(i)).getDisplayName() + comma;
+            winningTeamMembers += Bukkit.getPlayer(winningTeam.get(i)).getName() + comma;
         }
 
         for (UUID uuid : losingTeam) {

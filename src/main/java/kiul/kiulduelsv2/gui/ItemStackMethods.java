@@ -39,7 +39,7 @@ public class ItemStackMethods {
                 iM.getPersistentDataContainer().set(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING,localizedName);
             }
             i.setAmount(amount);
-            iM.setDisplayName(C.t(itemname));
+            iM.setItemName(C.t(itemname));
             if (enchantment != null) {
                 iM.addEnchant(enchantment, enchantLvl, true);
             }

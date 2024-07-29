@@ -106,7 +106,7 @@ public class C {
         }
 
         i.setAmount(amount);
-        iM.setDisplayName(C.t(itemName));
+        iM.setItemName(C.t(itemName));
         if (enchantment != null) {
             iM.addEnchant(enchantment, enchantLvl, true);
         }

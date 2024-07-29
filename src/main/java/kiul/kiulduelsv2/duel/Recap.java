@@ -38,13 +38,17 @@ public class Recap implements Listener {
         for (int i = 1; i <= 9; i++) {
             inventory.setItem(invSize - i, ItemStackMethods.createItemStack(" ", Material.GRAY_STAINED_GLASS_PANE, 1, List.of(new String[]{""}), null, null,null));
         }
+        String displayName = ChatColor.WHITE+recapping.getName();
+        if ((boolean)DuelListeners.duelStatistics.get(recapping.getUniqueId()).get("dead")) {
+            displayName = ChatColor.GRAY+recapping.getName() + ChatColor.RED + " (DEAD)";
+        }
         lore.add(ChatColor.GRAY + "Hits: " + (int)DuelListeners.duelStatistics.get(recapping.getUniqueId()).get("hits_dealt"));
         lore.add(ChatColor.GRAY + "Hits Taken: " +(int)DuelListeners.duelStatistics.get(recapping.getUniqueId()).get("hits_taken"));
         lore.add(ChatColor.GRAY + "Damage Dealt: " +(int)DuelListeners.duelStatistics.get(recapping.getUniqueId()).get("damage_dealt"));
         lore.add(ChatColor.GRAY + "Longest Combo: " + (int)DuelListeners.duelStatistics.get(recapping.getUniqueId()).get("longest_combo"));
         lore.add("");
         lore.add(ChatColor.GRAY+"Click To View Initial Kit Used");
-        inventory.setItem(invSize-5,ItemStackMethods.createSkullItem(recapping.getDisplayName(),recapping,lore,"swap"));
+        inventory.setItem(invSize-5,ItemStackMethods.createSkullItem(displayName,recapping,lore,"swap"));
 
 
 
@@ -79,9 +83,9 @@ public class Recap implements Listener {
 
         ArrayList<String> lore = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
-            String displayName = ChatColor.WHITE+players.get(i).getDisplayName();
+            String displayName = ChatColor.WHITE+players.get(i).getName();
             if ((boolean)DuelListeners.duelStatistics.get(p.getUniqueId()).get("dead")) {
-                displayName = ChatColor.GRAY+players.get(i).getDisplayName() + ChatColor.RED + " (DEAD)";
+                displayName = ChatColor.GRAY+players.get(i).getName() + ChatColor.RED + " (DEAD)";
             }
 
             lore.add(ChatColor.GRAY + "Hits: " + isThisStatTheBest(players.get(i),players,"hits_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_dealt"));
@@ -136,13 +140,13 @@ public class Recap implements Listener {
             }
             if (winner.contains(player)) {
 
-                TextComponent displayName = new TextComponent(player.getDisplayName()+playerElo);
+                TextComponent displayName = new TextComponent(player.getName()+playerElo);
                 TextComponent winnerMessage = new TextComponent(ChatColor.GOLD+" (WINNER)");
                 displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getName() + " " + DuelListeners.duelStatistics.get(player.getUniqueId()).get("type")));
                 p.spigot().sendMessage(bulletPoint,displayName,winnerMessage);
 
             } else {
-                TextComponent displayName = new TextComponent(player.getDisplayName()+playerElo);
+                TextComponent displayName = new TextComponent(player.getName()+playerElo);
                 displayName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/previewinv " + player.getName()+ " " + DuelListeners.duelStatistics.get(player.getUniqueId()).get("type")));
                 p.spigot().sendMessage(bulletPoint,displayName);
             }

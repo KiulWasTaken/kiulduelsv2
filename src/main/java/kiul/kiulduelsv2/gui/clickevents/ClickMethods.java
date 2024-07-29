@@ -72,7 +72,7 @@ public class ClickMethods {
         p.sendMessage(C.t("&7by &#4DBA4BSHIFT-RIGHT-CLICKING &7on the item that you want to edit."));
         p.sendMessage(C.t(""));
         p.sendMessage(C.t("&#4DBA4B&m                                                                "));
-        if (Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
+        if (Userdata.get().get("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
             try {
                 KitMethods.loadSelectedKitSlot(p,type);
             } catch (IOException e) {

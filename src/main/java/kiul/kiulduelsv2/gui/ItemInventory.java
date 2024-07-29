@@ -86,7 +86,7 @@ public class ItemInventory implements Listener {
                         PotionMeta iM = (PotionMeta) i.getItemMeta();
                         iM.setBasePotionType(item.getPotionType());
                         i.setItemMeta(iM);
-                        displayName = C.t(iM.getItemName() + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
+                        displayName = C.t("&fPotion of ") + C.t("&f"+item.getPotionType().name() + " &7x" + itemAmount).toLowerCase().replaceAll("_", " ");
                         inventory.setItem(item.getInventorySlot(), ItemStackMethods.createPotion(displayName, itemType, itemAmount, item.getPotionType()));
                     }
                 }
@@ -112,12 +112,12 @@ public class ItemInventory implements Listener {
                 for (ItemEnum item : ItemEnum.values()) {
                     if (e.getCurrentItem() == null)
                         break;
-                    if (item.getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(item.getDisplayName()))) {
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
+                    if (item.getDisplayName() != null && e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(item.getDisplayName()))) {
+                        if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
                             ItemInventory.itemInventory(p);
                             break;
                         }
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.clearinventory.getDisplayName()))) {
+                        if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.clearinventory.getDisplayName()))) {
                             for (ItemStack items : p.getInventory().getContents()) {
                                 if (items != null && items.getType() != Material.AIR) {
                                     items.setAmount(0);
@@ -125,7 +125,7 @@ public class ItemInventory implements Listener {
                             }
                             return;
                         }
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemType.getDisplayName()))) {
+                        if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.itemType.getDisplayName()))) {
                             int amount = 1;
                             Material itemType = Material.POTION;
                             if (e.getClick() == ClickType.LEFT) {
@@ -158,7 +158,7 @@ public class ItemInventory implements Listener {
                             ItemInventory.subItemInventory(p, p.getOpenInventory().getTopInventory().getSize(), "potions", amount, itemType);
                             break;
                         }
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(ItemEnum.itemamount.getDisplayName()))) {
+                        if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.itemamount.getDisplayName()))) {
                             int amount = 0;
                             if (e.getClick() == ClickType.LEFT) {
                                 switch (e.getCurrentItem().getAmount()) {
@@ -217,10 +217,10 @@ public class ItemInventory implements Listener {
                     } else {
                         if (e.getClickedInventory() != null && e.getClickedInventory().equals(p.getOpenInventory().getTopInventory())) {
                             if (e.getCurrentItem() != null) {
-                                if (ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).endsWith("x" + e.getCurrentItem().getAmount())) {
+                                if (ChatColor.stripColor(e.getCurrentItem().getItemMeta().getItemName()).endsWith("x" + e.getCurrentItem().getAmount())) {
                                     ItemStack itemStack = e.getCurrentItem().clone();
                                     ItemMeta itemMeta = itemStack.getItemMeta();
-                                    itemMeta.setDisplayName("");
+                                    itemMeta.setItemName(null);
                                     itemMeta.setLore(null);
                                     itemStack.setAmount(e.getCurrentItem().getAmount());
                                     itemStack.setItemMeta(itemMeta);

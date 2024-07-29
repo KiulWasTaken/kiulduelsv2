@@ -278,6 +278,7 @@ public class Commands implements CommandExecutor {
                             if (partyManager.findPartyForMember(uuid) != null) {
                                 if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
                                     if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
+                                        Player invited = Bukkit.getPlayer(args[1]);
                                         if (Party.invitedPlayer.get(Bukkit.getPlayer(args[1]).getUniqueId()) != uuid) {
                                             Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
                                             PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
@@ -289,8 +290,8 @@ public class Commands implements CommandExecutor {
                                             new BukkitRunnable() {
                                                 @Override
                                                 public void run() {
-                                                    Party.invitedPlayer.remove(Bukkit.getPlayer(args[1]).getUniqueId());
-                                                    if (partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId()) == null) {
+                                                    Party.invitedPlayer.remove(invited.getUniqueId());
+                                                    if (partyManager.findPartyForMember(invited.getUniqueId()) == null) {
                                                         Party.sendPartyMessage(C.t("party invite from &d"+p.getName()+"&7&o has expired."),Bukkit.getPlayer(args[1]));
                                                     }
                                                 }
@@ -304,11 +305,25 @@ public class Commands implements CommandExecutor {
                                 }
                             } else {
                                 if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
-                                    Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
-                                    PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
-                                    Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName()+" has been invited to the party",p);
+                                    Player invited = Bukkit.getPlayer(args[1]);
+                                    if (Party.invitedPlayer.get(Bukkit.getPlayer(args[1]).getUniqueId()) != uuid) {
+                                        Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);
+                                        PartyMethods.partyInvitePlayer(uuid, Bukkit.getPlayer(args[1]).getUniqueId());
+                                        Party.sendPartyMessage(Bukkit.getPlayer(args[1]).getName() + " has been invited to the party", p);
+                                        new BukkitRunnable() {
+                                            @Override
+                                            public void run() {
+                                                Party.invitedPlayer.remove(invited.getUniqueId());
+                                                if (partyManager.findPartyForMember(invited.getUniqueId()) == null) {
+                                                    Party.sendPartyMessage(C.t("party invite from &d"+p.getName()+"&7&o has expired."),Bukkit.getPlayer(args[1]));
+                                                }
+                                            }
+                                        }.runTaskLater(C.plugin,600);
+                                    } else {
+                                        Party.sendPartyMessage(C.t("&d"+args[1]+" &7&ois already invited to this party"),p);
+                                    }
                                 } else {
-                                    Party.sendPartyMessage("player does not exist (or is you!)",p);
+                                    Party.sendPartyMessage(args[1].equalsIgnoreCase(p.getName()) ?  "that's you! your name is &d" + args[1] + "!" : "&d"+args[1]+" &7&odoes not exist or is not online",p);
                                 }
                             }
                             break;
@@ -386,6 +401,7 @@ public class Commands implements CommandExecutor {
                                             newParty = partyManager.findPartyForMember(Bukkit.getPlayer(args[1]).getUniqueId());
                                         }
                                         newParty.addMember(uuid);
+                                        Party.invitedPlayer.remove(uuid);
                                         for (UUID memberUUIDs : newParty.getMembersInclusive()) {
                                             if (Bukkit.getPlayer(memberUUIDs) != null) {
                                                 Player member = Bukkit.getPlayer(memberUUIDs);

@@ -394,18 +394,21 @@ public class TerrainArena extends ChunkGenerator {
 
                 Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(15, 0, 15);
                 Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
-
                 if (!isBiomeAllowed(world, SECorner, NWCorner, size)) {
                     generateTerrainPerformant(targetLocation, size); // Recursively retry
                     return;
                 }
 
                 scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+
+
+
                     CuboidRegion region = new CuboidRegion(BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()), BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ()));
                     com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(world);
                     BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
                     clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
                     ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(faweWorld, region, clipboard, region.getMinimumPoint());
+                    forwardExtentCopy.setCopyingEntities(false); // Disable copying entities
                     Operations.complete(forwardExtentCopy);
 
                     Chunk c = targetLocation.getChunk();

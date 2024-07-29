@@ -233,7 +233,7 @@ public class EnchantInventory implements Listener {
                     e.getCursor().setAmount(0);
                     return;
                 }
-                if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(C.t(EnchantEnum.iteminventory.getDisplayName()))) {
+                if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(EnchantEnum.iteminventory.getDisplayName()))) {
                     ItemInventory.itemInventory(p);
                     return;
                 }
