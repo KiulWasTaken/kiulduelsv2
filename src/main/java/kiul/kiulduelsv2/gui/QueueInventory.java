@@ -87,6 +87,10 @@ public class QueueInventory {
                     for (int i = 0; i < numEntries; i++) {
                         lore.add(career.get(i));
                     }
+                    for (int i = 0; i < 10-numEntries; i++) {
+                        lore.add(ChatColor.GRAY+"???");
+                    }
+                    lore.add(ChatColor.DARK_GRAY+""+ChatColor.STRIKETHROUGH+"                                                       ");
                 }
                 String itemName = C.t(item.getDisplayName());
                 String[] realLore = lore.toArray(new String[0]);

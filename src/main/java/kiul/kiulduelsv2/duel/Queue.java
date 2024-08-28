@@ -34,6 +34,7 @@ public class Queue implements Listener {
         put("SMP-RATED",new ArrayList<>());
         put("CRYSTAL-RATED",new ArrayList<>());
         put("SHIELD-RATED",new ArrayList<>());
+        put("MAP-QUEUE",new ArrayList<>());
     }};
     public static List<String> queueTypesLowercase() {
         List<String> types = new ArrayList<>();
@@ -64,13 +65,6 @@ public class Queue implements Listener {
                     String strings[] = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).split("-");
                     String kitType = strings[0].toLowerCase();
                     if (Userdata.get().get("kits." + p.getUniqueId() + "." + kitType + ".kit-slot-" + kitSlot.get(p).get(kitType)) != null) {
-                        // if (KitMethods.kitMatchesCriteria(String kit,int playerKitSlot,Player p) {
-                        // proceed
-                        // } else {
-                        // "you dickhead!"
-                        // }
-
-                        // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
 
                         boolean rated = false;
                         if (type.toLowerCase().contains("rated")) {
@@ -122,6 +116,7 @@ public class Queue implements Listener {
                     }
                     p.closeInventory();
                     for (String queueType : queue.keySet()) {
+                        if (queueType.equals("MAP-QUEUE")) {continue;}
                         boolean rated = false;
                         if (queueType.toLowerCase().contains("rated")) {
                             rated = true;
@@ -144,39 +139,6 @@ public class Queue implements Listener {
         }
     }
 
-
-        /*if (Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p)) != null) {
-            // if (KitMethods.kitMatchesCriteria(String kit,int playerKitSlot,Player p) {
-            // proceed
-            // } else {
-            // "you dickhead!"
-            // }
-
-            // FORMAT: Userdata.get().get("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p))
-
-
-            if (p.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
-                    String type = p.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
-                    boolean rated = false;
-                    if (type.toLowerCase().contains("rated")) {rated = true;}
-                    Bukkit.broadcastMessage(type);
-                    joinQueue(p,type,rated);
-
-                    p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.4f);
-                    try {
-                        loadGlobalKit(p, "queue");
-                    } catch (IOException err) {
-                        err.printStackTrace();
-                    }
-                } else {
-                    p.playSound(p, Sound.BLOCK_NOTE_BLOCK_PLING, 0.3f, 0.4f);
-                }
-            } else {
-            p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Selected kit slot (" + KitMethods.kitSlot.get(p) + ") is empty!");
-            }
-        }*/
-
-
     public void joinQueue (Player p, String type,boolean rated) {
         getQueue(type).add(p);
         String strings[] = type.split("-");
@@ -194,13 +156,15 @@ public class Queue implements Listener {
         } else {
             players.add(p);
         }
+
+        String finalType = type;
         new BukkitRunnable() {
 
 
 
             @Override
             public void run() {
-                if (getQueue(type).contains(p) && p.isOnline()) {
+                if (getQueue(finalType).contains(p) && p.isOnline()) {
 
                     int[] times = C.splitTimestampSince(sinceJoined);
                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
@@ -214,7 +178,7 @@ public class Queue implements Listener {
                     }
 
                     if (rated) {
-                        for (Player playersInQueue : getQueue(type)) {
+                        for (Player playersInQueue : getQueue(finalType)) {
                             if (playersInQueue == p) {continue;}
                             int eElo = (int) DuelsDB.readPlayer(playersInQueue.getUniqueId(), "stat_elo_"+kitType);
                             double difference = pElo - eElo;
@@ -241,9 +205,10 @@ public class Queue implements Listener {
                             }
                         }
                     } else {
+
                         players.clear();
-                        Party party1 = C.partyManager.findPartyForMember(getQueue(type).get(0).getUniqueId());
-                        Party party2 = C.partyManager.findPartyForMember(getQueue(type).get(1).getUniqueId());
+                        Party party1 = C.partyManager.findPartyForMember(getQueue(finalType).get(0).getUniqueId());
+                        Party party2 = C.partyManager.findPartyForMember(getQueue(finalType).get(1).getUniqueId());
                         if (party1 != null && party2 != null) {
                             for (UUID memberUUIDs : party1.getMembers()) {
                                 if (Bukkit.getPlayer(memberUUIDs) != null) {
@@ -256,22 +221,23 @@ public class Queue implements Listener {
                                 }
                             }
                         } else {
-                            players.add(getQueue(type).get(0));
-                            players.add(getQueue(type).get(1));
+                            players.add(getQueue(finalType).get(0));
+                            players.add(getQueue(finalType).get(1));
                         }
                     }
 
 
                     if (players.size() > 1) {
                         String arena = ArenaMethods.getSuitableArena();
-                        if (arena != null) {
-                            for (Player duelMembers : players) {
-                                for (String type : queue.keySet()) {
-                                    if (getQueue(type).contains(duelMembers)) {
-                                        getQueue(type).remove(duelMembers);
-                                    }
+                        for (Player duelMembers : players) {
+                            for (String type : queue.keySet()) {
+                                if (getQueue(type).contains(duelMembers)) {
+                                    getQueue(type).remove(duelMembers);
                                 }
                             }
+                        }
+                        if (arena != null) {
+
                             DuelMethods.startRealisticDuel(players, arena, false, rated,kitType);
                             cancel();
                         } else {
@@ -279,16 +245,22 @@ public class Queue implements Listener {
                                 for (String type : queue.keySet()) {
                                     if (getQueue(type).contains(duelMembers)) {
                                         getQueue(type).remove(duelMembers);
+                                        Queue.queue.get("MAP-QUEUE").add(duelMembers);
                                     }
                                 }
                             }
+
                             new BukkitRunnable() {
 
                                 @Override
                                 public void run() {
+                                    boolean next = false;
                                     for (Player duelMembers : players) {
-                                        if (!duelMembers.isOnline()) {
+                                        int[] times = C.splitTimestampSince(sinceJoined);
+                                        duelMembers.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
+                                        if (!duelMembers.isOnline() || !Queue.queue.get("MAP-QUEUE").contains(duelMembers)) {
                                             for (Player online : players) {
+                                                Queue.queue.get("MAP-QUEUE").remove(players);
                                                 if (online.isOnline()) {
                                                     try {
                                                         KitMethods.lobbyKit(online);
@@ -297,13 +269,17 @@ public class Queue implements Listener {
                                                     }
                                                 }
                                             }
+                                            players.clear();
                                             cancel();
+                                            return;
+                                        }
+                                        if (Queue.queue.get("MAP-QUEUE").get(0) == duelMembers) {
+                                            next = true;
                                         }
                                     }
-                                    int[] times = C.splitTimestampSince(sinceJoined);
-                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
+
                                     String arena = ArenaMethods.getSuitableArena();
-                                    if (arena != null) {
+                                    if (arena != null && next) {
                                         DuelMethods.startRealisticDuel(players, arena, false, rated,kitType);
                                         cancel();
                                     }

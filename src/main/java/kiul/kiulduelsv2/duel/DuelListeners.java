@@ -117,7 +117,7 @@ public class DuelListeners implements Listener {
                             if (duel.isRated()) {
                                 DuelMethods.updateElo(duel.getRedTeamMembers(), duel.getBlueTeamMembers());
                             }
-                            DuelMethods.updateCareer(duel.getBlueTeamMembers(),duel.getRedTeamMembers(),duel.isRated());
+                            DuelMethods.updateCareer(duel.getRedTeamMembers(),duel.getBlueTeamMembers(),duel.isRated());
                             for (UUID team2UUIDs : team2) {
                                 if (Bukkit.getPlayer(team2UUIDs) != null) {
                                     Player team2Members = Bukkit.getPlayer(team2UUIDs);
@@ -226,8 +226,10 @@ public class DuelListeners implements Listener {
             Duel duel = C.duelManager.findDuelForMember(p.getUniqueId());
             if (duel != null) {
                 duel.remove(p.getUniqueId());
-                DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead",true);
-                if (p.getLastDamageCause().getEntity() != null) {
+                if (duelStatistics.get(p.getUniqueId()) != null) {
+                    DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead", true);
+                }
+                if (p.getLastDamageCause() != null) {
                     if (p.getLastDamageCause().getEntity() instanceof Player) {
                         Userdata.get().set(p.getLastDamageCause().getEntity().getUniqueId()+".stats.kills",Userdata.get().getInt((p.getLastDamageCause().getEntity().getUniqueId()+".stats.kills"))+1);
                     }

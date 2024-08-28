@@ -40,9 +40,6 @@ public class DuelMethods {
 
     public static void beginDuel (String arenaName,List<Player> players,boolean rated,String kitType) {
         for (Player play : players) {
-            if (preDuel.contains(play)) {
-                preDuel.remove(play);
-            }
             play.setGameMode(GameMode.SURVIVAL);
             String rating = rated ? "Rated" : "Casual";
             ScoreboardMethods.startDuelSidebar(play,players,rating,System.currentTimeMillis());
@@ -86,7 +83,6 @@ public class DuelMethods {
         for (Player p : players) {
             try {
                 KitMethods.loadSelectedKitSlot(p,kitType);
-                preDuel.add(p);
                 preDuelCountdown(p);
                     p.setSaturation(5);
                     p.setFoodLevel(20);
@@ -104,13 +100,12 @@ public class DuelMethods {
     }
 
     public static void preDuelCountdown (Player p) {
-        int timer = 10;
-        Bukkit.getScheduler().runTaskTimer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), new Runnable() {
-            int time = timer; //or any other number you want to start countdown from
-
+        preDuel.add(p);
+         new BukkitRunnable() {
+            int time = 10; //or any other number you want to start countdown from
             @Override
             public void run() {
-                if (this.time >= 0) {
+                if (this.time >= 0 && C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
                     p.sendTitle(ChatColor.DARK_AQUA + "" + time, "Ready", 0, 15, 5);
                     if (this.time == 1) {
                         p.sendTitle(ChatColor.DARK_AQUA + "" + time, "Fight!", 0, 15, 5);
@@ -118,10 +113,11 @@ public class DuelMethods {
                     this.time--;
                 } else {
                     preDuel.remove(p);
+                    cancel();
                 }
 
             }
-        }, 0L, 20L);
+        }.runTaskTimer(C.plugin,10,20);
     }
 
     public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled, boolean rated,String kitType) {
@@ -266,15 +262,15 @@ public class DuelMethods {
                 p.setFlying(true);
             }
             new BukkitRunnable() {
+                boolean allPlayersPresent = true;
                 @Override
                 public void run() {
-                    players.removeIf(Objects::isNull);
                     for (Player p : players) {
                         if (!p.isOnline()) {
-                            players.remove(p);
+                            allPlayersPresent = false;
                         }
                      }
-                    if (players.size() == size) {
+                    if (allPlayersPresent) {
                         beginDuel(arenaName, players,rated,kitType);
                     } else {
                         for (Player p : players) {
@@ -493,7 +489,7 @@ public class DuelMethods {
             String playerElo = "";
             if (rated) {
                 int eloChange = (int) DuelListeners.duelStatistics.get(uuid).get("elo");
-                    playerElo = ChatColor.WHITE + " (" + ChatColor.GOLD + "+" + eloChange + ChatColor.WHITE + ")";
+                    playerElo = ChatColor.WHITE + " (" + ChatColor.GREEN + "+" + eloChange + ChatColor.WHITE + ")";
                 if (eloChange < 0) {
                     playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";
                 }
@@ -505,7 +501,7 @@ public class DuelMethods {
             }
             career.add(C.t(  typeText + defeat + winningTeamMembers + playerElo));
             if (career.size() > 10) {
-                career.remove(10);
+                career.remove(0);
             }
             Userdata.get().set(uuid+".career",career);
         }
@@ -513,7 +509,7 @@ public class DuelMethods {
             String playerElo = "";
             if (rated) {
                 int eloChange = (int) DuelListeners.duelStatistics.get(uuid).get("elo");
-                    playerElo = ChatColor.WHITE + " (" + ChatColor.GOLD + "+" + eloChange + ChatColor.WHITE + ")";
+                    playerElo = ChatColor.WHITE + " (" + ChatColor.GREEN + "+" + eloChange + ChatColor.WHITE + ")";
                 if (eloChange < 0) {
                     playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";
                 }

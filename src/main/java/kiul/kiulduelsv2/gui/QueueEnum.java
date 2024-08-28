@@ -25,7 +25,7 @@ public enum QueueEnum {
     QUEUE_ALL("&#FFFFFF&lQ&#FFFFFF&lU&#FFFFFF&lE&#FFFFFF&lU&#FFFFFF&lE&#FFFFFF&l-&#FFFFFF&lA&#FFFFFF&lL&#FFFFFF&lL", Material.NETHER_STAR, new String[]{
             ChatColor.GRAY+"Connects you to all queues at once",
             ChatColor.GRAY+"ideal for getting into a match quickly.",}, 14,"ALL",null),
-    Career("&6Career", Material.CLOCK, new String[]{ChatColor.GRAY+"displays the outcome and elo",ChatColor.GRAY+"change of all your recent matches","",ChatColor.STRIKETHROUGH+""+ChatColor.GRAY+"                                    "}, 11,"career",null);
+    Career("&6Career", Material.CLOCK, new String[]{ChatColor.GRAY+"displays the outcome and elo",ChatColor.GRAY+"change of all your recent matches","",ChatColor.DARK_GRAY+""+ChatColor.STRIKETHROUGH+"                                                       "}, 11,"career",null);
 
     private String displayName;
     private Material material;
