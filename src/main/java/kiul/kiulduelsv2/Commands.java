@@ -277,7 +277,7 @@ public class Commands implements CommandExecutor {
                         case "invite":
                             if (partyManager.findPartyForMember(uuid) != null) {
                                 if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
-                                    if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
+                                    if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p && !partyManager.findPartyForMember(uuid).getMembers().contains(Bukkit.getPlayer(args[1]))) {
                                         Player invited = Bukkit.getPlayer(args[1]);
                                         if (Party.invitedPlayer.get(Bukkit.getPlayer(args[1]).getUniqueId()) != uuid) {
                                             Party.invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), uuid);

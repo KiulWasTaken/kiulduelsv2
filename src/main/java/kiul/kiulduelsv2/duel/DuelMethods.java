@@ -144,7 +144,7 @@ public class DuelMethods {
             ArenaMethods.arenasInUse.add(backupArena);
             // Create a clickable message with two components
             ComponentBuilder message = new ComponentBuilder("Re-Roll this randomly generated map? ")
-                    .color(net.md_5.bungee.api.ChatColor.GRAY).color(net.md_5.bungee.api.ChatColor.ITALIC);
+                    .color(net.md_5.bungee.api.ChatColor.GRAY).italic(true);
 
             // Add the first clickable component
             message.append("[✓]")
@@ -285,25 +285,34 @@ public class DuelMethods {
 
 
     public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> teamOne,List<UUID> teamTwo, boolean ffa,String kitType) {
-        Map<String,Object> duelStatistics = DuelListeners.createStatsArraylist();
-        for (UUID player : players) {
-            Player play = Bukkit.getPlayer(player);
-            if (preDuel.contains(play)) {
-                preDuel.remove(play);
+        List<Player> playerList = new ArrayList<>();
+        for (UUID uuid : players) {
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null) {
+                playerList.add(p);
             }
-            play.setGameMode(GameMode.SURVIVAL);
-            DuelListeners.duelStatistics.put(play.getUniqueId(),duelStatistics);
         }
         UUID duelUUID = UUID.randomUUID();
-        for (UUID pUUIDs : players) {
-            Player p = Bukkit.getPlayer(pUUIDs);
-            DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
-            DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
-            DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
-            p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
+        for (UUID player : players) {
+            Player play = Bukkit.getPlayer(player);
+            play.setGameMode(GameMode.SURVIVAL);
+            String rating = "Party";
+            ScoreboardMethods.startDuelSidebar(play,playerList,rating,System.currentTimeMillis());
+            UUID pUUIDs = play.getUniqueId();
+            DuelListeners.duelStatistics.put(pUUIDs,DuelListeners.createStatsArraylist());
+            DuelListeners.duelStatistics.get(pUUIDs).put("uuid",duelUUID);
+            DuelListeners.duelStatistics.get(pUUIDs).put("type",kitType.toLowerCase());
         }
-        Location teamOneSpawn = Arenadata.get().getLocation("arenas."+arenaName+".southeast");
-        Location teamTwoSpawn = Arenadata.get().getLocation("arenas."+arenaName+".northwest");
+        Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
+        int size = Arenadata.get().getInt("arenas."+arenaName+".size");
+        World world = center.getWorld();
+
+        Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+        Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
+
+
+        Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(-56, 0, -56);
+        Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(56, 0, 56);
         if (!ffa) {
 
             C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
@@ -328,7 +337,6 @@ public class DuelMethods {
             if (p != null) {
                 try {
                     KitMethods.loadSelectedKitSlot(p,kitType);
-                    preDuel.add(p);
                     preDuelCountdown(p);
                     p.setSaturation(5);
                     p.setFoodLevel(20);
