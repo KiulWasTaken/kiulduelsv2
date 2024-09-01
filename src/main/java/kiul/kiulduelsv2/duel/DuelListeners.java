@@ -44,7 +44,6 @@ public class DuelListeners implements Listener {
                     e.setCancelled(true);
                     DuelMethods.inventoryPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
                     DuelMethods.armourPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
-                    UtilMethods.becomeSpectator(p);
                     duel.killPlayer(p.getUniqueId());
                     DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead",true);
                     if (p.getKiller() != null) {
@@ -108,6 +107,7 @@ public class DuelListeners implements Listener {
                                                 Recap.sendMatchRecap(onlinePlayers, duel.getAllRedTeamPlayers(), duel.isRated());
                                                 UtilMethods.becomeNotSpectator(onlinePlayers);
                                                 UtilMethods.teleportLobby(onlinePlayers);
+                                                duel.remove(allUUIDs);
                                             }
                                         }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
                                     }
@@ -160,7 +160,7 @@ public class DuelListeners implements Listener {
                                             Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
                                             UtilMethods.becomeNotSpectator(onlinePlayers);
                                             UtilMethods.teleportLobby(onlinePlayers);
-
+                                                duel.remove(allUUIDs);
                                             }
                                         }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
 
@@ -174,45 +174,42 @@ public class DuelListeners implements Listener {
                             er.printStackTrace();
                         }
                         p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                        int losses = Userdata.get().getInt(p.getUniqueId()+".stats.losses");
-                        Userdata.get().set(p.getUniqueId()+".stats.losses",losses+1);
-                        Userdata.get().set(p.getUniqueId()+".stats.streak",0);
+                        int losses = Userdata.get().getInt(p.getUniqueId() + ".stats.losses");
+                        Userdata.get().set(p.getUniqueId() + ".stats.losses", losses + 1);
+                        Userdata.get().set(p.getUniqueId() + ".stats.streak", 0);
                         if (duel.getPlayers().size() <= 1) {
                             Player victor = Bukkit.getPlayer(duel.getPlayers().get(0));
                             victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                            int wins = Userdata.get().getInt(victor.getUniqueId()+".stats.wins");
-                            int streak = Userdata.get().getInt(victor.getUniqueId()+".stats.streak");
-                            Userdata.get().set(victor.getUniqueId()+".stats.wins",wins+1);
-                            Userdata.get().set(victor.getUniqueId()+".stats.streak",streak+1);
-                            if (Userdata.get().getInt(victor.getUniqueId()+".stats.streak") > Userdata.get().getInt(victor.getUniqueId()+".stats.best_streak")) {
-                                Userdata.get().set(victor.getUniqueId()+".stats.best_streak",Userdata.get().getInt(victor.getUniqueId()+".stats.streak"));
+                            int wins = Userdata.get().getInt(victor.getUniqueId() + ".stats.wins");
+                            int streak = Userdata.get().getInt(victor.getUniqueId() + ".stats.streak");
+                            Userdata.get().set(victor.getUniqueId() + ".stats.wins", wins + 1);
+                            Userdata.get().set(victor.getUniqueId() + ".stats.streak", streak + 1);
+                            if (Userdata.get().getInt(victor.getUniqueId() + ".stats.streak") > Userdata.get().getInt(victor.getUniqueId() + ".stats.best_streak")) {
+                                Userdata.get().set(victor.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(victor.getUniqueId() + ".stats.streak"));
                             }
                             Userdata.save();
                             victor.playSound(victor, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                            DuelMethods.inventoryPreview.put(victor,InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getContents()));
-                            DuelMethods.armourPreview.put(victor,InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getArmorContents()));
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    UtilMethods.teleportLobby(victor);
-                                }
-                            }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-
+                            DuelMethods.inventoryPreview.put(victor, InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getContents()));
+                            DuelMethods.armourPreview.put(victor, InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getArmorContents()));
                             for (UUID allUUIDs : duel.getAllContained()) {
                                 Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                UtilMethods.becomeNotSpectator(onlinePlayers);
-                                UtilMethods.teleportLobby(onlinePlayers);
-
-                                    if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
-                                        if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
-                                            List<Player> winners = new ArrayList<>() {{add(victor);}};
-                                            Recap.sendMatchRecap(onlinePlayers,winners, duel.isRated());
-                                        }
+                                new BukkitRunnable() {
+                                    List<Player> winners = new ArrayList<>() {{
+                                        add(victor);
+                                    }};
+                                    @Override
+                                    public void run() {
+                                        Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
+                                        UtilMethods.becomeNotSpectator(onlinePlayers);
+                                        UtilMethods.teleportLobby(onlinePlayers);
+                                        duel.remove(allUUIDs);
                                     }
-                                }
+                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
+
                             }
-                        ArenaMethods.regenerateArena(arenaName);
+                            ArenaMethods.regenerateArena(arenaName);
                         }
+                    }
                     }
                 }
             }
@@ -285,6 +282,7 @@ public class DuelListeners implements Listener {
                                         Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.losses", losses + 1);
                                         Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.streak", 0);
                                     }
+                                    duel.remove(allUUIDs);
                                     UtilMethods.becomeNotSpectator(onlinePlayers);
                                     UtilMethods.teleportLobby(onlinePlayers);
                                 }
@@ -330,6 +328,7 @@ public class DuelListeners implements Listener {
                                         Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.losses", losses + 1);
                                         Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.streak", 0);
                                     }
+                                    duel.remove(allUUIDs);
                                     UtilMethods.becomeNotSpectator(onlinePlayers);
                                     UtilMethods.teleportLobby(onlinePlayers);
                                 }
@@ -364,23 +363,23 @@ public class DuelListeners implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                UtilMethods.teleportLobby(victor);
+                                for (UUID allUUIDs : duel.getAllContained()) {
+                                    Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
+                                    if (onlinePlayers != null) {
+                                        List<Player> winners = new ArrayList<>() {{
+                                            add(victor);
+                                        }};
+                                        Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
+                                        UtilMethods.becomeNotSpectator(onlinePlayers);
+                                        UtilMethods.teleportLobby(onlinePlayers);
+                                    }
+                                    duel.remove(allUUIDs);
+                                }
+
                             }
                         }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-
-                        for (UUID allUUIDs : duel.getAllContained()) {
-                            Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                            UtilMethods.becomeNotSpectator(onlinePlayers);
-                            UtilMethods.teleportLobby(onlinePlayers);
-                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
-                                if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString() == DuelListeners.duelStatistics.get(victor.getUniqueId()).get("uuid")) {
-                                    List<Player> winners = new ArrayList<>() {{add(victor);}};
-                                    Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
-                                }
-                            }
-                        }
+                        ArenaMethods.regenerateArena(arenaName);
                     }
-                    ArenaMethods.regenerateArena(arenaName);
                 }
             }
         }
@@ -468,6 +467,18 @@ public class DuelListeners implements Listener {
                         Userdata.get().set(damager.getUniqueId()+".stats.kills",kills+1);
                         Userdata.save();
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void spectatorPreventHurt (EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player spectator) {
+            Duel duel = C.duelManager.findDuelForMember(spectator.getUniqueId());
+            if (duel != null) {
+                if (duel.getSpectators().contains(spectator.getUniqueId())) {
+                    e.setCancelled(true);
                 }
             }
         }

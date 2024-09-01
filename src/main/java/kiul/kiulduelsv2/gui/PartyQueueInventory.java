@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.ChatPaginator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +120,7 @@ public class PartyQueueInventory implements Listener {
                         selectMode(p,localName);
                         break;
                     case "smp","shield","crystal":
+                        if (ArenaMethods.getSuitableArena() != null) {
                         String[] strings = e.getView().getTitle().split("\\|");
                         String partyFightType = strings[1].toLowerCase().trim();
                         if (partyFightType.equalsIgnoreCase("versus")) {
@@ -126,7 +128,13 @@ public class PartyQueueInventory implements Listener {
                         }
                         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
                         boolean ffa = partyFightType.equalsIgnoreCase("ffa");
-                        DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(),party.getMembersInclusive(),party.teamOne(),party.teamTwo(),ffa,localName);
+
+
+
+                            DuelMethods.startPartyDuel(ArenaMethods.getSuitableArena(), new ArrayList<>(party.getMembersInclusive()), new ArrayList<>(party.teamOne()), new ArrayList<>(party.teamTwo()), ffa, localName);
+                        } else {
+                            p.sendMessage(C.t("&c&oNo arenas available"));
+                        }
                         p.closeInventory();
                     default:
                         if (e.getCurrentItem().getType().equals(Material.PLAYER_HEAD)) {

@@ -55,6 +55,14 @@ public class UtilMethods {
         for (UUID alivePlayersUUID : duel.getPlayers()) {
             Bukkit.getPlayer(alivePlayersUUID).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
         }
+        if (duel != null) {
+            duel.addSpectator(player.getUniqueId());
+            List<UUID> playersInDuel = duel.getPlayers();
+            for (UUID alivePlayerUUIDs : playersInDuel) {
+                Bukkit.getPlayer(alivePlayerUUIDs).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), player);
+            }
+        }
+
         player.setAllowFlight(true);
         player.setFlying(true);
         player.setHealth(20);
@@ -66,6 +74,9 @@ public class UtilMethods {
     public static void becomeNotSpectator (Player player) {
         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
             onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
+        }
+        if (C.duelManager.findDuelForMember(player.getUniqueId()) != null) {
+            C.duelManager.findDuelForMember(player.getUniqueId()).remove(player.getUniqueId());
         }
         player.setHealth(20);
         player.setFoodLevel(20);

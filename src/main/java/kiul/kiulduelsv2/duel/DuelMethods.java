@@ -102,7 +102,7 @@ public class DuelMethods {
     public static void preDuelCountdown (Player p) {
         preDuel.add(p);
          new BukkitRunnable() {
-            int time = 10; //or any other number you want to start countdown from
+            int time = 5; //or any other number you want to start countdown from
             @Override
             public void run() {
                 if (this.time >= 0 && C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
@@ -228,7 +228,6 @@ public class DuelMethods {
                             p.setFlying(false);
                             p.setAllowFlight(false);
                             p.teleport(teleportTo);
-                            preDuel.add(p);
                         }
                         reRollNo.remove(arenaName);
                         reRollYes.remove(arenaName);
@@ -285,6 +284,7 @@ public class DuelMethods {
 
 
     public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> teamOne,List<UUID> teamTwo, boolean ffa,String kitType) {
+        ArenaMethods.arenasInUse.add(arenaName);
         List<Player> playerList = new ArrayList<>();
         for (UUID uuid : players) {
             Player p = Bukkit.getPlayer(uuid);
@@ -292,65 +292,89 @@ public class DuelMethods {
                 playerList.add(p);
             }
         }
+        Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
+        Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());
         UUID duelUUID = UUID.randomUUID();
-        for (UUID player : players) {
-            Player play = Bukkit.getPlayer(player);
-            play.setGameMode(GameMode.SURVIVAL);
-            String rating = "Party";
-            ScoreboardMethods.startDuelSidebar(play,playerList,rating,System.currentTimeMillis());
-            UUID pUUIDs = play.getUniqueId();
-            DuelListeners.duelStatistics.put(pUUIDs,DuelListeners.createStatsArraylist());
-            DuelListeners.duelStatistics.get(pUUIDs).put("uuid",duelUUID);
-            DuelListeners.duelStatistics.get(pUUIDs).put("type",kitType.toLowerCase());
+        for (Player p : playerList) {
+            p.teleport(teleportTo);
+            p.setGameMode(GameMode.SPECTATOR);
+            p.setAllowFlight(true);
+            p.setFlying(true);
+            DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
+            DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
+            DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
+            p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
         }
-        Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
-        int size = Arenadata.get().getInt("arenas."+arenaName+".size");
-        World world = center.getWorld();
+        new BukkitRunnable() {
+            int time = 5; //or any other number you want to start countdown from
 
-        Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
-        Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
-
-
-        Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(-56, 0, -56);
-        Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(56, 0, 56);
-        if (!ffa) {
-
-            C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
-
-
-                for (UUID p : teamOne) {
-                    Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation().add(0.5,1,0.5));
+            @Override
+            public void run() {
+                for (Player p : playerList) {
+                    String message = "§7" + time;
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                 }
-                for (UUID p : teamTwo) {
-                    Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation().add(0.5,1,0.5));
-                }
+                if (this.time <= 0) {
 
-        } else {
-            C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName);
-            Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
-            for (UUID p : players) {
-                Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,spawn).getLocation().add(0.5,1,0.5));
-            }
-        }
-        for (UUID uuid : players) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p != null) {
-                try {
-                    KitMethods.loadSelectedKitSlot(p,kitType);
-                    preDuelCountdown(p);
-                    p.setSaturation(5);
-                    p.setFoodLevel(20);
-                    p.setHealth(20);
-                    p.setGameMode(GameMode.SURVIVAL);
-                    for (PotionEffect potionEffect : p.getActivePotionEffects()) {
-                        p.removePotionEffect(potionEffect.getType());
+                    Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
+                    int size = Arenadata.get().getInt("arenas."+arenaName+".size");
+                    World world = center.getWorld();
+
+                    Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+                    Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
+
+
+                    Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(-56, 0, -56);
+                    Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(56, 0, 56);
+                    if (!ffa) {
+
+                        C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
+
+                        for (UUID p : teamOne) {
+                            Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamOneSpawn).getLocation().add(0.5,1,0.5));
+                        }
+                        for (UUID p : teamTwo) {
+                            Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,teamTwoSpawn).getLocation().add(0.5,1,0.5));
+                        }
+
+                    } else {
+                        C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName);
+                        Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
+                        for (UUID p : players) {
+                            Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,spawn).getLocation().add(0.5,1,0.5));
+                        }
                     }
-                } catch (IOException err) {
-                    err.printStackTrace();
-                }
-            }
+                    for (UUID uuid : players) {
+                        Player p = Bukkit.getPlayer(uuid);
+                        if (p != null) {
+                            try {
+                                p.setGameMode(GameMode.SURVIVAL);
+                                p.setFlying(false);
+                                p.setAllowFlight(false);
+                                String rating = "Party";
+                                ScoreboardMethods.startDuelSidebar(p,playerList,rating,System.currentTimeMillis());
+                                KitMethods.loadSelectedKitSlot(p,kitType);
+                                preDuelCountdown(p);
+                                p.setSaturation(5);
+                                p.setFoodLevel(20);
+                                p.setHealth(20);
+                                p.setGameMode(GameMode.SURVIVAL);
+                                for (PotionEffect potionEffect : p.getActivePotionEffects()) {
+                                    p.removePotionEffect(potionEffect.getType());
+                                }
+                            } catch (IOException err) {
+                                err.printStackTrace();
+                            }
+                        }
 
-        }
+                    }
+                    cancel();
+                    return;
+                }
+                time--;
+            }
+        }.runTaskTimer(C.plugin,0,20);
+
 
     }
 

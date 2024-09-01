@@ -47,6 +47,8 @@ public class TerrainArena extends ChunkGenerator {
         add(Biome.DEEP_FROZEN_OCEAN);
         add(Biome.LUKEWARM_OCEAN);
         add(Biome.DEEP_LUKEWARM_OCEAN);
+        add(Biome.RIVER);
+        add(Biome.FROZEN_RIVER);
     }};
 
     private static Random random = new Random();
@@ -446,8 +448,8 @@ public class TerrainArena extends ChunkGenerator {
         for (int x = SECorner.getChunk().getX(); x <= NWCorner.getChunk().getX(); x++) {
             for (int z = SECorner.getChunk().getZ(); z <= NWCorner.getChunk().getZ(); z++) {
                 Chunk chunk = world.getChunkAt(x, z);
-                Biome biome = chunk.getBlock(0, 0, 0).getBiome(); // Checking one block per chunk
-
+                Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
+                Bukkit.broadcastMessage(biome.name());
                 if (disallowedBiomes.contains(biome)) {
                     disallowedCount++;
                 }
@@ -455,7 +457,7 @@ public class TerrainArena extends ChunkGenerator {
         }
 
         double disallowedPercentage = (double) disallowedCount / totalChunks;
-        return disallowedPercentage <= 0.2;
+        return disallowedPercentage <= 0.05;
     }
 }
 

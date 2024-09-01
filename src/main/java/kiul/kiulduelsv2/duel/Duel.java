@@ -122,10 +122,11 @@ public class Duel {
         return spectators;
     }
     public void removeSpectator(UUID playerUUID) {
-        spectators.remove(playerUUID);
+        spectators.remove(playerUUID);allContained.remove(playerUUID);
     }
     public void addSpectator(UUID playerUUID) {
         spectators.add(playerUUID);
+        allContained.add(playerUUID);
     }
 
     public boolean isRated() {
