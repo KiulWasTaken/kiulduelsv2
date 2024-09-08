@@ -15,6 +15,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import io.papermc.lib.PaperLib;
+import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
@@ -383,8 +384,8 @@ public class TerrainArena extends ChunkGenerator {
         scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
             double Rx = random.nextDouble(0, 1);
             double Rz = random.nextDouble(0, 1);
-            double Lx = (Rx - 0.5) * 8000;
-            double Lz = (Rz - 0.5) * 8000;
+            double Lx = (Rx - 0.5) * 2000;
+            double Lz = (Rz - 0.5) * 2000;
 
             scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
                 Location center = new Location(world, Lx, 0, Lz);
@@ -397,7 +398,14 @@ public class TerrainArena extends ChunkGenerator {
                 Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(15, 0, 15);
                 Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
                 if (!isBiomeAllowed(world, SECorner, NWCorner, size)) {
-                    generateTerrainPerformant(targetLocation, size); // Recursively retry
+                    // delay by 1 tick so that retries don't clog up the server thread
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            generateTerrainPerformant(targetLocation, size); // Recursively retry
+                        }
+                    }.runTaskLater(C.plugin,10);
+
                     return;
                 }
 
@@ -440,16 +448,15 @@ public class TerrainArena extends ChunkGenerator {
         });
     }
 
-    private static boolean isBiomeAllowed(World world, Location SECorner, Location NWCorner, int size) {
+    public static boolean isBiomeAllowed(World world, Location SECorner, Location NWCorner, int size) {
+        Bukkit.broadcastMessage("started");
         Set<Biome> disallowedBiomes = TerrainArena.disallowedBiomes; // Add disallowed biomes here
         int disallowedCount = 0;
         int totalChunks = size * size;
-
-        for (int x = SECorner.getChunk().getX(); x <= NWCorner.getChunk().getX(); x++) {
-            for (int z = SECorner.getChunk().getZ(); z <= NWCorner.getChunk().getZ(); z++) {
+        for (int x = NWCorner.getChunk().getX(); x <= SECorner.getChunk().getX(); x++) {
+            for (int z = NWCorner.getChunk().getZ(); z <= SECorner.getChunk().getZ(); z++) {
                 Chunk chunk = world.getChunkAt(x, z);
                 Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
-                Bukkit.broadcastMessage(biome.name());
                 if (disallowedBiomes.contains(biome)) {
                     disallowedCount++;
                 }
@@ -457,7 +464,7 @@ public class TerrainArena extends ChunkGenerator {
         }
 
         double disallowedPercentage = (double) disallowedCount / totalChunks;
-        return disallowedPercentage <= 0.05;
+        return disallowedPercentage <= 0.30;
     }
 }
 

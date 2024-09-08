@@ -246,7 +246,7 @@ public class EnchantInventory implements Listener {
                         if (currentItem.get(p).getType() != Material.AIR) {
                             if (!currentItem.get(p).getEnchantments().isEmpty()) {
                                 for (Map.Entry<Enchantment, Integer> a : p.getInventory().getItemInMainHand().getEnchantments().entrySet()) {
-                                    p.getInventory().getItemInMainHand().removeEnchantment(a.getKey());
+                                    currentItem.get(p).removeEnchantment(a.getKey());
                                 }
                                 p.playSound(p, Sound.BLOCK_GRINDSTONE_USE, 0.8f, 1.0f);
                             } else {

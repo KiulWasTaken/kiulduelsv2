@@ -71,6 +71,7 @@ public class Queue implements Listener {
                             rated = true;
                         }
                         p.closeInventory();
+                        if (p.getUniqueId() == null) {return;}
                         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
                         if (party != null) {
                             for (UUID partyMember : party.getMembers()) {
@@ -258,7 +259,7 @@ public class Queue implements Listener {
                                     for (Player duelMembers : players) {
                                         int[] times = C.splitTimestampSince(sinceJoined);
                                         duelMembers.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
-                                        if (!duelMembers.isOnline() || !Queue.queue.get("MAP-QUEUE").contains(duelMembers)) {
+                                        if (!duelMembers.isOnline()) {
                                             for (Player online : players) {
                                                 Queue.queue.get("MAP-QUEUE").remove(players);
                                                 if (online.isOnline()) {

@@ -531,9 +531,9 @@ public class DuelMethods {
             if (Userdata.get().get(uuid+".career") != null) {
                 career = (ArrayList<String>) Userdata.get().get(uuid+".career");
             }
-            career.add(C.t(  typeText + defeat + winningTeamMembers + playerElo));
+            career.add(0, C.t(  typeText + defeat + winningTeamMembers + playerElo));
             if (career.size() > 10) {
-                career.remove(0);
+                career.remove(9);
             }
             Userdata.get().set(uuid+".career",career);
         }
@@ -551,9 +551,10 @@ public class DuelMethods {
             if (Userdata.get().get(uuid+".career") != null) {
                 career = (ArrayList<String>) Userdata.get().get(uuid+".career");
             }
-            career.add(C.t( typeText + victory + losingTeamMembers + playerElo));
+
+            career.add(0,C.t( typeText + victory + losingTeamMembers + playerElo));
             if (career.size() > 10) {
-                career.remove(0);
+                career.remove(9);
             }
             Userdata.get().set(uuid+".career",career);
         }
