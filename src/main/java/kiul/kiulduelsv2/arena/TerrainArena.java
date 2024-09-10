@@ -15,7 +15,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import io.papermc.lib.PaperLib;
-import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.duel.DuelMethods;
@@ -34,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.bukkit.Bukkit.getScheduler;
 import static org.bukkit.Bukkit.getServer;
@@ -379,92 +379,110 @@ public class TerrainArena extends ChunkGenerator {
             worldCreator = worldCreator.environment(World.Environment.NORMAL);
             worldCreator = worldCreator.generateStructures(true);
             worldCreator.createWorld();
+            world = Bukkit.getWorld(worldName); // Ensure world is loaded
         }
 
+        World finalWorld = world;
         scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
             double Rx = random.nextDouble(0, 1);
             double Rz = random.nextDouble(0, 1);
-            double Lx = (Rx - 0.5) * 2000;
-            double Lz = (Rz - 0.5) * 2000;
+            double Lx = (Rx - 0.5) * 8000;
+            double Lz = (Rz - 0.5) * 8000;
 
-            scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-                Location center = new Location(world, Lx, 0, Lz);
-                Chunk ch = center.getChunk();
-                Location retrieveCenter = new Location(ch.getWorld(), ch.getX() << 4, 64, ch.getZ() << 4).add(8, 0, 8);
+            // Asynchronously get the center chunk
+            finalWorld.getChunkAtAsync(new Location(finalWorld, Lx, 0, Lz)).thenAccept(centerChunk -> {
+                Location retrieveCenter = new Location(centerChunk.getWorld(), centerChunk.getX() << 4, 64, centerChunk.getZ() << 4).add(8, 0, 8);
 
-                Chunk SEChunk = world.getChunkAt(center.getChunk().getX() + size, center.getChunk().getZ() + size);
-                Chunk NWChunk = world.getChunkAt(center.getChunk().getX() - (size - 1), center.getChunk().getZ() - (size - 1));
+                // Asynchronously get SEChunk and NWChunk
+                CompletableFuture<Chunk> SEChunkFuture = finalWorld.getChunkAtAsync(centerChunk.getX() + size, centerChunk.getZ() + size);
+                CompletableFuture<Chunk> NWChunkFuture = finalWorld.getChunkAtAsync(centerChunk.getX() - (size - 1), centerChunk.getZ() - (size - 1));
 
-                Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(15, 0, 15);
-                Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
-                if (!isBiomeAllowed(world, SECorner, NWCorner, size)) {
-                    // delay by 1 tick so that retries don't clog up the server thread
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            generateTerrainPerformant(targetLocation, size); // Recursively retry
+                // When both chunks are loaded, proceed
+                CompletableFuture.allOf(SEChunkFuture, NWChunkFuture).thenAccept(v -> {
+                    Chunk SEChunk = SEChunkFuture.join();
+                    Chunk NWChunk = NWChunkFuture.join();
+
+                    Location SECorner = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 0, SEChunk.getZ() << 4).add(15, 0, 15);
+                    Location NWCorner = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 0, NWChunk.getZ() << 4).add(-16, 199, -16);
+
+                    // Check if the biome is allowed asynchronously
+                    isBiomeAllowed(finalWorld, SECorner, NWCorner, size).thenAccept(allowed -> {
+                        if (!allowed) {
+                            // If the biome is not allowed, regenerate the terrain by calling the method recursively
+                            generateTerrainPerformant(targetLocation, size);
+                            return;
                         }
-                    }.runTaskLater(C.plugin,10);
 
-                    return;
-                }
+                        // Proceed with terrain generation
+                        scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                            CuboidRegion region = new CuboidRegion(
+                                    BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()),
+                                    BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ())
+                            );
+                            com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(finalWorld);
+                            BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+                            clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
 
-                scheduler.runTaskAsynchronously(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                            ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(faweWorld, region, clipboard, region.getMinimumPoint());
+                            forwardExtentCopy.setCopyingEntities(false); // Disable copying entities
+                            Operations.complete(forwardExtentCopy);
 
+                            Chunk c = targetLocation.getChunk();
+                            Location targetCenter = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
 
+                            com.sk89q.worldedit.world.World fawePasteWorld = BukkitAdapter.adapt(targetLocation.getWorld());
+                            try (EditSession editSession = WorldEdit.getInstance().newEditSession(fawePasteWorld)) {
+                                Operation operation = new ClipboardHolder(clipboard)
+                                        .createPaste(editSession)
+                                        .to(BlockVector3.at(targetCenter.getX(), targetCenter.getBlockY(), targetCenter.getZ()))
+                                        .build();
+                                Operations.complete(operation);
 
-                    CuboidRegion region = new CuboidRegion(BlockVector3.at(SECorner.getX(), SECorner.getY(), SECorner.getZ()), BlockVector3.at(NWCorner.getX(), NWCorner.getY(), NWCorner.getZ()));
-                    com.sk89q.worldedit.world.World faweWorld = BukkitAdapter.adapt(world);
-                    BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
-                    clipboard.setOrigin(BlockVector3.at(retrieveCenter.getX(), retrieveCenter.getY(), retrieveCenter.getZ()));
-                    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(faweWorld, region, clipboard, region.getMinimumPoint());
-                    forwardExtentCopy.setCopyingEntities(false); // Disable copying entities
-                    Operations.complete(forwardExtentCopy);
+                                editSession.close();
 
-                    Chunk c = targetLocation.getChunk();
-                    Location targetCenter = new Location(c.getWorld(), c.getX() << 4, 64, c.getZ() << 4).add(8, 0, 8);
-
-                    com.sk89q.worldedit.world.World fawePasteWorld = BukkitAdapter.adapt(targetLocation.getWorld());
-                    try (EditSession editSession = WorldEdit.getInstance().newEditSession(fawePasteWorld)) {
-                        Operation operation = new ClipboardHolder(clipboard)
-                                .createPaste(editSession)
-                                .to(BlockVector3.at(targetCenter.getX(), targetCenter.getBlockY(), targetCenter.getZ()))
-                                .build();
-                        Operations.complete(operation);
-
-                        editSession.close();
-                        scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
-                            for (String arenaName : ArenaMethods.getArenas()) {
-                                if (Arenadata.get().getLocation("arenas." + arenaName + ".center") == targetLocation) {
-                                    if (ArenaMethods.arenasInUse.contains(arenaName)) {
-                                        ArenaMethods.arenasInUse.remove(arenaName);
+                                scheduler.runTask(Kiulduelsv2.getPlugin(Kiulduelsv2.class), () -> {
+                                    for (String arenaName : ArenaMethods.getArenas()) {
+                                        if (Arenadata.get().getLocation("arenas." + arenaName + ".center").equals(targetLocation)) {
+                                            if (ArenaMethods.arenasInUse.contains(arenaName)) {
+                                                ArenaMethods.arenasInUse.remove(arenaName);
+                                            }
+                                        }
                                     }
-                                }
+                                });
                             }
                         });
-                    }
+                    });
                 });
             });
         });
     }
 
-    public static boolean isBiomeAllowed(World world, Location SECorner, Location NWCorner, int size) {
-        Bukkit.broadcastMessage("started");
+    private static CompletableFuture<Boolean> isBiomeAllowed(World world, Location SECorner, Location NWCorner, int size) {
         Set<Biome> disallowedBiomes = TerrainArena.disallowedBiomes; // Add disallowed biomes here
-        int disallowedCount = 0;
         int totalChunks = size * size;
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        AtomicInteger disallowedCount = new AtomicInteger(0);
+
         for (int x = NWCorner.getChunk().getX(); x <= SECorner.getChunk().getX(); x++) {
-            for (int z = NWCorner.getChunk().getZ(); z <= SECorner.getChunk().getZ(); z++) {
-                Chunk chunk = world.getChunkAt(x, z);
-                Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
-                if (disallowedBiomes.contains(biome)) {
-                    disallowedCount++;
-                }
+            for (int z = NWCorner.getChunk().getZ(); z <= SECorner.getChunk().getZ();  z++) {
+                CompletableFuture<Void> future = world.getChunkAtAsync(x, z).thenAccept(chunk -> {
+                    Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
+                    Bukkit.broadcastMessage(biome.name());
+                    if (disallowedBiomes.contains(biome)) {
+                        disallowedCount.incrementAndGet();
+                    }
+                });
+                futures.add(future);
             }
         }
 
-        double disallowedPercentage = (double) disallowedCount / totalChunks;
-        return disallowedPercentage <= 0.30;
+        // Wait for all futures to complete
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> {
+                    double disallowedPercentage = (double) disallowedCount.get() / totalChunks;
+                    return disallowedPercentage <= 0.20;
+                });
     }
 }
 
