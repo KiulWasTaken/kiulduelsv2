@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,15 +50,24 @@ public class ScoreboardMethods {
                     int kills = Userdata.get().getInt(p.getUniqueId() + ".stats.kills");
                     int deaths = Userdata.get().getInt(p.getUniqueId() + ".stats.deaths");
                     int crystalElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_crystal");
+                    int cartElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_cart");
                     int smpElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_smp");
                     int shieldElo = (int) DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_shield");
                     String crystalPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_crystal_placement") + ")";
                     String smpPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_smp_placement") + ")";
                     String shieldPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_shield_placement") + ")";
+                    String cartPlacement = " &8(#" + DuelsDB.readPlayer(p.getUniqueId(), "stat_elo_cart_placement") + ")";
                     double winRate = C.safeDivide(wins, (wins + losses)) * 100;
                     double kdRatio = C.safeDivide(kills, deaths);
-
-                    Score first = objective.getScore(" ");
+                    double damageDealtDeltaRound = 0;
+                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(p.getUniqueId() + ".stats.damagedelta");
+                    for (int damageDelta : damageDeltaPerRound) {
+                        damageDealtDeltaRound += damageDelta;
+                    }
+                    if (!damageDeltaPerRound.isEmpty()) {
+                        damageDealtDeltaRound = (double)(damageDealtDeltaRound / damageDeltaPerRound.size());
+                    }
+                    Score first = objective.getScore("  " + C.t(" "));
                     Score second = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a"));
                     Score third = objective.getScore("  " + C.t("&7Wins&8 » &f" + wins));
                     Score fourth = objective.getScore("  " + C.t("&7Losses&8 » &f" + losses));
@@ -67,32 +77,32 @@ public class ScoreboardMethods {
 //        Score eighth = objective.getScore("  " + C.t("&7Kills&8 » &f"+kills));
 //        Score ninth = objective.getScore("  " + C.t("&7Deaths&8 » &f"+deaths));
                     Score eighth = objective.getScore("  " + C.t("&7K/D&8 » &f" + df.format(kdRatio)));
-                    Score ninth = objective.getScore("  " + C.t(" "));
+                    Score ninth = objective.getScore("  " + C.t("&7DDΔ/R&8 » &f" + df.format(damageDealtDeltaRound)));
                     Score tenth = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&c"));
                     Score eleventh = objective.getScore("  " + C.t("&7Standard&8 » &f" + smpElo + smpPlacement));
-                Score twelfth = objective.getScore("  " + C.t("&7Attrition&8 » &f" + shieldElo + shieldPlacement));
+                    Score twelfth = objective.getScore("  " + C.t("&7Attrition&8 » &f" + shieldElo + shieldPlacement));
                     Score thirteenth = objective.getScore("  " + C.t("&7Vanilla&8 » &f" + crystalElo + crystalPlacement));
-                    Score fourteenth = objective.getScore("  " + C.t(" "));
+                    Score fourteenth = objective.getScore("  " + C.t("&7Cart&8 » &f" + cartElo + cartPlacement));
                     Score fifteenth = objective.getScore("  " + C.t(" "));
                     Score sixteenth = objective.getScore(C.t("&7kiul.net &8(" + p.getPing() + "ms)"));
 
 
-                    first.setScore(15);
-                    second.setScore(14);
-                    third.setScore(13);
-                    fourth.setScore(12);
-                    fifth.setScore(11);
-                    sixth.setScore(10);
-                    seventh.setScore(9);
-                    eighth.setScore(8);
-                    ninth.setScore(7);
-                    tenth.setScore(6);
-                    eleventh.setScore(5);
-                    twelfth.setScore(4);
-                    thirteenth.setScore(3);
-                    fourteenth.setScore(2);
-                    fifteenth.setScore(1);
-                    sixteenth.setScore(0);
+                    first.setScore(0);
+                    second.setScore(15);
+                    third.setScore(14);
+                    fourth.setScore(13);
+                    fifth.setScore(12);
+                    sixth.setScore(11);
+                    seventh.setScore(10);
+                    eighth.setScore(9);
+                    ninth.setScore(8);
+                    tenth.setScore(7);
+                    eleventh.setScore(6);
+                    twelfth.setScore(5);
+                    thirteenth.setScore(4);
+                    fourteenth.setScore(3);
+                    fifteenth.setScore(2);
+                    sixteenth.setScore(1);
                     p.setScoreboard(scoreboard);
 
             }

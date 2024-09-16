@@ -190,8 +190,8 @@ public class EnchantInventory implements Listener {
                     }
                 }
             }
-            inventory.setItem(invSize-5,C.createItemStack(C.t(HeadEnum.CLEAR_ENCHANTS.getDisplayName()),HeadEnum.CLEAR_ENCHANTS.getMaterial(),1,HeadEnum.CLEAR_ENCHANTS.getLore(),null,null,HeadEnum.CLEAR_ENCHANTS.getLocalName(), HeadEnum.CLEAR_ENCHANTS.getURL()));
-            inventory.setItem(invSize-4,C.createItemStack(C.t(HeadEnum.CUSTOMIZE_ITEM.getDisplayName()),HeadEnum.CUSTOMIZE_ITEM.getMaterial(),1,HeadEnum.CUSTOMIZE_ITEM.getLore(),null,null,HeadEnum.CUSTOMIZE_ITEM.getLocalName(), HeadEnum.CUSTOMIZE_ITEM.getURL()));
+            inventory.setItem(invSize-5,C.createItemStack(C.t(HeadEnum.CLEAR_ENCHANTS.getDisplayName()),Material.GRINDSTONE,1,HeadEnum.CLEAR_ENCHANTS.getLore(),null,null,HeadEnum.CLEAR_ENCHANTS.getLocalName(), HeadEnum.CLEAR_ENCHANTS.getURL()));
+            inventory.setItem(invSize-4,C.createItemStack(C.t(HeadEnum.CUSTOMIZE_ITEM.getDisplayName()),Material.ANVIL,1,HeadEnum.CUSTOMIZE_ITEM.getLore(),null,null,HeadEnum.CUSTOMIZE_ITEM.getLocalName(), HeadEnum.CUSTOMIZE_ITEM.getURL()));
             p.openInventory(inventory);
         }
     }
@@ -245,7 +245,7 @@ public class EnchantInventory implements Listener {
                     if (e.getCurrentItem() != null && e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.CLEAR_ENCHANTS.getLocalName())) {
                         if (currentItem.get(p).getType() != Material.AIR) {
                             if (!currentItem.get(p).getEnchantments().isEmpty()) {
-                                for (Map.Entry<Enchantment, Integer> a : p.getInventory().getItemInMainHand().getEnchantments().entrySet()) {
+                                for (Map.Entry<Enchantment, Integer> a : currentItem.get(p).getEnchantments().entrySet()) {
                                     currentItem.get(p).removeEnchantment(a.getKey());
                                 }
                                 p.playSound(p, Sound.BLOCK_GRINDSTONE_USE, 0.8f, 1.0f);
@@ -290,13 +290,16 @@ public class EnchantInventory implements Listener {
         if (playerInv.equals(clickedInv) && inEditor.containsKey(p)) {
             // do stuff
             switch (e.getClick()) {
-                case SHIFT_LEFT:
+                case SHIFT_RIGHT:
                     e.setCancelled(true);
                     ItemInventory.itemInventory(p);
                     break;
-                case SHIFT_RIGHT:
-                    e.setCancelled(true);
-                    open(p,e.getCurrentItem());
+                case RIGHT:
+                    if (e.getCurrentItem().getMaxStackSize() == 1 && e.getCurrentItem().getType() != Material.POTION
+                            && e.getCurrentItem().getType() != Material.SPLASH_POTION && e.getCurrentItem().getType() != Material.TOTEM_OF_UNDYING)  {
+                        e.setCancelled(true);
+                        open(p, e.getCurrentItem());
+                    }
                     break;
                 case DROP:
                     e.setCancelled(true);

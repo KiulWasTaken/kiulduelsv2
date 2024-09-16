@@ -481,7 +481,7 @@ public class DuelMethods {
         String typeText = "";
         String victory = "&a&lVICTORY &7vs. ";
         String defeat = "&c&lDEFEAT &7vs. ";
-//        [🗡] [🪓] [🔱]
+//        [🗡] [🪓] [☠] [⭐]
         switch (type) {
             case "smp":
                 typeText = "&#FBE108&l[&#FBE108&l\uD83D\uDDE1&#F8FB08&l] ";
@@ -490,7 +490,10 @@ public class DuelMethods {
                 typeText = "&#2623FA&l[&#425EFF&l\uD83E\uDE93&#425EFF&l] ";
                 break;
             case "crystal":
-                typeText = "&#FF40F2&l[&#E95FFF&l\uD83D\uDD31O&#E95FFF&l] ";
+                typeText = "&#FF40F2&l[&#E95FFF&l☠O&#E95FFF&l] ";
+                break;
+            case "cart":
+                typeText = "&#FF2214&l[&#FF1D17&l⭐&#FF1919&l] ";
                 break;
         }
         for (int i = 0; i < losingTeam.size(); i++) {

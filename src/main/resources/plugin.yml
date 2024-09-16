@@ -21,3 +21,7 @@ commands:
   recap:
   previewinv:
   spectate:
+permissions:
+  kiulduels.extraslots:
+    description: gives you access to extra kit slots
+    default: false

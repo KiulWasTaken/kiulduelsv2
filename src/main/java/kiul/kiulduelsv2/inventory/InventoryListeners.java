@@ -41,6 +41,7 @@ public class InventoryListeners implements Listener {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.best_streak", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.kills", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.deaths", 0);
+            Userdata.get().set(e.getPlayer().getUniqueId()+".stats.damagedelta", new ArrayList<Integer>());
         }
             List<String> types = new ArrayList<>();
             for (String key : Queue.queue.keySet()) {

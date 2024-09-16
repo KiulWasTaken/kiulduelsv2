@@ -45,6 +45,7 @@ public class DuelListeners implements Listener {
                     DuelMethods.inventoryPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
                     DuelMethods.armourPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
                     duel.killPlayer(p.getUniqueId());
+
                     DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead",true);
                     if (p.getKiller() != null) {
                         Userdata.get().set(p.getKiller().getUniqueId() + ".stats.kills", Userdata.get().getInt(p.getKiller().getUniqueId() + ".stats.kills") + 1);
@@ -74,6 +75,15 @@ public class DuelListeners implements Listener {
                                     int streak = Userdata.get().getInt(team1UUIDs + ".stats.streak");
                                     Userdata.get().set(team1UUIDs + ".stats.wins", wins + 1);
                                     Userdata.get().set(team1UUIDs + ".stats.streak", streak + 1);
+                                    int getDamageDealt = (int) duelStatistics.get(team1UUIDs).get("damage_dealt");
+                                    int getDamageTaken = (int) duelStatistics.get(team1UUIDs).get("damage_taken");
+                                    int damageDelta = getDamageDealt-getDamageTaken;
+                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(team1UUIDs + ".stats.damagedelta");
+                                    damageDeltaPerRound.add(0,damageDelta);
+                                    if (damageDeltaPerRound.size() > 10) {
+                                        damageDeltaPerRound.remove(10);
+                                    }
+                                    Userdata.get().set(team1UUIDs + ".stats.damagedelta",damageDeltaPerRound);
                                     if (Userdata.get().getInt(team1UUIDs + ".stats.streak") > Userdata.get().getInt(team1UUIDs + ".stats.best_streak")) {
                                         Userdata.get().set(team1UUIDs + ".stats.best_streak", Userdata.get().getInt(team1UUIDs + ".stats.streak"));
                                     }
@@ -99,6 +109,15 @@ public class DuelListeners implements Listener {
                                                     int losses = Userdata.get().getInt(allUUIDs+".stats.losses");
                                                     Userdata.get().set(allUUIDs+".stats.losses",losses+1);
                                                     Userdata.get().set(allUUIDs+".stats.streak",0);
+                                                    int getDamageDealt = (int) duelStatistics.get(allUUIDs).get("damage_dealt");
+                                                    int getDamageTaken = (int) duelStatistics.get(allUUIDs).get("damage_taken");
+                                                    int damageDelta = getDamageDealt-getDamageTaken;
+                                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(allUUIDs + ".stats.damagedelta");
+                                                    damageDeltaPerRound.add(0,damageDelta);
+                                                    if (damageDeltaPerRound.size() > 10) {
+                                                        damageDeltaPerRound.remove(10);
+                                                    }
+                                                    Userdata.get().set(allUUIDs + ".stats.damagedelta",damageDeltaPerRound);
                                                     Userdata.save();
                                                 }
                                         new BukkitRunnable() {
@@ -128,6 +147,15 @@ public class DuelListeners implements Listener {
                                     int streak = Userdata.get().getInt(team2UUIDs + ".stats.streak");
                                     Userdata.get().set(team2UUIDs + ".stats.wins", wins + 1);
                                     Userdata.get().set(team2UUIDs + ".stats.streak", streak + 1);
+                                    int getDamageDealt = (int) duelStatistics.get(team2UUIDs).get("damage_dealt");
+                                    int getDamageTaken = (int) duelStatistics.get(team2UUIDs).get("damage_taken");
+                                    int damageDelta = getDamageDealt-getDamageTaken;
+                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(team2UUIDs + ".stats.damagedelta");
+                                    damageDeltaPerRound.add(0,damageDelta);
+                                    if (damageDeltaPerRound.size() > 10) {
+                                        damageDeltaPerRound.remove(10);
+                                    }
+                                    Userdata.get().set(team2UUIDs + ".stats.damagedelta",damageDeltaPerRound);
                                     if (Userdata.get().getInt(team2UUIDs + ".stats.streak") > Userdata.get().getInt(team2UUIDs + ".stats.best_streak")) {
                                         Userdata.get().set(team2UUIDs + ".stats.best_streak", Userdata.get().getInt(team2UUIDs + ".stats.streak"));
                                     }
@@ -152,6 +180,15 @@ public class DuelListeners implements Listener {
                                             int losses = Userdata.get().getInt(allUUIDs+".stats.losses");
                                             Userdata.get().set(allUUIDs+".stats.losses",losses+1);
                                             Userdata.get().set(allUUIDs+".stats.streak",0);
+                                            int getDamageDealt = (int) duelStatistics.get(allUUIDs).get("damage_dealt");
+                                            int getDamageTaken = (int) duelStatistics.get(allUUIDs).get("damage_taken");
+                                            int damageDelta = getDamageDealt-getDamageTaken;
+                                            ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(allUUIDs + ".stats.damagedelta");
+                                            damageDeltaPerRound.add(0,damageDelta);
+                                            if (damageDeltaPerRound.size() > 10) {
+                                                damageDeltaPerRound.remove(10);
+                                            }
+                                            Userdata.get().set(allUUIDs + ".stats.damagedelta",damageDeltaPerRound);
                                             Userdata.save();
                                         }
                                         new BukkitRunnable() {
@@ -184,6 +221,15 @@ public class DuelListeners implements Listener {
                             int streak = Userdata.get().getInt(victor.getUniqueId() + ".stats.streak");
                             Userdata.get().set(victor.getUniqueId() + ".stats.wins", wins + 1);
                             Userdata.get().set(victor.getUniqueId() + ".stats.streak", streak + 1);
+                            int getDamageDealt = (int) duelStatistics.get(victor.getUniqueId()).get("damage_dealt");
+                            int getDamageTaken = (int) duelStatistics.get(victor.getUniqueId()).get("damage_taken");
+                            int damageDelta = getDamageDealt-getDamageTaken;
+                            ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(victor.getUniqueId() + ".stats.damagedelta");
+                            damageDeltaPerRound.add(0,damageDelta);
+                            if (damageDeltaPerRound.size() > 10) {
+                                damageDeltaPerRound.remove(10);
+                            }
+                            Userdata.get().set(victor.getUniqueId() + ".stats.damagedelta",damageDeltaPerRound);
                             if (Userdata.get().getInt(victor.getUniqueId() + ".stats.streak") > Userdata.get().getInt(victor.getUniqueId() + ".stats.best_streak")) {
                                 Userdata.get().set(victor.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(victor.getUniqueId() + ".stats.streak"));
                             }
@@ -202,6 +248,15 @@ public class DuelListeners implements Listener {
                                         Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
                                         UtilMethods.becomeNotSpectator(onlinePlayers);
                                         UtilMethods.teleportLobby(onlinePlayers);
+                                        int getDamageDealt = (int) duelStatistics.get(allUUIDs).get("damage_dealt");
+                                        int getDamageTaken = (int) duelStatistics.get(allUUIDs).get("damage_taken");
+                                        int damageDelta = getDamageDealt-getDamageTaken;
+                                        ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(allUUIDs + ".stats.damagedelta");
+                                        damageDeltaPerRound.add(0,damageDelta);
+                                        if (damageDeltaPerRound.size() > 10) {
+                                            damageDeltaPerRound.remove(10);
+                                        }
+                                        Userdata.get().set(allUUIDs + ".stats.damagedelta",damageDeltaPerRound);
                                         duel.remove(allUUIDs);
                                     }
                                 }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
@@ -428,6 +483,7 @@ public class DuelListeners implements Listener {
            put("combo",0);
            put("longest_combo",0);
            put("damage_dealt",0);
+           put("damage_taken",0);
            put("dead",false);
            put("uuid",duelUUID);
 
@@ -452,12 +508,14 @@ public class DuelListeners implements Listener {
                     int getDamagerDamageDealt = (int) duelStatistics.get(damager.getUniqueId()).get("damage_dealt");
 
                     int getDamagedHitsTaken = (int) duelStatistics.get(damaged.getUniqueId()).get("hits_taken");
+                    int getDamagedDamageTaken = (int) duelStatistics.get(damaged.getUniqueId()).get("damage_taken");
 
 
                     duelStatistics.get(damager.getUniqueId()).put("hits_dealt", getDamagerHitsDealt + 1);
                     duelStatistics.get(damager.getUniqueId()).put("combo", getDamagerCombo + 1);
                     duelStatistics.get(damager.getUniqueId()).put("damage_dealt", getDamagerDamageDealt + (int) e.getFinalDamage());
                     duelStatistics.get(damaged.getUniqueId()).put("hits_taken", getDamagedHitsTaken + 1);
+                    duelStatistics.get(damaged.getUniqueId()).put("damage_taken", getDamagedDamageTaken + (int) e.getFinalDamage());
                     if ((int) duelStatistics.get(damager.getUniqueId()).get("combo") > (int) duelStatistics.get(damager.getUniqueId()).get("longest_combo")) {
                         duelStatistics.get(damager.getUniqueId()).put("longest_combo", duelStatistics.get(damager.getUniqueId()).get("combo"));
                     }

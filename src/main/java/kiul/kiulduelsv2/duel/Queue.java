@@ -32,6 +32,7 @@ public class Queue implements Listener {
 
     public final static HashMap<String,ArrayList<Player>> queue = new HashMap<>() {{
         put("SMP-RATED",new ArrayList<>());
+        put("CART-RATED",new ArrayList<>());
         put("CRYSTAL-RATED",new ArrayList<>());
         put("SHIELD-RATED",new ArrayList<>());
         put("MAP-QUEUE",new ArrayList<>());
