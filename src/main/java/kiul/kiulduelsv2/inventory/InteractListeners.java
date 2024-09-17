@@ -87,9 +87,7 @@ public class InteractListeners implements Listener {
                                 try {
                                     KitMethods.lobbyKit(e.getPlayer());
                                     for (String types : Queue.queue.keySet()) {
-                                        if (Queue.queue.get(types).contains(p)) {
-                                            Queue.queue.get(types).remove(p);
-                                        }
+                                        Queue.queue.get(types).remove(p);
                                     }
                                 } catch (IOException r) {
                                     r.printStackTrace();

@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.duel;
 
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -34,6 +35,13 @@ public class Duel {
         this.blueTeam = blueTeam;
         this.ffa = ffa;
         this.allContained = new ArrayList<>(players);
+
+//        for (UUID redTeamUUIDs : redTeamMembers) {
+//            Bukkit.getPlayer(redTeamUUIDs).setDisplayName(ChatColor.RED+""+ChatColor.BOLD+"[RED] "+ChatColor.RESET+Bukkit.getPlayer(redTeamUUIDs).getName());
+//        }
+//        for (UUID blueTeamUUIDs : blueTeamMembers) {
+//            Bukkit.getPlayer(blueTeamUUIDs).setDisplayName(ChatColor.BLUE+""+ChatColor.BOLD+"[BLUE] "+ChatColor.RESET+Bukkit.getPlayer(blueTeamUUIDs).getName());
+//        }
     }
 
     public List<UUID> getPlayers() {
@@ -96,6 +104,7 @@ public class Duel {
         if (allContained.contains(playerUUID)) {
             allContained.remove(playerUUID);
         }
+//        Bukkit.getPlayer(playerUUID).setDisplayName(null);
     }
     public void killPlayer(UUID playerUUID) {
         if (blueTeam.contains(playerUUID)) {
@@ -106,6 +115,7 @@ public class Duel {
         }
         players.remove(playerUUID);
         spectators.add(playerUUID);
+
 
         try {
             KitMethods.spectatorKit(Bukkit.getPlayer(playerUUID));

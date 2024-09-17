@@ -3,6 +3,7 @@ package kiul.kiulduelsv2.scoreboard;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
+import kiul.kiulduelsv2.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -111,11 +112,41 @@ public class ScoreboardMethods {
 
     }
 
-    public static void startDuelSidebar(Player p, List<Player> duelMembers, String rating, long duelStartTime) {
+    public static void startDuelSidebar(Player p, List<Player> duelMembers, String rating, long duelStartTime,String duelType) {
         if (activeBoard.get(p) != null) {
             activeBoard.get(p).cancel();
             activeBoard.remove(p);
         }
+        Party party = C.partyManager.findPartyForMember(p.getUniqueId());
+        List<Player> teammates = new ArrayList<>();
+        List<Player> enemies = new ArrayList<>();
+        for (Player duelMember : duelMembers) {
+            if (party != null) {
+                if (party.isMember(duelMember.getUniqueId())) {
+                    teammates.add(duelMember);
+                } else {
+                    enemies.add(duelMember);
+                }
+            } else {
+                teammates.add(p);
+                enemies.add(duelMember);
+            }
+        }
+
+        int myTeamElo = 0;
+        for (Player teammate : teammates) {
+            int elo = (int) DuelsDB.readPlayer(teammate.getUniqueId(), "stat_elo_"+duelType.toLowerCase());
+            myTeamElo += elo;
+        }
+        int enemyTeamElo = 0;
+        for (Player enemy : enemies) {
+            int elo = (int) DuelsDB.readPlayer(enemy.getUniqueId(), "stat_elo_"+duelType.toLowerCase());
+            enemyTeamElo += elo;
+        }
+        enemyTeamElo = enemyTeamElo/enemies.size();
+        myTeamElo = myTeamElo/teammates.size();
+        double expected = 1.0 / (1.0 + Math.pow(10.0, (enemyTeamElo - myTeamElo) / 400.0));
+
         final BukkitTask runnable = new BukkitRunnable() {
 
             @Override
@@ -126,14 +157,16 @@ public class ScoreboardMethods {
                     StringBuilder ping = new StringBuilder();
                     for (int i = 0; i < duelMembers.size(); i++) {
                         Player member = duelMembers.get(i);
-                        if (member == p) {
-                            ping.append(ChatColor.GREEN).append(member.getPing()).append("ms ");
+                        if (member == p || (C.partyManager.findPartyForMember(p.getUniqueId()) != null && C.partyManager.findPartyForMember(p.getUniqueId()).isMember(member.getUniqueId()))) {
+
+                            ping.insert(0,ChatColor.GREEN+""+member.getPing()+"ms " + ChatColor.WHITE+"- ");
                         } else {
-                            ping.append(ChatColor.RED).append(member.getPing()).append("ms ");
+                            ping.append(ChatColor.RED).append(member.getPing()+"ms ");
+                            if (i != duelMembers.size() - 1) {
+                                ping.append(ChatColor.WHITE).append("- ");
+                            }
                         }
-                        if (i != duelMembers.size() - 1) {
-                            ping.append(ChatColor.WHITE).append("- ");
-                        }
+
                     }
 
                     // Create a new scoreboard
@@ -150,16 +183,18 @@ public class ScoreboardMethods {
 
                     // Add lines to the sidebar
                     Score anotherEmptyLine = objective.getScore(" ");
-                    anotherEmptyLine.setScore(5);
+                    anotherEmptyLine.setScore(6);
                     Score title = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a"));
-                    title.setScore(4);
+                    title.setScore(5);
 
                     String duration = String.format("%02d:%02d:%02d", times[0], times[1], times[2]);
                     Score durationLine = objective.getScore(ChatColor.GRAY + " Duration " + ChatColor.DARK_GRAY + "» " + ChatColor.WHITE + duration);
-                    durationLine.setScore(3);
+                    durationLine.setScore(4);
 
                     Score latencyLine = objective.getScore(ChatColor.GRAY + " Latency " + ChatColor.DARK_GRAY + "» " + ping.toString());
-                    latencyLine.setScore(2);
+                    latencyLine.setScore(3);
+                    Score oddsLine = objective.getScore(ChatColor.GRAY + " Win% " + ChatColor.DARK_GRAY + "» " + ChatColor.GREEN+(int)(expected*100) + "%"+ChatColor.DARK_GRAY+" / "+ChatColor.RED+""+(100-(int)(expected*100))+"%");
+                    oddsLine.setScore(2);
                     Score emptyLine = objective.getScore("  " + C.t(" "));
                     emptyLine.setScore(1);
                     Score lastLine = objective.getScore(C.t("&7kiul.net &8(" + p.getPing() + "ms)"));

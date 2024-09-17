@@ -43,6 +43,7 @@ public class InventoryListeners implements Listener {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.deaths", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.damagedelta", new ArrayList<Integer>());
         }
+        e.getPlayer().setDisplayName(null);
             List<String> types = new ArrayList<>();
             for (String key : Queue.queue.keySet()) {
                 String[] keys = key.split("-");

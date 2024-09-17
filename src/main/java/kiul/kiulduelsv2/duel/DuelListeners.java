@@ -13,19 +13,16 @@ import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,6 +49,16 @@ public class DuelListeners implements Listener {
                     }
                     Userdata.get().set(p.getUniqueId()+".stats.deaths",Userdata.get().getInt(p.getUniqueId()+".stats.deaths")+1);
 
+
+                    // Create a firework effect with the specified colors
+                    FireworkEffect effect = FireworkEffect.builder()
+                            .with(FireworkEffect.Type.BALL_LARGE) // You can choose different types like STAR, CREEPER, etc.
+                            .withColor(Color.LIME)
+                            .withColor(Color.WHITE)
+                            .build();
+
+                    // Apply the effect to the firework
+
                     if (!duel.isFfa()) {
 
                         List<UUID> team1 = duel.getRedTeam();
@@ -60,6 +67,16 @@ public class DuelListeners implements Listener {
 
                         // if only one team has players, end the game.
                         if (team2.size() == 0) {
+                            Firework firework = (Firework) p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK_ROCKET);
+                            FireworkMeta meta = firework.getFireworkMeta();
+                            meta.addEffect(effect);
+
+                            // Set the power of the firework
+                            meta.setPower(0); // Power 0 means instant explosion
+
+                            // Apply the meta to the firework
+                            firework.setFireworkMeta(meta);
+                            firework.detonate();
                             if (duel.isRated()) {
                                 DuelMethods.updateElo(duel.getBlueTeamMembers(), duel.getRedTeamMembers());
                             }
@@ -133,6 +150,16 @@ public class DuelListeners implements Listener {
 
 
                         } else if (team1.size() == 0) {
+                            Firework firework = (Firework) p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK_ROCKET);
+                            FireworkMeta meta = firework.getFireworkMeta();
+                            meta.addEffect(effect);
+
+                            // Set the power of the firework
+                            meta.setPower(0); // Power 0 means instant explosion
+
+                            // Apply the meta to the firework
+                            firework.setFireworkMeta(meta);
+                            firework.detonate();
                             if (duel.isRated()) {
                                 DuelMethods.updateElo(duel.getRedTeamMembers(), duel.getBlueTeamMembers());
                             }
@@ -215,6 +242,16 @@ public class DuelListeners implements Listener {
                         Userdata.get().set(p.getUniqueId() + ".stats.losses", losses + 1);
                         Userdata.get().set(p.getUniqueId() + ".stats.streak", 0);
                         if (duel.getPlayers().size() <= 1) {
+                            Firework firework = (Firework) p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK_ROCKET);
+                            FireworkMeta meta = firework.getFireworkMeta();
+                            meta.addEffect(effect);
+
+                            // Set the power of the firework
+                            meta.setPower(0); // Power 0 means instant explosion
+
+                            // Apply the meta to the firework
+                            firework.setFireworkMeta(meta);
+                            firework.detonate();
                             Player victor = Bukkit.getPlayer(duel.getPlayers().get(0));
                             victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
                             int wins = Userdata.get().getInt(victor.getUniqueId() + ".stats.wins");
@@ -471,6 +508,56 @@ public class DuelListeners implements Listener {
                 p.teleport(e.getFrom());
             }
         }
+    }
+
+    /**
+     * When a player is damaged, if they are inside an arena but not in a duel or in a duel's living participants, cancel the event.
+     **/
+    @EventHandler
+    public void preventHurtInInactiveArena (EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player p) {
+            if (ArenaMethods.findPlayerArena(p) != null) {
+
+                if (C.duelManager.findDuelForMember(p.getUniqueId()) == null) {
+                    e.setCancelled(true);
+                } else {
+                    Duel duel = C.duelManager.findDuelForMember(p.getUniqueId());
+                    if (!duel.getPlayers().contains(p.getUniqueId()) || duel.getPlayers().size() <= 1) {
+                        e.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEnderPearlHit(ProjectileHitEvent event) {
+        // Check if the projectile is an Ender Pearl
+
+            // Check if the entity who threw the Ender Pearl is a player
+            if (event.getEntity().getShooter() instanceof Player) {
+                Location hitLocation = event.getEntity().getLocation();
+                Location blockHitLocation = event.getHitBlock() != null ? event.getHitBlock().getLocation() : null;
+
+                // Check if it hit a barrier block
+                if (blockHitLocation != null && blockHitLocation.getBlock().getType() == Material.BARRIER) {
+                    // Teleport the ender pearl to the highest block location
+
+                    if (event.getEntity() instanceof EnderPearl) {
+                        event.setCancelled(true);
+                        EnderPearl enderPearl = (EnderPearl) event.getEntity();
+                        enderPearl.teleport(DuelMethods.getHighestBlockBelow(199, enderPearl.getLocation()).getLocation().add(0, 1, 0));
+                        enderPearl.setVelocity(new Vector(0, -20, 0));
+                        return;
+                    }
+
+                    Vector reversedVelocity = event.getEntity().getVelocity().multiply(-1);
+                    event.getEntity().teleport(event.getEntity().getLocation().add(reversedVelocity.normalize()));
+                    event.getEntity().setVelocity(reversedVelocity);
+                    event.getEntity().getLocation().setDirection(reversedVelocity);
+
+                }
+            }
     }
 
     public static HashMap<UUID, Map<String,Object>> duelStatistics = new HashMap<>();

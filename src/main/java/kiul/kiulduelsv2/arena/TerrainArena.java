@@ -48,6 +48,7 @@ public class TerrainArena extends ChunkGenerator {
         add(Biome.DEEP_FROZEN_OCEAN);
         add(Biome.LUKEWARM_OCEAN);
         add(Biome.DEEP_LUKEWARM_OCEAN);
+        add(Biome.WARM_OCEAN);
         add(Biome.RIVER);
         add(Biome.FROZEN_RIVER);
     }};
@@ -461,28 +462,39 @@ public class TerrainArena extends ChunkGenerator {
         Set<Biome> disallowedBiomes = TerrainArena.disallowedBiomes; // Add disallowed biomes here
         int totalChunks = size * size;
 
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
-        AtomicInteger disallowedCount = new AtomicInteger(0);
+        // Retrieve SECorner and NWCorner chunks asynchronously
+        CompletableFuture<Chunk> SEChunkFuture = world.getChunkAtAsync(SECorner);
+        CompletableFuture<Chunk> NWChunkFuture = world.getChunkAtAsync(NWCorner);
 
-        for (int x = NWCorner.getChunk().getX(); x <= SECorner.getChunk().getX(); x++) {
-            for (int z = NWCorner.getChunk().getZ(); z <= SECorner.getChunk().getZ();  z++) {
-                CompletableFuture<Void> future = world.getChunkAtAsync(x, z).thenAccept(chunk -> {
-                    Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
-                    Bukkit.broadcastMessage(biome.name());
-                    if (disallowedBiomes.contains(biome)) {
-                        disallowedCount.incrementAndGet();
-                    }
-                });
-                futures.add(future);
+        // Once both chunks are retrieved, proceed with biome checking
+        return CompletableFuture.allOf(SEChunkFuture, NWChunkFuture).thenCompose(v -> {
+            Chunk SEChunk = SEChunkFuture.join();
+            Chunk NWChunk = NWChunkFuture.join();
+
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            AtomicInteger disallowedCount = new AtomicInteger(0);
+
+            // Now that the corners' chunks are retrieved, proceed with the biome check
+            for (int x = NWChunk.getX(); x <= SEChunk.getX(); x++) {
+                for (int z = NWChunk.getZ(); z <= SEChunk.getZ(); z++) {
+                    CompletableFuture<Void> future = world.getChunkAtAsync(x, z).thenAccept(chunk -> {
+                        Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
+                        Bukkit.broadcastMessage(biome.name());
+                        if (disallowedBiomes.contains(biome)) {
+                            disallowedCount.incrementAndGet();
+                        }
+                    });
+                    futures.add(future);
+                }
             }
-        }
 
-        // Wait for all futures to complete
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(v -> {
-                    double disallowedPercentage = (double) disallowedCount.get() / totalChunks;
-                    return disallowedPercentage <= 0.20;
-                });
+            // Wait for all futures to complete
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                    .thenApply(v2 -> {
+                        double disallowedPercentage = (double) disallowedCount.get() / totalChunks;
+                        return disallowedPercentage <= 0.20;
+                    });
+        });
     }
 }
 

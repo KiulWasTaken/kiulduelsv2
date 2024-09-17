@@ -27,7 +27,6 @@ public class UtilMethods {
             C.duelManager.findDuelForMember(p.getUniqueId()).remove(p.getUniqueId());
         }
         p.teleport(p.getWorld().getSpawnLocation());
-        p.setDisplayName(ChatColor.WHITE + p.getName());
         p.setHealth(20);
         p.setFoodLevel(20);
         p.setSaturation(5);

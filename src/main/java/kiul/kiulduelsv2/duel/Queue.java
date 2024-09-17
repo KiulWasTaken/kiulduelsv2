@@ -58,6 +58,7 @@ public class Queue implements Listener {
     @EventHandler
     public void queueGuiClick (InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
+        if (e.getCurrentItem() == null) {return;}
         if (e.getView().getTitle().equalsIgnoreCase("queue")) {
             e.setCancelled(true);
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING)) {
@@ -247,8 +248,8 @@ public class Queue implements Listener {
                                 for (String type : queue.keySet()) {
                                     if (getQueue(type).contains(duelMembers)) {
                                         getQueue(type).remove(duelMembers);
-                                        Queue.queue.get("MAP-QUEUE").add(duelMembers);
                                     }
+                                    Queue.queue.get("MAP-QUEUE").add(duelMembers);
                                 }
                             }
 
@@ -261,8 +262,11 @@ public class Queue implements Listener {
                                         int[] times = C.splitTimestampSince(sinceJoined);
                                         duelMembers.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + String.format("%02d:%02d:%02d", times[0], times[1], times[2])));
                                         if (!duelMembers.isOnline()) {
+                                            Queue.queue.get("MAP-QUEUE").remove(duelMembers);
+                                        }
+                                        if (!Queue.queue.get("MAP-QUEUE").contains(duelMembers)) {
                                             for (Player online : players) {
-                                                Queue.queue.get("MAP-QUEUE").remove(players);
+                                                Queue.queue.get("MAP-QUEUE").remove(online);
                                                 if (online.isOnline()) {
                                                     try {
                                                         KitMethods.lobbyKit(online);

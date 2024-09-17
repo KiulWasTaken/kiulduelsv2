@@ -90,7 +90,7 @@ public class Recap implements Listener {
 
             lore.add(ChatColor.GRAY + "Hits: " + isThisStatTheBest(players.get(i),players,"hits_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_dealt"));
             lore.add(ChatColor.GRAY + "Hits Taken: " + isThisStatTheBest(players.get(i),players,"hits_taken") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("hits_taken"));
-            lore.add(ChatColor.GRAY + "Damage Dealt: " + isThisStatTheBest(players.get(i),players,"damage_dealt") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("damage_dealt"));
+            lore.add(ChatColor.GRAY + "DDΔ: " + ((int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("damage_dealt")-(int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("damage_taken")));
             lore.add(ChatColor.GRAY + "Longest Combo: " + isThisStatTheBest(players.get(i),players,"longest_combo") + (int)DuelListeners.duelStatistics.get(players.get(i).getUniqueId()).get("longest_combo"));
 
             inventory.addItem(ItemStackMethods.createSkullItem(displayName,players.get(i),lore,null));
