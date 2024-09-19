@@ -1,4 +1,4 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.layout;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

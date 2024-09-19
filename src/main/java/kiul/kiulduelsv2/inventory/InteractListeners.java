@@ -1,11 +1,11 @@
 package kiul.kiulduelsv2.inventory;
 
 import kiul.kiulduelsv2.C;
-import kiul.kiulduelsv2.arena.ArenaMethods;
-import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.gui.*;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.duel.Queue;
+import kiul.kiulduelsv2.gui.layout.KitInventory;
+import kiul.kiulduelsv2.gui.queue.PartyQueueInventory;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.*;

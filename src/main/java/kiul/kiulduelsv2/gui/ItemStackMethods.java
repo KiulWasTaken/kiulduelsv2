@@ -6,6 +6,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -26,6 +28,8 @@ import java.util.regex.Pattern;
 import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
 
 public class ItemStackMethods {
+
+
 
     public static ItemStack createItemStack (String itemname, Material material, int amount, List<String> lore, Enchantment enchantment, Integer enchantLvl,String localizedName) {
             ItemStack i = new ItemStack(material);

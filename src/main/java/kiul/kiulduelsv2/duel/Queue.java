@@ -4,7 +4,7 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
-import kiul.kiulduelsv2.gui.QueueInventory;
+import kiul.kiulduelsv2.gui.queue.QueueInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import net.md_5.bungee.api.ChatMessageType;

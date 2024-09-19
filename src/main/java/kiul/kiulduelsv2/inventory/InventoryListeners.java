@@ -3,22 +3,38 @@ package kiul.kiulduelsv2.inventory;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
+import kiul.kiulduelsv2.gui.layout.EnchantEnum;
+import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 
 public class InventoryListeners implements Listener {
+
+    public static HashMap<Player, Inventory> previousInventory = new HashMap<>();
+
+    @EventHandler
+    public void updatePreviousInventoryEvent (InventoryCloseEvent e) {
+        if (inEditor.containsKey((Player)e.getPlayer()) && !e.getView().getTitle().equals("Customize Armour") && !e.getView().getTitle().equals(ItemEditInventory.itemEnchantInvTitle)) {
+            previousInventory.put((Player)e.getPlayer(),e.getInventory());
+        } else {
+            previousInventory.remove((Player) e.getPlayer());
+        }
+    }
 
     @EventHandler
     public void inventoryClick(InventoryClickEvent e) {

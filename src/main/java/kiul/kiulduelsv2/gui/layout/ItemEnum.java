@@ -1,13 +1,8 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-
-import java.awt.*;
-import java.util.List;
 
 public enum ItemEnum {
     itemamount(C.t("&6Adjust Item Size"), Material.SPECTRAL_ARROW, null, null, null, null),

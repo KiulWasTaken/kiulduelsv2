@@ -1,4 +1,4 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
 import org.bukkit.Material;

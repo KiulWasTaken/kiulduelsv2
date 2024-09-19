@@ -1,25 +1,37 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.layout;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import kiul.kiulduelsv2.C;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import kiul.kiulduelsv2.gui.HeadEnum;
+import kiul.kiulduelsv2.gui.ItemStackMethods;
+import kiul.kiulduelsv2.inventory.InventoryListeners;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
 import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
 
-public class EnchantInventory implements Listener {
+public class ItemEditInventory implements Listener {
 
 
     HashMap<Player,ItemStack> currentItem = new HashMap<>();
@@ -66,6 +78,9 @@ public class EnchantInventory implements Listener {
         put(Enchantment.RIPTIDE,2);
         put(Enchantment.CHANNELING,3);
         put(Enchantment.LOYALTY,3);
+
+        put(Enchantment.DENSITY,1);
+        put(Enchantment.BREACH,1);
     }};
 
     final static HashMap<Enchantment, Material> ENCHANTMENT_ICON = new HashMap<>() {{
@@ -190,12 +205,31 @@ public class EnchantInventory implements Listener {
                     }
                 }
             }
-            inventory.setItem(invSize-5,C.createItemStack(C.t(HeadEnum.CLEAR_ENCHANTS.getDisplayName()),Material.GRINDSTONE,1,HeadEnum.CLEAR_ENCHANTS.getLore(),null,null,HeadEnum.CLEAR_ENCHANTS.getLocalName(), HeadEnum.CLEAR_ENCHANTS.getURL()));
-            inventory.setItem(invSize-4,C.createItemStack(C.t(HeadEnum.CUSTOMIZE_ITEM.getDisplayName()),Material.ANVIL,1,HeadEnum.CUSTOMIZE_ITEM.getLore(),null,null,HeadEnum.CUSTOMIZE_ITEM.getLocalName(), HeadEnum.CUSTOMIZE_ITEM.getURL()));
+
+            if (isArmor(currentItem.get(p))) {
+                inventory.setItem(invSize - 4, C.createItemStack(C.t(HeadEnum.TRIM_ITEM.getDisplayName()), Material.SMITHING_TABLE, 1, HeadEnum.TRIM_ITEM.getLore(), null, null, HeadEnum.TRIM_ITEM.getLocalName(), HeadEnum.TRIM_ITEM.getURL()));
+            }
+            inventory.setItem(invSize-9,C.createItemStack(C.t("&cPrevious Inventory"),Material.RED_STAINED_GLASS_PANE,1,HeadEnum.TRIM_ITEM.getLore(),null,null,"return",null));
+            inventory.setItem(invSize-1,currentItem.get(p));
+            inventory.setItem(invSize-6,C.createItemStack(C.t(HeadEnum.CLEAR_ENCHANTS.getDisplayName()),Material.GRINDSTONE,1,HeadEnum.CLEAR_ENCHANTS.getLore(),null,null,HeadEnum.CLEAR_ENCHANTS.getLocalName(), HeadEnum.CLEAR_ENCHANTS.getURL()));
+            inventory.setItem(invSize-5,C.createItemStack(C.t(HeadEnum.RENAME_ITEM.getDisplayName()),Material.ANVIL,1,HeadEnum.RENAME_ITEM.getLore(),null,null,HeadEnum.RENAME_ITEM.getLocalName(), HeadEnum.RENAME_ITEM.getURL()));
             p.openInventory(inventory);
         }
     }
 
+    private boolean isArmor(final ItemStack itemStack) {
+        if (itemStack == null)
+            return false;
+        final String typeNameString = itemStack.getType().name();
+        if (typeNameString.endsWith("_HELMET")
+                || typeNameString.endsWith("_CHESTPLATE")
+                || typeNameString.endsWith("_LEGGINGS")
+                || typeNameString.endsWith("_BOOTS")) {
+            return true;
+        }
+
+        return false;
+    }
     public static void itemEnchantInventory(Player p) {
 
         Inventory inventory = Bukkit.createInventory(p, 45, itemEnchantInvTitle);
@@ -222,10 +256,11 @@ public class EnchantInventory implements Listener {
     }
 
 
+
     @EventHandler
     public void enchantInventoryClickEvents (InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getView().getTitle().equalsIgnoreCase(EnchantInventory.itemEnchantInvTitle)) {
+        if (e.getView().getTitle().equalsIgnoreCase(ItemEditInventory.itemEnchantInvTitle)) {
             if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory() || e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
                 e.setCancelled(true);
                 if (e.getCurrentItem() == null) {return;}
@@ -242,12 +277,31 @@ public class EnchantInventory implements Listener {
                     return;
                 }
                 if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"))) {
+                    if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.TRIM_ITEM.getLocalName())) {
+                        trim(p, 1,Material.LIME_STAINED_GLASS_PANE);
+                        return;
+                    }
+                    if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.RENAME_ITEM.getLocalName())) {
+                        p.closeInventory();
+                        takeTextFromNextChat.add(p);
+                        p.sendMessage(ChatColor.GRAY+"Send the name of your item as a chat message.");
+                        return;
+                    }
+                    if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals("return")) {
+                        if (InventoryListeners.previousInventory.get(p) != null) {
+                            p.openInventory(InventoryListeners.previousInventory.get(p));
+                        }
+                        return;
+                    }
+                }
+                if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"))) {
                     if (e.getCurrentItem() != null && e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.CLEAR_ENCHANTS.getLocalName())) {
                         if (currentItem.get(p).getType() != Material.AIR) {
                             if (!currentItem.get(p).getEnchantments().isEmpty()) {
                                 for (Map.Entry<Enchantment, Integer> a : currentItem.get(p).getEnchantments().entrySet()) {
                                     currentItem.get(p).removeEnchantment(a.getKey());
                                 }
+                                e.getInventory().setItem(e.getInventory().getSize()-1,currentItem.get(p));
                                 p.playSound(p, Sound.BLOCK_GRINDSTONE_USE, 0.8f, 1.0f);
                             } else {
                                 p.sendMessage(C.t("&7[&4⏩&7] &cItem already has no enchantments"));
@@ -268,6 +322,7 @@ public class EnchantInventory implements Listener {
                                     }
                                 }
                                 currentItem.get(p).addEnchantment(entry.getKey(), entry.getValue());
+                                e.getInventory().setItem(e.getInventory().getSize()-1,currentItem.get(p));
                                 p.playSound(p, Sound.BLOCK_ENCHANTMENT_TABLE_USE,0.3f,1.2f);
                             } else {
                                 p.sendMessage(C.t("&7[&4⏩&7] &cYou cannot add this enchant to this item"));
@@ -287,6 +342,7 @@ public class EnchantInventory implements Listener {
         Inventory clickedInv = e.getClickedInventory();
         Player p =(Player) e.getWhoClicked();
         Inventory playerInv = (e.getWhoClicked()).getInventory();
+
         if (playerInv.equals(clickedInv) && inEditor.containsKey(p)) {
             // do stuff
             switch (e.getClick()) {
@@ -295,10 +351,12 @@ public class EnchantInventory implements Listener {
                     ItemInventory.itemInventory(p);
                     break;
                 case RIGHT:
-                    if (e.getCurrentItem().getMaxStackSize() == 1 && e.getCurrentItem().getType() != Material.POTION
-                            && e.getCurrentItem().getType() != Material.SPLASH_POTION && e.getCurrentItem().getType() != Material.TOTEM_OF_UNDYING)  {
-                        e.setCancelled(true);
-                        open(p, e.getCurrentItem());
+                    if (e.getCurrentItem() != null) {
+                        if (e.getCurrentItem().getMaxStackSize() == 1 && e.getCurrentItem().getType() != Material.POTION
+                                && e.getCurrentItem().getType() != Material.SPLASH_POTION && e.getCurrentItem().getType() != Material.TOTEM_OF_UNDYING) {
+                            e.setCancelled(true);
+                            open(p, e.getCurrentItem());
+                        }
                     }
                     break;
                 case DROP:
@@ -310,6 +368,186 @@ public class EnchantInventory implements Listener {
                     e.getCurrentItem().setAmount(0);
                     break;
             }
+        }
+    }
+
+    public static void trim(Player p, int page,Material border) {
+        int invSize = 45 + (9*page);
+        Inventory inventory = Bukkit.createInventory(p, invSize, "Customize Armour");
+        List<String> emptylore = new ArrayList<>();
+        emptylore.add("");
+
+        for (int i = 0; i < inventory.getSize(); i++) {
+            inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
+        }
+
+        int[] slots = {11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42};
+        for (int slot : slots) {
+            if (slot < invSize-9) {
+                inventory.setItem(slot, ItemStackMethods.createItemStack(ChatColor.GRAY + "?", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
+            }
+        }
+
+        for (int i = 0; i <= invSize/9; i++) {
+            if (i*9 < invSize && i*9 >= 0) {
+                inventory.setItem(i * 9, ItemStackMethods.createItemStack("", border, 1, emptylore, null, null, null));
+            }
+            if ((i*9)-1 < invSize && (i*9)-1 >= 0) {
+                inventory.setItem((i * 9) - 1, ItemStackMethods.createItemStack("", border, 1, emptylore, null, null, null));
+            }
+        }
+
+        for (CosmeticEnum item : CosmeticEnum.values()) {
+            if (page == item.getPage()) {
+                List<String> lore = new ArrayList<>();
+                for (String itemLore : item.getLore()) {
+                    lore.add((itemLore));
+                }
+
+                String itemName = ItemStackMethods.translateHexColorCodes("&#", "", item.getDisplayName());
+                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(itemName, item.getMaterial(), 1, lore, null, null, item.getlocalName()));
+            }
+        }
+        p.openInventory(inventory);
+
+    }
+
+    public static TrimPattern getTrimPatternFromItemStack(ItemStack itemStack) {
+
+        switch (itemStack.getType()) {
+            case BOLT_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.BOLT;
+            case COAST_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.COAST;
+            case DUNE_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.DUNE;
+            case EYE_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.EYE;
+            case FLOW_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.FLOW;
+            case HOST_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.HOST;
+            case RAISER_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.RAISER;
+            case RIB_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.RIB;
+            case SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.SENTRY;
+            case SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.SHAPER;
+            case SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.SILENCE;
+            case SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.SNOUT;
+            case SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.SPIRE;
+            case TIDE_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.TIDE;
+            case VEX_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.VEX;
+            case WARD_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.WARD;
+            case WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.WAYFINDER;
+            case WILD_ARMOR_TRIM_SMITHING_TEMPLATE:
+                return TrimPattern.WILD;
+        }
+        return null; // No ArmorTrim found
+    }
+
+    public static TrimMaterial getTrimMaterialFromItemStack(ItemStack itemStack) {
+        if (itemStack == null) {
+            return null;
+        }
+
+        Material material = itemStack.getType();
+
+        // Map Material.DIAMOND or Material.IRON_INGOT to their respective TrimMaterial
+        switch (material) {
+            case DIAMOND:
+                return TrimMaterial.DIAMOND;
+            case IRON_INGOT:
+                return TrimMaterial.IRON;
+            case EMERALD:
+                return TrimMaterial.EMERALD;
+            case NETHERITE_INGOT:
+                return TrimMaterial.NETHERITE;
+            case QUARTZ:
+                return TrimMaterial.QUARTZ;
+            case LAPIS_LAZULI:
+                return TrimMaterial.LAPIS;
+            case COPPER_INGOT:
+                return TrimMaterial.COPPER;
+            case GOLD_INGOT:
+                return TrimMaterial.GOLD;
+            case AMETHYST_SHARD:
+                return TrimMaterial.AMETHYST;
+            case REDSTONE:
+                return TrimMaterial.REDSTONE;
+            default:
+                return null; // No matching TrimMaterial found
+        }
+    }
+
+    HashMap<Player, TrimPattern> currentPattern = new HashMap<>();
+
+    @EventHandler
+    public void trimGUIClickEvent (InventoryClickEvent e) {
+        if (e.getView().getTitle().equalsIgnoreCase("Customize Armour")) {
+            e.setCancelled(true);
+            if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
+                Player p = (Player) e.getView().getPlayer();
+
+                ItemStack armor = currentItem.get(p);
+                ArmorMeta armorMeta = (ArmorMeta) armor.getItemMeta();
+
+                String localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING);
+                ItemStack clickedItem = e.getCurrentItem();
+                if (clickedItem.getType().name().contains("TRIM")) {
+                    currentPattern.put(p,getTrimPatternFromItemStack(clickedItem));
+                    p.playSound(p,Sound.ITEM_ARMOR_EQUIP_CHAIN,1,1);
+                    trim(p,0,Material.GREEN_STAINED_GLASS_PANE);
+                } else {
+                    TrimMaterial trimMaterial = getTrimMaterialFromItemStack(e.getCurrentItem());
+                    armorMeta.setTrim(new ArmorTrim(trimMaterial,currentPattern.get(p)));
+                    currentPattern.remove(p);
+                    armor.setItemMeta(armorMeta);
+                    p.playSound(p,Sound.ENTITY_VILLAGER_WORK_TOOLSMITH,1,1);
+                    open(p,currentItem.get(p));
+                }
+            }
+        }
+    }
+
+    ArrayList<Player> takeTextFromNextChat = new ArrayList<>();
+
+    @EventHandler (priority =  EventPriority.LOWEST)
+    public void itemRenameChatEventIntercept (AsyncChatEvent e) {
+        Component message = e.message();
+        Player p = e.getPlayer();
+
+        if (takeTextFromNextChat.contains(p)) {
+            e.setCancelled(true);
+            ItemStack editingItem = currentItem.get(p);
+            ItemMeta editingItemMeta = editingItem.getItemMeta();
+            editingItemMeta.itemName(Component.empty().append(Component.empty().color(NamedTextColor.AQUA).decorate(TextDecoration.ITALIC).append(message)));
+            currentItem.get(p).setItemMeta(editingItemMeta);
+            takeTextFromNextChat.remove(p);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    open(p,currentItem.get(p));
+                }
+            }.runTask(C.plugin);
+        }
+    }
+
+    @EventHandler
+    public void preventGUIWhilstAwaitingChatIntercept (InventoryOpenEvent e) {
+        Player p = (Player) e.getPlayer();
+        if (takeTextFromNextChat.contains(p)) {
+            p.sendMessage(ChatColor.RED + "You cannot do this whilst renaming your item!");
+            e.setCancelled(true);
         }
     }
 }

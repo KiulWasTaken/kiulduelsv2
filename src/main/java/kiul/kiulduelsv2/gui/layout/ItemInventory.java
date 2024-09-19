@@ -1,12 +1,11 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
-import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

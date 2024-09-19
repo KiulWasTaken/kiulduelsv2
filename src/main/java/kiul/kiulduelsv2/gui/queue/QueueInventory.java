@@ -1,9 +1,10 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.queue;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
+import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;

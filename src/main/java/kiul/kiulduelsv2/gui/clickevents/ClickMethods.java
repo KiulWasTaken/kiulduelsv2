@@ -1,13 +1,8 @@
 package kiul.kiulduelsv2.gui.clickevents;
 
-import it.unimi.dsi.fastutil.Hash;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
-import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.duel.DuelMethods;
-import kiul.kiulduelsv2.gui.ItemInventory;
-import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

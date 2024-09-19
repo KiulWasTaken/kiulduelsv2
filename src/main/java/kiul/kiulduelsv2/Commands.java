@@ -1,26 +1,21 @@
 package kiul.kiulduelsv2;
 
 import kiul.kiulduelsv2.arena.ArenaMethods;
-import kiul.kiulduelsv2.arena.Region;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Recap;
-import kiul.kiulduelsv2.gui.EnchantInventory;
-import kiul.kiulduelsv2.duel.DuelListeners;
-import kiul.kiulduelsv2.gui.ItemEnum;
-import kiul.kiulduelsv2.gui.ItemInventory;
-import kiul.kiulduelsv2.gui.QueueInventory;
+import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
+import kiul.kiulduelsv2.gui.layout.ItemInventory;
+import kiul.kiulduelsv2.gui.queue.QueueInventory;
 import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
-import kiul.kiulduelsv2.party.PartyManager;
 import kiul.kiulduelsv2.party.PartyMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
-import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,16 +24,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.StringUtil;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static kiul.kiulduelsv2.C.partyManager;
-import static kiul.kiulduelsv2.C.t;
 import static kiul.kiulduelsv2.inventory.KitMethods.*;
-import static kiul.kiulduelsv2.config.Userdata.*;
 
 public class Commands implements CommandExecutor {
 
@@ -215,7 +206,7 @@ public class Commands implements CommandExecutor {
                 ItemInventory.itemInventory(p);
                 break;
             case "e":
-                EnchantInventory.itemEnchantInventory(p);
+                ItemEditInventory.itemEnchantInventory(p);
                 break;
             case "cancel":
                 if (ClickMethods.inEditor.containsKey(p)) {

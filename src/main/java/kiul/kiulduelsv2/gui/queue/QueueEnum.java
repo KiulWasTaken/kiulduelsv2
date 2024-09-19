@@ -1,8 +1,7 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.queue;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 
 public enum QueueEnum {
     /**

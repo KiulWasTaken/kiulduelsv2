@@ -1,11 +1,9 @@
-package kiul.kiulduelsv2.gui;
+package kiul.kiulduelsv2.gui.queue;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.duel.DuelMethods;
-import kiul.kiulduelsv2.duel.Queue;
-import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
-import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -14,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.ChatPaginator;
 
 import java.util.ArrayList;
 import java.util.List;

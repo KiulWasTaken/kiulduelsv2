@@ -7,11 +7,11 @@ import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.Recap;
-import kiul.kiulduelsv2.gui.EnchantInventory;
-import kiul.kiulduelsv2.gui.ItemInventory;
-import kiul.kiulduelsv2.gui.KitInventory;
+import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
+import kiul.kiulduelsv2.gui.layout.ItemInventory;
+import kiul.kiulduelsv2.gui.layout.KitInventory;
 import kiul.kiulduelsv2.duel.Queue;
-import kiul.kiulduelsv2.gui.PartyQueueInventory;
+import kiul.kiulduelsv2.gui.queue.PartyQueueInventory;
 import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
@@ -40,7 +40,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
         getServer().getPluginManager().registerEvents(new ItemInventory(),this);
-        getServer().getPluginManager().registerEvents(new EnchantInventory(),this);
+        getServer().getPluginManager().registerEvents(new ItemEditInventory(),this);
 
         getServer().getPluginManager().registerEvents(new Queue(),this);
         getServer().getPluginManager().registerEvents(new KitInventory(),this);
