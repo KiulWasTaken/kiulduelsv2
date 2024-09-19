@@ -4,7 +4,7 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
-import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
+import kiul.kiulduelsv2.gui.ClickMethods;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -102,7 +102,6 @@ public class KitInventory implements Listener {
             if (e.getClick() == ClickType.LEFT) {
                 if (e.getCurrentItem().getItemMeta().getLore().get(0).trim().equals(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Edit")) {
                     ClickMethods.enterKitEditor(p, type);
-                    p.closeInventory();
                     p.playSound(p, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 1f, 1.5f);
                 } else if (e.getCurrentItem().getItemMeta().getLore().get(0).trim().equals(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.GREEN + " Cancel Erasure")) {
                     List<String> lore = e.getCurrentItem().getLore();

@@ -1,8 +1,9 @@
-package kiul.kiulduelsv2.gui.clickevents;
+package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.gui.layout.LayoutMenuInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -91,6 +92,7 @@ public class ClickMethods {
 
         p.closeInventory();
         p.sendMessage(C.t("&#4DBA4B&m                                                                "));
+        p.sendMessage(C.t("&#4DBA4B→ &fSNEAK&7 to re-open the &fEXPLORER GUI"));
         p.sendMessage(C.t("&#4DBA4B→ &fRIGHT-CLICK&7 on items in your inventory to &dENCHANT&7"));
         p.sendMessage(C.t("&#4DBA4B→ &fSHIFT-RIGHT-CLICK&7 on an empty slot to &eADD ITEMS"));
         p.sendMessage(C.t("&#4DBA4B→ &f/save &7to &fSAVE &7your kit"));
@@ -103,6 +105,7 @@ public class ClickMethods {
                 e.printStackTrace();
             }
         }
+        LayoutMenuInventory.open(p);
     }
 
     public static boolean itemAmountIsWithinLimit (Player p, ItemStack itemStack,String type) {

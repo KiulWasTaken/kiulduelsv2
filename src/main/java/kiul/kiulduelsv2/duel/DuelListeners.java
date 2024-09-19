@@ -4,7 +4,7 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
+import kiul.kiulduelsv2.gui.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;

@@ -10,7 +10,7 @@ import kiul.kiulduelsv2.duel.Recap;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import kiul.kiulduelsv2.gui.layout.ItemInventory;
 import kiul.kiulduelsv2.gui.queue.QueueInventory;
-import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
+import kiul.kiulduelsv2.gui.ClickMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
@@ -212,6 +212,7 @@ public class Commands implements CommandExecutor {
                 if (ClickMethods.inEditor.containsKey(p)) {
                     p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Exiting kit editor..");
                     ClickMethods.inEditor.remove(p);
+                    ItemEditInventory.currentItem.remove(p);
                     p.getActivePotionEffects().clear();
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                         onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);

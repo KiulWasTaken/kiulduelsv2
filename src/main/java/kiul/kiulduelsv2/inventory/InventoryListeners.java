@@ -3,7 +3,6 @@ package kiul.kiulduelsv2.inventory;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
-import kiul.kiulduelsv2.gui.layout.EnchantEnum;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 
 public class InventoryListeners implements Listener {

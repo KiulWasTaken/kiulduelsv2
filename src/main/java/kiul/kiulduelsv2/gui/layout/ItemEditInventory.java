@@ -29,12 +29,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
 
 public class ItemEditInventory implements Listener {
 
 
-    HashMap<Player,ItemStack> currentItem = new HashMap<>();
+    public static HashMap<Player,ItemStack> currentItem = new HashMap<>();
     final static HashMap<Enchantment,Integer> ENCHANTMENT_PRIORITY = new HashMap<>() {{
         put(Enchantment.SHARPNESS,1);
         put(Enchantment.FIRE_ASPECT,2);
@@ -127,7 +127,7 @@ public class ItemEditInventory implements Listener {
         put(Enchantment.CHANNELING,Material.LIGHTNING_ROD);
         put(Enchantment.LOYALTY,Material.TRIDENT);
     }};
-    public List<Enchantment> getApplicableEnchantments(ItemStack item) {
+    public static List<Enchantment> getApplicableEnchantments(ItemStack item) {
         List<Enchantment> applicableEnchantments = new ArrayList<>();
 
         for (Enchantment enchantment : Enchantment.values()) {
@@ -141,7 +141,7 @@ public class ItemEditInventory implements Listener {
 
     public static String itemEnchantInvTitle = C.t("&#681dc8&lE&#7719cf&ln&#8615d6&lc&#9511dc&lh&#a40ee3&la&#b30aea&ln&#c206f1&lt &#d102f8&lI&#d102f8&ln&#c206f1&lv&#b30aea&le&#a40ee3&ln&#9511dc&lt&#8615d6&lo&#7719cf&lr&#681dc8&ly");
 
-    public void open(Player p, ItemStack itemStack) {
+    public static void open(Player p, ItemStack itemStack) {
         currentItem.put(p, itemStack);
         List<Enchantment> applicableEnchantments = getApplicableEnchantments(itemStack);
 
@@ -217,7 +217,7 @@ public class ItemEditInventory implements Listener {
         }
     }
 
-    private boolean isArmor(final ItemStack itemStack) {
+    public static boolean isArmor(final ItemStack itemStack) {
         if (itemStack == null)
             return false;
         final String typeNameString = itemStack.getType().name();
@@ -519,14 +519,14 @@ public class ItemEditInventory implements Listener {
         }
     }
 
-    ArrayList<Player> takeTextFromNextChat = new ArrayList<>();
+    static ArrayList<Player> takeTextFromNextChat = new ArrayList<>();
 
     @EventHandler (priority =  EventPriority.LOWEST)
     public void itemRenameChatEventIntercept (AsyncChatEvent e) {
         Component message = e.message();
         Player p = e.getPlayer();
 
-        if (takeTextFromNextChat.contains(p)) {
+        if (takeTextFromNextChat.contains(p) && inEditor.containsKey(p)) {
             e.setCancelled(true);
             ItemStack editingItem = currentItem.get(p);
             ItemMeta editingItemMeta = editingItem.getItemMeta();
@@ -539,6 +539,8 @@ public class ItemEditInventory implements Listener {
                     open(p,currentItem.get(p));
                 }
             }.runTask(C.plugin);
+        } else {
+            takeTextFromNextChat.remove(p);
         }
     }
 

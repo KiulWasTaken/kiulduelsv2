@@ -2,7 +2,7 @@ package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
-import kiul.kiulduelsv2.gui.clickevents.ClickMethods;
+import kiul.kiulduelsv2.gui.ClickMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,7 +19,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
 
 public class ItemInventory implements Listener {
 

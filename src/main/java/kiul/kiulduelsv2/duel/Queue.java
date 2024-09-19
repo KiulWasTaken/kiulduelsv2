@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static kiul.kiulduelsv2.gui.clickevents.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
 
