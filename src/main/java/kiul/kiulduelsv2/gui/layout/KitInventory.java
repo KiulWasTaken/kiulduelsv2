@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
@@ -133,9 +134,9 @@ public class KitInventory implements Listener {
                     lore.add(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵ " + ChatColor.WHITE + " Edit");
                     lore.add(ChatColor.GRAY + "Right Click " + ChatColor.GOLD + "⏵ " + ChatColor.WHITE + " Erase");
                     e.getCurrentItem().getItemMeta().setItemName(lastColours+name);
-                    Userdata.get().set("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type) + ".inventory",null);
-                    Userdata.get().set("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type) + ".armour",null);
-                    Userdata.save();
+                    CustomKitData.get().set(p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type) + ".inventory",null);
+                    CustomKitData.get().set(p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type) + ".armour",null);
+                    CustomKitData.save();
                     p.playSound(p, Sound.ENTITY_VILLAGER_WORK_LIBRARIAN, 1f, 1f);
                     kitInventory(p);
                 }

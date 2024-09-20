@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.inventory;
 
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
@@ -13,6 +14,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,6 +59,7 @@ public class InventoryListeners implements Listener {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.kills", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.deaths", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.damagedelta", new ArrayList<Integer>());
+
         }
         e.getPlayer().setDisplayName(null);
             List<String> types = new ArrayList<>();

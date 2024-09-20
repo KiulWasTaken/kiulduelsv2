@@ -6,6 +6,7 @@ import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.gui.queue.QueueEnum;
+import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class LayoutMenuInventory implements Listener {
 
         p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1F, 0.8F);
 
-        Inventory inventory = Bukkit.createInventory(p, 36, "Edit Kit");
+        Inventory inventory = Bukkit.createInventory(p, 27, "Edit Kit");
         List<String> emptylore = new ArrayList<>();
         emptylore.add("");
 
@@ -46,6 +47,12 @@ public class LayoutMenuInventory implements Listener {
         }
         for (LayoutMenuEnum item : LayoutMenuEnum.values()) {
             inventory.setItem(item.getInventorySlot(), C.createItemStack(item.getDisplayName(), item.getMaterial(), 1, item.getLore(), null, null, item.getlocalName(), null));
+        }
+
+        if (KitMethods.savedItemsArrayContains(p,currentItem.get(p))) {
+            inventory.setItem(11, C.createItemStack(C.t(LayoutMenuEnum.ERASE_ITEM.getDisplayName()), LayoutMenuEnum.ERASE_ITEM.getMaterial(), 1, LayoutMenuEnum.ERASE_ITEM.getLore(), null, null, LayoutMenuEnum.ERASE_ITEM.getlocalName(), null));
+        } else {
+            inventory.setItem(11, C.createItemStack(C.t(LayoutMenuEnum.SAVE_ITEM.getDisplayName()), LayoutMenuEnum.SAVE_ITEM.getMaterial(), 1, LayoutMenuEnum.SAVE_ITEM.getLore(), null, null, LayoutMenuEnum.SAVE_ITEM.getlocalName(), null));
         }
 
         p.openInventory(inventory);
@@ -100,7 +107,14 @@ public class LayoutMenuInventory implements Listener {
                         }
                         break;
                     case "save_item":
-
+                            KitMethods.saveItemToSavedItemsArray(p,currentItem.get(p));
+                            p.playSound(p,Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER,0.7f,1f);
+                            open(p);
+                        break;
+                    case "erase_item":
+                            KitMethods.eraseItemFromSavedItemsArray(p,currentItem.get(p));
+                            p.playSound(p,Sound.UI_STONECUTTER_TAKE_RESULT,0.7f,1f);
+                            open(p);
                         break;
                 }
             }

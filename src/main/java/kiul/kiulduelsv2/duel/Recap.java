@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.duel;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
@@ -32,7 +33,7 @@ public class Recap implements Listener {
         int invSize = 54;
         String name = post ? "Post-Game Inventory | " + kitType.toUpperCase() : "Initial Kit Used | " + kitType.toUpperCase();
         Inventory inventory = Bukkit.createInventory(null,invSize,name);
-        String kitContentsBase64 = post ? DuelMethods.inventoryPreview.get(recapping) : (String) Userdata.get().get("kits." + recapping.getUniqueId() + "." + kitType + ".kit-slot-" + KitMethods.kitSlot.get(recapping).get(kitType) + ".inventory");
+        String kitContentsBase64 = post ? DuelMethods.inventoryPreview.get(recapping) : (String) CustomKitData.get().get(recapping.getUniqueId() + "." + kitType + ".kit-slot-" + KitMethods.kitSlot.get(recapping).get(kitType) + ".inventory");
         try{inventory.setContents(InventoryToBase64.itemStackArrayFromBase64(kitContentsBase64));}catch(IOException err){err.printStackTrace();}
         ArrayList<String> lore = new ArrayList<>();
         for (int i = 1; i <= 9; i++) {

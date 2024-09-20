@@ -10,9 +10,9 @@ public enum LayoutMenuEnum {
 
     EXPORT("&f&lSAVE / EXIT", Material.WRITABLE_BOOK, new String[]{
             ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Save",
-            ChatColor.GRAY + "Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Exit"}, 32,"save",null),
+            ChatColor.GRAY + "Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Exit"}, 12,"save",null),
     ITEM_INV("&6&lADD ITEMS", Material.CHEST, new String[]{
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 13,"item",null),
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 14,"item",null),
     ENCHANT_ITEM("&4&lENCHANT ITEM", Material.ENCHANTING_TABLE, new String[]{
             ChatColor.GRAY+"Edit the enchantments of the item",
             ChatColor.GRAY+"in your main hand.",
@@ -22,17 +22,22 @@ public enum LayoutMenuEnum {
             ChatColor.GRAY+"Change the name of the item",
             ChatColor.GRAY+"in your main hand.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Edit"}, 16,"rename",null),
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Edit"}, 17,"rename",null),
     TRIM_ITEM("&f&lCUSTOMIZE", Material.SMITHING_TABLE, new String[]{
             ChatColor.GRAY+"Edit the trim of the item",
             ChatColor.GRAY+"in your main hand.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 17,"trim",null),
-    SAVE_ITEM("&f&lSAVE/UPLOAD ITEM", Material.NETHER_STAR, new String[]{
-            ChatColor.GRAY+"SAVE the item in your main hand",
-            ChatColor.GRAY+"to the \"saved items\" tab in the editor.",
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 18,"trim",null),
+    SAVE_ITEM("&f&lSAVE/UPLOAD ITEM", Material.BLACK_DYE, new String[]{
+            ChatColor.GRAY+"SAVE the selected item from the",
+            ChatColor.GRAY+"\"saved items\" tab in the editor.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to SAVE"}, 11,"save_item",null);
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to SAVE"}, 11,"save_item",null),
+    ERASE_ITEM("&c&lERASE ITEM", Material.RED_DYE, new String[]{
+            ChatColor.GRAY+"Remove the selected item from the ",
+            ChatColor.GRAY+"\"saved items\" tab in the editor.",
+            "",
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to ERASE"}, 11,"erase_item",null);
 
     private String displayName;
     private Material material;

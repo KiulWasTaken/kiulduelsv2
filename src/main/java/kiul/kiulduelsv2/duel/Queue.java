@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.duel;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.gui.queue.QueueInventory;
@@ -66,7 +67,7 @@ public class Queue implements Listener {
                 if (!e.getCurrentItem().getType().equals(Material.NETHER_STAR)) {
                     String strings[] = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).split("-");
                     String kitType = strings[0].toLowerCase();
-                    if (Userdata.get().get("kits." + p.getUniqueId() + "." + kitType + ".kit-slot-" + kitSlot.get(p).get(kitType)) != null) {
+                    if (CustomKitData.get().get(p.getUniqueId() + "." + kitType + ".kit-slot-" + kitSlot.get(p).get(kitType)) != null) {
 
                         boolean rated = false;
                         if (type.toLowerCase().contains("rated")) {

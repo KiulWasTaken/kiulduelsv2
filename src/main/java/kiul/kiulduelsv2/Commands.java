@@ -49,7 +49,7 @@ public class Commands implements CommandExecutor {
                         break;
                     case "delete":
                         if (args[1].equalsIgnoreCase("confirm")) {
-                            Userdata.get().set("kits." + p.getUniqueId() + ".kit-slot-" + kitSlot.get(p), null);
+                            CustomKitData.get().set(p.getUniqueId() + ".kit-slot-" + kitSlot.get(p), null);
                         } else {
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cAre you sure? &7Type &6/kit delete confirm &7to permanently delete the contents of your selected kit slot"));
                         }

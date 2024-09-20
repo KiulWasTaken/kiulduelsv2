@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.gui.HeadEnum;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
+import kiul.kiulduelsv2.inventory.KitMethods;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -211,6 +212,11 @@ public class ItemEditInventory implements Listener {
             }
             inventory.setItem(invSize-9,C.createItemStack(C.t("&cPrevious Inventory"),Material.RED_STAINED_GLASS_PANE,1,HeadEnum.TRIM_ITEM.getLore(),null,null,"return",null));
             inventory.setItem(invSize-1,currentItem.get(p));
+            if (KitMethods.savedItemsArrayContains(p,currentItem.get(p))) {
+                inventory.setItem(invSize - 2, C.createItemStack(C.t(LayoutMenuEnum.ERASE_ITEM.getDisplayName()), LayoutMenuEnum.ERASE_ITEM.getMaterial(), 1, LayoutMenuEnum.ERASE_ITEM.getLore(), null, null, LayoutMenuEnum.ERASE_ITEM.getlocalName(), null));
+            } else {
+                inventory.setItem(invSize - 2, C.createItemStack(C.t(LayoutMenuEnum.SAVE_ITEM.getDisplayName()), LayoutMenuEnum.SAVE_ITEM.getMaterial(), 1, LayoutMenuEnum.SAVE_ITEM.getLore(), null, null, LayoutMenuEnum.SAVE_ITEM.getlocalName(), null));
+            }
             inventory.setItem(invSize-6,C.createItemStack(C.t(HeadEnum.CLEAR_ENCHANTS.getDisplayName()),Material.GRINDSTONE,1,HeadEnum.CLEAR_ENCHANTS.getLore(),null,null,HeadEnum.CLEAR_ENCHANTS.getLocalName(), HeadEnum.CLEAR_ENCHANTS.getURL()));
             inventory.setItem(invSize-5,C.createItemStack(C.t(HeadEnum.RENAME_ITEM.getDisplayName()),Material.ANVIL,1,HeadEnum.RENAME_ITEM.getLore(),null,null,HeadEnum.RENAME_ITEM.getLocalName(), HeadEnum.RENAME_ITEM.getURL()));
             p.openInventory(inventory);
@@ -279,6 +285,18 @@ public class ItemEditInventory implements Listener {
                 if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"))) {
                     if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.TRIM_ITEM.getLocalName())) {
                         trim(p, 1,Material.LIME_STAINED_GLASS_PANE);
+                        return;
+                    }
+                    if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals("save_item")) {
+                        KitMethods.saveItemToSavedItemsArray(p,currentItem.get(p));
+                        p.playSound(p,Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER,0.7f,1f);
+                        open(p,currentItem.get(p));
+                        return;
+                    }
+                    if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals("erase_item")) {
+                        KitMethods.eraseItemFromSavedItemsArray(p,currentItem.get(p));
+                        p.playSound(p,Sound.UI_STONECUTTER_TAKE_RESULT,0.7f,1f);
+                        open(p,currentItem.get(p));
                         return;
                     }
                     if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.RENAME_ITEM.getLocalName())) {

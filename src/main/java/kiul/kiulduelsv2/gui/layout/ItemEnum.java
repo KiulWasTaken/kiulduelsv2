@@ -123,6 +123,7 @@ public enum ItemEnum {
     blocks(C.t("&#9c8e8e&lB&#c4b2b2&ll&#ebd6d6&lo&#ebd6d6&lc&#c4b2b2&lk&#9c8e8e&ls"), Material.COBBLESTONE, 12, "blocks", 18, null),
     potions(C.t("&#9c8e8e&lP&#bdacac&lo&#decaca&lt&#ffe8e8&li&#decaca&lo&#bdacac&ln&#9c8e8e&ls"), Material.SPLASH_POTION, 13, "potions", 54, null),
     food(C.t("&#9c8e8e&lF&#decaca&lo&#decaca&lo&#9c8e8e&ld"), Material.GOLDEN_CARROT, 14, "food", 18, null),
+    saved_items(C.t("&fsaved items"), Material.NETHER_STAR, 23, "saved", 18, null),
     weapons(C.t("&#9c8e8e&lW&#bdacac&le&#decaca&la&#ffe8e8&lp&#decaca&lo&#bdacac&ln&#9c8e8e&ls"), Material.STONE_AXE, 15, "weapons", 36, null),
     utilities(C.t("&#9c8e8e&lU&#b5a5a5&lt&#cebbbb&li&#e6d2d2&ll&#ffe8e8&li&#e6d2d2&lt&#cebbbb&li&#b5a5a5&le&#9c8e8e&ls"), Material.TRIDENT, 16, "utilities", 36, null);
 //    ownInventory(C.t("&#3C4766&lI&#3F4F67&ln&#425769&lv&#455E6A&le&#48666B&ln&#455E6A&lt&#425769&lo&#3F4F67&lr&#3C4766&ly"), Material.ENDER_CHEST, 23, null, 9, null);

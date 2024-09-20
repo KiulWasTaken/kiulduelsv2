@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.gui;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.layout.LayoutMenuInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
@@ -98,7 +99,7 @@ public class ClickMethods {
         p.sendMessage(C.t("&#4DBA4B→ &f/save &7to &fSAVE &7your kit"));
         p.sendMessage(C.t("&#4DBA4B→ &f/cancel &7to &cCANCEL &7editing."));
         p.sendMessage(C.t("&#4DBA4B&m                                                                "));
-        if (Userdata.get().get("kits." + p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
+        if (CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
             try {
                 KitMethods.loadSelectedKitSlot(p,type);
             } catch (IOException e) {

@@ -1,11 +1,15 @@
 package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.gui.ClickMethods;
+import kiul.kiulduelsv2.inventory.InventoryToBase64;
+import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,8 +19,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
@@ -96,6 +103,70 @@ public class ItemInventory implements Listener {
 
     }
 
+    public static void savedItemsInventory(Player p) {
+        Inventory inventory = Bukkit.createInventory(p, 36, "Saved Items");
+
+        ItemStack[] savedItemsArray = new ItemStack[28];
+        if (CustomKitData.get().get(p.getUniqueId()+".saved_items") != null) {
+            try {
+                savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
+            } catch (IOException err) {
+                err.printStackTrace();
+            }
+        }
+        List<String> emptylore = new ArrayList<>();
+        inventory.setContents(savedItemsArray);
+        for (int i = 0; i < inventory.getSize(); i++) {
+            if (inventory.getItem(i).getType().equals(Material.AIR)) {
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
+            }
+            if (i >= 27) {
+                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
+            }
+        }
+        inventory.setItem(27, ItemStackMethods.createItemStack(ItemEnum.backtomain.getDisplayName(), ItemEnum.backtomain.getMaterial(), 1, List.of(new String[]{""}), null, null,null));
+
+        p.openInventory(inventory);
+    }
+
+    @EventHandler
+    public void savedItemInventoryClickEvent (InventoryClickEvent e) {
+        Player p = (Player) e.getWhoClicked();
+        if (e.getView().getTitle().equals("Saved Items") && e.getCurrentItem() != null) {
+
+            String localName = "null";
+            if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has( new NamespacedKey(C.plugin,"local"))) {
+                localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
+            }
+
+
+            e.setCancelled(true);
+            if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
+                ItemInventory.itemInventory(p);
+                return;
+            }
+
+
+                if (localName.equalsIgnoreCase("item")) {
+                    if (e.getClick() != (ClickType.SHIFT_RIGHT)) {
+                        ItemStack itemStack = e.getCurrentItem().clone();
+                        ItemMeta itemMeta = itemStack.getItemMeta();
+                        itemMeta.setItemName(null);
+                        itemMeta.setLore(null);
+                        itemStack.setAmount(e.getCurrentItem().getAmount());
+                        itemStack.setItemMeta(itemMeta);
+                        if (ClickMethods.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                            p.getInventory().addItem(itemStack);
+                        }
+                    } else {
+                        KitMethods.eraseItemFromSavedItemsArray(p,e.getCurrentItem());
+                        savedItemsInventory(p);
+                    }
+                    return;
+                }
+            }
+    }
+
 
     @EventHandler
     public void itemInventoryClickEvent (InventoryClickEvent e) {
@@ -106,6 +177,14 @@ public class ItemInventory implements Listener {
                 e.setCancelled(true);
                 if (e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
                     e.getCursor().setAmount(0);
+                    return;
+                }
+                String localName = "null";
+                if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has( new NamespacedKey(C.plugin,"local"))) {
+                    localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
+                }
+                if (localName.equalsIgnoreCase("saved")) {
+                    savedItemsInventory(p);
                     return;
                 }
                 for (ItemEnum item : ItemEnum.values()) {
