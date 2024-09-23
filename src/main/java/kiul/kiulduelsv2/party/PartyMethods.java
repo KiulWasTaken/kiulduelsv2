@@ -1,6 +1,8 @@
 package kiul.kiulduelsv2.party;
 
 import kiul.kiulduelsv2.C;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -16,15 +18,12 @@ public class PartyMethods {
         Player inviter = Bukkit.getPlayer(partyMember);
         Player player = Bukkit.getPlayer(invited);
 
-        player.sendMessage(C.t("&d&m                                                                "));
-        player.sendMessage(ChatColor.GRAY+ "" + ChatColor.ITALIC+ inviter.getName() + " has invited you to their party!");
-        ComponentBuilder message = new ComponentBuilder("click this message to accept the invitation!");
-        message.color(net.md_5.bungee.api.ChatColor.of(Color.PINK)).italic(true);
-
-        // Add the first clickable component
-        message.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept " + inviter.getName()));
-        player.spigot().sendMessage(message.create());
-        player.sendMessage(C.t("&d&m                                                                "));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#c73e8b:#6d2b94><strikethrough>                                                                "));
+        player.sendMessage(C.t(C.PINK + inviter.getName() + "&7 has invited you to their party!"));
+        player.sendMessage("");
+        net.kyori.adventure.text.Component clickComponent = net.kyori.adventure.text.Component.empty().append(MiniMessage.miniMessage().deserialize("<click:run_command:/party accept " + inviter.getName() +"><#27a33a><b>[✔]</click>")).append(Component.text("         ").append(MiniMessage.miniMessage().deserialize("<click:run_command:/party reject " + inviter.getName() + "><#e33630><b>[❌]</click>")));
+        player.sendMessage(clickComponent);
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#c73e8b:#6d2b94><strikethrough>                                                                "));
 
     }
 }

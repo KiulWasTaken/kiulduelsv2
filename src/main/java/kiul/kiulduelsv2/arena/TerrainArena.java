@@ -457,7 +457,7 @@ public class TerrainArena extends ChunkGenerator {
             });
         });
     }
-
+//
     private static CompletableFuture<Boolean> isBiomeAllowed(World world, Location SECorner, Location NWCorner, int size) {
         Set<Biome> disallowedBiomes = TerrainArena.disallowedBiomes; // Add disallowed biomes here
         int totalChunks = size * size;
@@ -479,7 +479,6 @@ public class TerrainArena extends ChunkGenerator {
                 for (int z = NWChunk.getZ(); z <= SEChunk.getZ(); z++) {
                     CompletableFuture<Void> future = world.getChunkAtAsync(x, z).thenAccept(chunk -> {
                         Biome biome = chunk.getBlock(0, 60, 0).getBiome(); // Checking one block per chunk
-                        Bukkit.broadcastMessage(biome.name());
                         if (disallowedBiomes.contains(biome)) {
                             disallowedCount.incrementAndGet();
                         }

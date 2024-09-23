@@ -566,7 +566,7 @@ public class ItemEditInventory implements Listener {
     public void preventGUIWhilstAwaitingChatIntercept (InventoryOpenEvent e) {
         Player p = (Player) e.getPlayer();
         if (takeTextFromNextChat.contains(p)) {
-            p.sendMessage(ChatColor.RED + "You cannot do this whilst renaming your item!");
+            p.sendMessage(C.failPrefix + "You cannot do this whilst renaming your item!");
             e.setCancelled(true);
         }
     }

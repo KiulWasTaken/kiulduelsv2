@@ -45,16 +45,19 @@ public class LayoutMenuInventory implements Listener {
                 inventory.setItem(i, ItemStackMethods.createItemStack("", Material.LIME_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
             }
         }
-        for (LayoutMenuEnum item : LayoutMenuEnum.values()) {
-            inventory.setItem(item.getInventorySlot(), C.createItemStack(item.getDisplayName(), item.getMaterial(), 1, item.getLore(), null, null, item.getlocalName(), null));
-        }
 
-        if (KitMethods.savedItemsArrayContains(p,currentItem.get(p))) {
-            inventory.setItem(11, C.createItemStack(C.t(LayoutMenuEnum.ERASE_ITEM.getDisplayName()), LayoutMenuEnum.ERASE_ITEM.getMaterial(), 1, LayoutMenuEnum.ERASE_ITEM.getLore(), null, null, LayoutMenuEnum.ERASE_ITEM.getlocalName(), null));
+
+        if (p.getInventory().getItemInMainHand().getType() != Material.AIR && KitMethods.savedItemsArrayContains(p,p.getInventory().getItemInMainHand()) ) {
+            inventory.setItem(10, C.createItemStack(C.t(LayoutMenuEnum.ERASE_ITEM.getDisplayName()), LayoutMenuEnum.ERASE_ITEM.getMaterial(), 1, LayoutMenuEnum.ERASE_ITEM.getLore(), null, null, LayoutMenuEnum.ERASE_ITEM.getlocalName(), null));
         } else {
-            inventory.setItem(11, C.createItemStack(C.t(LayoutMenuEnum.SAVE_ITEM.getDisplayName()), LayoutMenuEnum.SAVE_ITEM.getMaterial(), 1, LayoutMenuEnum.SAVE_ITEM.getLore(), null, null, LayoutMenuEnum.SAVE_ITEM.getlocalName(), null));
+            inventory.setItem(10, C.createItemStack(C.t(LayoutMenuEnum.SAVE_ITEM.getDisplayName()), LayoutMenuEnum.SAVE_ITEM.getMaterial(), 1, LayoutMenuEnum.SAVE_ITEM.getLore(), null, null, LayoutMenuEnum.SAVE_ITEM.getlocalName(), null));
         }
 
+        for (LayoutMenuEnum item : LayoutMenuEnum.values()) {
+            if (!item.getlocalName().contains("_item")) {
+                inventory.setItem(item.getInventorySlot(), C.createItemStack(item.getDisplayName(), item.getMaterial(), 1, item.getLore(), null, null, item.getlocalName(), null));
+            }
+            }
         p.openInventory(inventory);
 
     }
@@ -82,7 +85,7 @@ public class LayoutMenuInventory implements Listener {
                             currentItem.put(p, p.getInventory().getItemInMainHand());
                             trim(p, 1, Material.LIME_STAINED_GLASS_PANE);
                         } else {
-                            p.sendMessage(ChatColor.RED+"You cannot trim an item that is not armour!");
+                            p.sendMessage(C.failPrefix +"You cannot trim an item that is not armour!");
                         }
                         break;
                     case "item":
@@ -94,7 +97,7 @@ public class LayoutMenuInventory implements Listener {
                             p.closeInventory();
                             p.sendMessage(ChatColor.GRAY + "Send the name of your item as a chat message.");
                         } else {
-                            p.sendMessage(ChatColor.RED+"You cannot do this without an item in your hand!");
+                            p.sendMessage(C.failPrefix +"You cannot do this without an item in your hand!");
                         }
                         break;
                     case "enchant":
@@ -103,18 +106,26 @@ public class LayoutMenuInventory implements Listener {
 
                         ItemEditInventory.open(p,p.getInventory().getItemInMainHand());
                         } else {
-                            p.sendMessage(ChatColor.RED+"You cannot do this without an item in your hand!");
+                            p.sendMessage(C.failPrefix +"You cannot do this without an item in your hand!");
                         }
                         break;
                     case "save_item":
-                            KitMethods.saveItemToSavedItemsArray(p,currentItem.get(p));
-                            p.playSound(p,Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER,0.7f,1f);
+                        if (p.getInventory().getItemInMainHand().getType() != Material.AIR) {
+                            KitMethods.saveItemToSavedItemsArray(p, currentItem.get(p));
+                            p.playSound(p, Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER, 0.7f, 1f);
                             open(p);
+                        } else {
+                            p.sendMessage(C.failPrefix +"You cannot do this without an item in your hand!");
+                        }
                         break;
                     case "erase_item":
-                            KitMethods.eraseItemFromSavedItemsArray(p,currentItem.get(p));
-                            p.playSound(p,Sound.UI_STONECUTTER_TAKE_RESULT,0.7f,1f);
+                        if (p.getInventory().getItemInMainHand().getType() != Material.AIR) {
+                            KitMethods.eraseItemFromSavedItemsArray(p, currentItem.get(p));
+                            p.playSound(p, Sound.UI_STONECUTTER_TAKE_RESULT, 0.7f, 1f);
                             open(p);
+                        } else {
+                            p.sendMessage(C.failPrefix +"You cannot do this without an item in your hand!");
+                        }
                         break;
                 }
             }

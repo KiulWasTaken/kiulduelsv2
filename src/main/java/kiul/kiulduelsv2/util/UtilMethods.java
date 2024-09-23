@@ -45,7 +45,7 @@ public class UtilMethods {
             }
             duel.addSpectator(player.getUniqueId());
         } else {
-            player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + spectating.getName() + " is not in a duel right now");
+            player.sendMessage(C.failPrefix + spectating.getName() + " is not in a duel right now");
         }
     }
 

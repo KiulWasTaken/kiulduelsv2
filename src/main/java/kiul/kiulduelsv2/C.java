@@ -28,10 +28,23 @@ public class C {
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-fA-F])");
     public static int K = 30;
 
-    public static String primary = "&#5c8a0b";
-    public static String secondary = "&#5c944e";
-    public static String text = "&#e0deca";
 
+    public static String GOLD = "&#ebbc3d";
+    public static String LIGHT_RED = "&#f5633b";
+    public static String RED = "&#e33630";
+    public static String DARK_RED = "&#a11813";
+    public static String GREEN = "&#27a33a";
+    public static String YELLOW = "&#b59a4e";
+    public static String BLUE = "&#658bb5"; //old &#5f95ed
+    public static String GRAY = "&#787878";
+    public static String PURPLE = "&#6d2b94";
+    public static String PINK = "&#c73e8b";
+    public static String LIGHT_GREEN = "&#31e862";
+    public static String DARK_GREEN = "&#218a3c";
+    /*#c73e8b pink
+#6d2b94 purple*/
+    public static String failPrefix = C.t(DARK_RED+"❌ "+RED);
+    public static String successPrefix = C.t(DARK_GREEN+"✔ "+GREEN);
     public static double safeDivide(double dividend, double divisor) {
         if(Double.compare(divisor, Double.NaN) == 0) return Double.NaN;
         if(Double.compare(dividend, Double.NaN) == 0) return Double.NaN;

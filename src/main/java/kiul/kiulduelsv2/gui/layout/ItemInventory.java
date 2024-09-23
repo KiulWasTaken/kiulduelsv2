@@ -41,7 +41,7 @@ public class ItemInventory implements Listener {
                 List<String> lore = new ArrayList<>();
                 lore.add(C.t("&6⏵ &7Click to expand"));
 
-                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(item.getDisplayName(), item.getMaterial(), 1, lore, null, null,null));
+                inventory.setItem(item.getInventorySlot(), ItemStackMethods.createItemStack(item.getDisplayName(), item.getMaterial(), 1, lore, null, null,item.getInventory()));
             }
         }
 
@@ -117,54 +117,69 @@ public class ItemInventory implements Listener {
         List<String> emptylore = new ArrayList<>();
         inventory.setContents(savedItemsArray);
         for (int i = 0; i < inventory.getSize(); i++) {
-            if (inventory.getItem(i).getType().equals(Material.AIR)) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
-            }
             if (i >= 27) {
                 inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
             }
         }
         inventory.setItem(27, ItemStackMethods.createItemStack(ItemEnum.backtomain.getDisplayName(), ItemEnum.backtomain.getMaterial(), 1, List.of(new String[]{""}), null, null,null));
-
+        inventory.setItem(35, ItemStackMethods.createItemStack(ItemEnum.clearinventory.getDisplayName(), ItemEnum.clearinventory.getMaterial(), 1, List.of(new String[]{"&6⏵ &7Wipe your inventory of all its contents"}), null, null,null));
         p.openInventory(inventory);
     }
 
     @EventHandler
     public void savedItemInventoryClickEvent (InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getView().getTitle().equals("Saved Items") && e.getCurrentItem() != null) {
+        if (e.getCurrentItem() == null) {return;}
+        if (e.getView().getTitle().equals("Saved Items")) {
+            if (e.getClickedInventory() != null && e.getClickedInventory() == p.getOpenInventory().getTopInventory() || e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT) {
+                e.setCancelled(true);
+                if (e.getCursor() != null && e.getCursor().getType() != Material.AIR) {
+                    e.getCursor().setAmount(0);
+                    return;
+                }
+                String localName = "null";
+                if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin, "local"))) {
+                    localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING);
+                }
 
-            String localName = "null";
-            if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has( new NamespacedKey(C.plugin,"local"))) {
-                localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
-            }
 
-
-            e.setCancelled(true);
-            if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
-                ItemInventory.itemInventory(p);
-                return;
-            }
-
-
-                if (localName.equalsIgnoreCase("item")) {
-                    if (e.getClick() != (ClickType.SHIFT_RIGHT)) {
-                        ItemStack itemStack = e.getCurrentItem().clone();
-                        ItemMeta itemMeta = itemStack.getItemMeta();
-                        itemMeta.setItemName(null);
-                        itemMeta.setLore(null);
-                        itemStack.setAmount(e.getCurrentItem().getAmount());
-                        itemStack.setItemMeta(itemMeta);
-                        if (ClickMethods.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
-                            p.getInventory().addItem(itemStack);
+                e.setCancelled(true);
+                if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
+                    ItemInventory.itemInventory(p);
+                    return;
+                }
+                if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.clearinventory.getDisplayName()))) {
+                    for (ItemStack items : p.getInventory().getContents()) {
+                        if (items != null && items.getType() != Material.AIR) {
+                            items.setAmount(0);
                         }
-                    } else {
-                        KitMethods.eraseItemFromSavedItemsArray(p,e.getCurrentItem());
-                        savedItemsInventory(p);
                     }
                     return;
                 }
+
+                if (localName.equalsIgnoreCase("item")) {
+                    if (e.getClickedInventory() != null && e.getClickedInventory().equals(p.getOpenInventory().getTopInventory())) {
+                        if (e.getCurrentItem() != null) {
+                            if (e.getClick() != (ClickType.SHIFT_RIGHT)) {
+                                ItemStack itemStack = e.getCurrentItem().clone();
+                                ItemMeta itemMeta = itemStack.getItemMeta();
+                                itemMeta.setItemName(null);
+                                itemMeta.setLore(null);
+                                itemStack.setAmount(e.getCurrentItem().getAmount());
+                                itemStack.setItemMeta(itemMeta);
+                                if (ClickMethods.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                                    p.getInventory().addItem(itemStack);
+                                }
+                            } else {
+                                KitMethods.eraseItemFromSavedItemsArray(p, e.getCurrentItem());
+                                savedItemsInventory(p);
+                            }
+                            return;
+                        }
+                    }
+                }
             }
+        }
     }
 
 
@@ -179,17 +194,19 @@ public class ItemInventory implements Listener {
                     e.getCursor().setAmount(0);
                     return;
                 }
+                if (e.getCurrentItem() == null) {return;}
                 String localName = "null";
                 if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has( new NamespacedKey(C.plugin,"local"))) {
                     localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
                 }
-                if (localName.equalsIgnoreCase("saved")) {
+                if (localName.equals("saved")) {
                     savedItemsInventory(p);
                     return;
                 }
                 for (ItemEnum item : ItemEnum.values()) {
                     if (e.getCurrentItem() == null)
                         break;
+
                     if (item.getDisplayName() != null && e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(item.getDisplayName()))) {
                         if (e.getCurrentItem().getItemMeta().getItemName().equalsIgnoreCase(C.t(ItemEnum.backtomain.getDisplayName()))) {
                             ItemInventory.itemInventory(p);

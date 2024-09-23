@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.util;
 
+import kiul.kiulduelsv2.duel.Queue;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,6 +51,7 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
                 return null;
                 // Returns null to get all online players
             }
+
             Collections.sort(completions);
             return completions;
         }
@@ -69,6 +71,36 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
             if (args.length == 2){
                 return null;
                 // Returns null to get all online players
+            }
+
+            Collections.sort(completions);
+            return completions;
+        }
+        if (command.getName().equalsIgnoreCase("duel")) {
+            final List<String> oneArgList = new ArrayList<>();
+            final List<String> threeArgList = new ArrayList<>();
+            final List<String> completions = new ArrayList<>();
+
+            oneArgList.add("invite");
+            oneArgList.add("accept");
+            oneArgList.add("reject");
+
+            threeArgList.add("[ENABLE STATS?]");
+            threeArgList.add("true");
+            threeArgList.add("false");
+
+            if (args.length == 1){
+                StringUtil.copyPartialMatches(args[0], oneArgList, completions);
+            }
+            if (args.length == 2){
+                return null;
+                // Returns null to get all online players
+            }
+            if (args.length == 3) {
+                StringUtil.copyPartialMatches(args[2], threeArgList, completions);
+            }
+            if (args.length == 4) {
+                StringUtil.copyPartialMatches(args[3], Queue.queueTypesLowercase(), completions);
             }
             Collections.sort(completions);
             return completions;

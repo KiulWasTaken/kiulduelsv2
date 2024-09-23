@@ -30,8 +30,10 @@ public class InventoryListeners implements Listener {
 
     @EventHandler
     public void updatePreviousInventoryEvent (InventoryCloseEvent e) {
-        if (inEditor.containsKey((Player)e.getPlayer()) && !e.getView().getTitle().equals("Customize Armour") && !e.getView().getTitle().equals(ItemEditInventory.itemEnchantInvTitle)) {
-            previousInventory.put((Player)e.getPlayer(),e.getInventory());
+        if (inEditor.containsKey((Player)e.getPlayer())){
+            if (!e.getView().getTitle().equals("Customize Armour") && !e.getView().getTitle().equals(ItemEditInventory.itemEnchantInvTitle)) {
+                previousInventory.put((Player) e.getPlayer(), e.getInventory());
+            }
         } else {
             previousInventory.remove((Player) e.getPlayer());
         }

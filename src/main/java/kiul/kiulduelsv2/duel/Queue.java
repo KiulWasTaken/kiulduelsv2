@@ -42,7 +42,9 @@ public class Queue implements Listener {
         List<String> types = new ArrayList<>();
         for (String key : Queue.queue.keySet()) {
             String[] keys = key.split("-");
-            types.add(keys[0].toLowerCase());
+            if (!keys[0].equalsIgnoreCase("map")) {
+                types.add(keys[0].toLowerCase());
+            }
         }
         return types;
     }
@@ -110,7 +112,7 @@ public class Queue implements Listener {
 
                     } else {
                         p.closeInventory();
-                        p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "Selected kit slot (" + KitMethods.kitSlot.get(p).get(kitType) + ") is empty!");
+                        p.sendMessage(C.failPrefix + "Selected kit slot (" + KitMethods.kitSlot.get(p).get(kitType) + ") is empty!");
                     }
                 } else {
                     try {

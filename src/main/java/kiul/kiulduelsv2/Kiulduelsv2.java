@@ -3,6 +3,7 @@ package kiul.kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaListeners;
 import kiul.kiulduelsv2.config.Arenadata;
 import kiul.kiulduelsv2.config.ConfigListeners;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
@@ -36,6 +37,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         // Plugin startup logic
         Userdata.setup();
         Arenadata.setup();
+        CustomKitData.setup();
         GlobalKits.instantiate();
         getServer().getPluginManager().registerEvents(new LeakPatcher(), this);
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
@@ -65,9 +67,11 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("recap").setExecutor(new Commands());
         getCommand("spectate").setExecutor(new Commands());
         getCommand("save").setExecutor(new Commands());
+        getCommand("duel").setExecutor(new Commands());
         getCommand("kit").setTabCompleter(new TabCompleter());
         getCommand("arena").setTabCompleter(new TabCompleter());
         getCommand("party").setTabCompleter(new TabCompleter());
+        getCommand("duel").setTabCompleter(new TabCompleter());
         if (Bukkit.getOnlinePlayers() != null) {
 
             List<String> types = new ArrayList<>();

@@ -70,62 +70,99 @@ public class KitMethods {
             CustomKitData.save();
     }
 
-    public static void saveItemToSavedItemsArray (Player p, ItemStack item) {
-        ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING,"item");
-        List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Take x1 Item");
-        lore.add(ChatColor.GRAY + "Shift-Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Erase From Saved Items");
-        itemMeta.setLore(lore);
-        item.setItemMeta(itemMeta);
+    public static void saveItemToSavedItemsArray (Player p, ItemStack givenItemStack) {
+        if (givenItemStack != null) {
+            ItemStack item = givenItemStack.clone();
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.getPersistentDataContainer().set(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING, "item");
+            List<String> lore = new ArrayList<>();
+            lore.add("");
+            lore.add(C.t("&#4DBA4B&m                                                 "));
+            lore.add(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Take x1 Item");
+            lore.add(ChatColor.GRAY + "Shift-Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Erase From Saved Items");
+            itemMeta.setLore(lore);
+            item.setItemMeta(itemMeta);
 
-        ItemStack[] savedItemsArray = new ItemStack[28];
-        if (CustomKitData.get().get(p.getUniqueId()+".saved_items") != null) {
-            try {
-                savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
-            } catch (IOException err) {
-                err.printStackTrace();
+            ItemStack[] savedItemsArray = new ItemStack[28];
+            if (CustomKitData.get().get(p.getUniqueId() + ".saved_items") != null) {
+                try {
+                    savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
+                } catch (IOException err) {
+                    err.printStackTrace();
+                }
             }
-        }
-        List<ItemStack> savedItems = new ArrayList<>(Arrays.stream(savedItemsArray).toList());
-        if (savedItems.contains(item)) {return;}
-        savedItems.add(0,item);
-        if (savedItems.size() > 27) {
-            savedItems.remove(27);
-        }
-        savedItemsArray = (ItemStack[]) savedItems.toArray();
+            List<ItemStack> savedItems = new ArrayList<>(Arrays.stream(savedItemsArray).toList());
+            if (savedItems.contains(item)) {
+                return;
+            }
+            savedItems.add(0, item);
+            if (savedItems.size() > 27) {
+                savedItems.remove(27);
+            }
+            savedItemsArray = savedItems.toArray(ItemStack[]::new);
 
-        CustomKitData.get().set(p.getUniqueId()+".saved_items",InventoryToBase64.itemStackArrayToBase64(savedItemsArray));
-        CustomKitData.save();
+            CustomKitData.get().set(p.getUniqueId() + ".saved_items", InventoryToBase64.itemStackArrayToBase64(savedItemsArray));
+            CustomKitData.save();
+        }
     }
 
-    public static void eraseItemFromSavedItemsArray (Player p, ItemStack item) {
-        ItemStack[] savedItemsArray = new ItemStack[28];
-        if (CustomKitData.get().get(p.getUniqueId()+".saved_items") != null) {
-            try {
-                savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
-            } catch (IOException err) {
-                err.printStackTrace();
+    public static void eraseItemFromSavedItemsArray (Player p, ItemStack givenItemStack) {
+        if (givenItemStack != null) {
+            ItemStack item = givenItemStack.clone();
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.getPersistentDataContainer().set(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING, "item");
+            List<String> lore = new ArrayList<>();
+            lore.add("");
+            lore.add(C.t("&#4DBA4B&m                                                 "));
+            lore.add(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Take x1 Item");
+            lore.add(ChatColor.GRAY + "Shift-Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Erase From Saved Items");
+            itemMeta.setLore(lore);
+            item.setItemMeta(itemMeta);
+
+            ItemStack[] savedItemsArray = new ItemStack[28];
+            if (CustomKitData.get().get(p.getUniqueId() + ".saved_items") != null) {
+                try {
+                    savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
+                } catch (IOException err) {
+                    err.printStackTrace();
+                }
             }
+            List<ItemStack> savedItems = new ArrayList<>(Arrays.stream(savedItemsArray).toList());
+            if (!savedItems.contains(item)) {
+                return;
+            }
+            savedItems.remove(item);
+            savedItemsArray = savedItems.toArray(ItemStack[]::new);
+            CustomKitData.get().set(p.getUniqueId() + ".saved_items", InventoryToBase64.itemStackArrayToBase64(savedItemsArray));
+            CustomKitData.save();
         }
-        List<ItemStack> savedItems = new ArrayList<>(Arrays.stream(savedItemsArray).toList());
-        if (!savedItems.contains(item)) {return;}
-        savedItems.remove(item);
-        savedItemsArray = (ItemStack[]) savedItems.toArray();
-        CustomKitData.get().set(p.getUniqueId()+".saved_items",InventoryToBase64.itemStackArrayToBase64(savedItemsArray));
-        CustomKitData.save();
     }
-    public static boolean savedItemsArrayContains(Player p, ItemStack item) {
-        ItemStack[] savedItemsArray = new ItemStack[28];
-        if (CustomKitData.get().get(p.getUniqueId()+".saved_items") != null) {
-            try {
-                savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
-            } catch (IOException err) {
-                err.printStackTrace();
+    public static boolean savedItemsArrayContains(Player p, ItemStack givenItemStack) {
+        if (givenItemStack != null) {
+            ItemStack item = givenItemStack.clone();
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.getPersistentDataContainer().set(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING, "item");
+            List<String> lore = new ArrayList<>();
+            lore.add("");
+            lore.add(C.t("&#4DBA4B&m                                                 "));
+            lore.add(ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Take x1 Item");
+            lore.add(ChatColor.GRAY + "Shift-Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Erase From Saved Items");
+            itemMeta.setLore(lore);
+            item.setItemMeta(itemMeta);
+
+            ItemStack[] savedItemsArray = new ItemStack[28];
+            if (CustomKitData.get().get(p.getUniqueId() + ".saved_items") != null) {
+                try {
+                    savedItemsArray = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + ".saved_items"));
+                } catch (IOException err) {
+                    err.printStackTrace();
+                }
             }
+            List<ItemStack> savedItems = new ArrayList<>(Arrays.stream(savedItemsArray).toList());
+            return savedItems.contains(item);
+        } else {
+            return false;
         }
-        List<ItemStack> savedItems = new ArrayList<>(Arrays.stream(savedItemsArray).toList());
-        return savedItems.contains(item);
     }
 
     public static void loadSelectedKitSlot (Player p,String type) throws IOException {

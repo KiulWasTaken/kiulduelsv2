@@ -3,6 +3,7 @@ package kiul.kiulduelsv2.gui.queue;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.duel.DuelMethods;
+import kiul.kiulduelsv2.duel.Invites;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
@@ -113,14 +114,21 @@ public class PartyQueueInventory implements Listener {
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                 String localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
                 switch (localName) {
-                    case "split", "ffa","versus":
+                    case "split", "ffa":
                         selectMode(p,localName);
+                        break;
+                    case "versus":
+                        String rawItemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getItemName());
+                        String[] splitName = rawItemName.split("'");
+                        selectMode(p,localName+" → " + splitName[0]);
                         break;
                     case "smp","shield","crystal":
                         if (ArenaMethods.getSuitableArena() != null) {
                         String[] strings = e.getView().getTitle().split("\\|");
                         String partyFightType = strings[1].toLowerCase().trim();
-                        if (partyFightType.equalsIgnoreCase("versus")) {
+                        if (partyFightType.contains("versus")) {
+                            String[] split = partyFightType.split("→");
+                            Invites.duelInviteSend(p,Bukkit.getPlayer(split[1].trim()),true,false,localName);
                             return;
                         }
                         Party party = C.partyManager.findPartyForMember(p.getUniqueId());

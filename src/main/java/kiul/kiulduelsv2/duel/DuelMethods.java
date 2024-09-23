@@ -113,9 +113,9 @@ public class DuelMethods {
             @Override
             public void run() {
                 if (this.time > 0 && C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
-                    p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "" + time, ChatColor.BOLD + "STEEL YOURSELF", 0, 15, 5);
+                    p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "" + time,  "STEEL YOURSELF", 0, 15, 5);
                     if (this.time == 1) {
-                        p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "" + time, ChatColor.BOLD +"FIGHT", 0, 15, 5);
+                        p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "" + time, "FIGHT", 0, 15, 5);
                     }
                     this.time--;
                 } else {
@@ -180,7 +180,7 @@ public class DuelMethods {
                 p.spigot().sendMessage(message.create());
             }
             for (Player p : players) {
-                p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) +""+ChatColor.BOLD+"GAME STARTS SOON",ChatColor.WHITE+""+ChatColor.BOLD+"VOTE TO RE-ROLL ARENA",10,40,10);
+                p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) +""+ChatColor.BOLD+"GAME STARTS SOON",ChatColor.WHITE+"VOTE TO RE-ROLL ARENA",10,40,10);
             }
             new BukkitRunnable() {
                 int time = 15; //or any other number you want to start countdown from
@@ -208,7 +208,7 @@ public class DuelMethods {
                         cancel();
                         if (reRollYes.get(arenaName).size() >= reRollNo.get(arenaName).size()) {
                             for (Player p : players) {
-                                p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE + "" + ChatColor.BOLD + "MAP RE-ROLLING",0,40,20);
+                                p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE + "MAP RE-ROLLING",0,40,20);
                             }
                             reRollNo.remove(arenaName);
                             reRollYes.remove(arenaName);
@@ -218,7 +218,7 @@ public class DuelMethods {
 
                         } else {
                             for (Player p : players) {
-                                p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE + "" + ChatColor.BOLD + "GAME STARTING",0,40,20);
+                                p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE + "GAME STARTING",0,40,20);
                                 p.setFlying(false);
                                 p.setAllowFlight(false);
                             }
@@ -232,7 +232,7 @@ public class DuelMethods {
 
                     if (reRollYes.get(arenaName).size() >= reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
-                            p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE + "" + ChatColor.BOLD + "MAP RE-ROLLING",0,40,20);
+                            p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE +"MAP RE-ROLLING",0,40,20);
                             p.setFlying(false);
                             p.setAllowFlight(false);
                             p.teleport(teleportTo);
@@ -246,7 +246,7 @@ public class DuelMethods {
                         return;
                     } else if (reRollYes.get(arenaName).size() < reRollNo.get(arenaName).size() && allowedToReRoll.get(arenaName).isEmpty()) {
                         for (Player p : players) {
-                            p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE + "" + ChatColor.BOLD + "GAME STARTING",0,40,20);
+                            p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "VOTING COMPLETE",ChatColor.WHITE +"GAME STARTING",0,40,20);
                             p.setFlying(false);
                             p.setAllowFlight(false);
                         }
@@ -273,7 +273,7 @@ public class DuelMethods {
                 public void run() {
                     if (time > 0) {
                         for (Player p : players) {
-                            p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(80, 199, 50)) + "" + ChatColor.BOLD + "NO ARENAS AVAILABLE", ChatColor.WHITE + "" + ChatColor.BOLD + "GAME STARTS IN " + time,0,40,0);
+                            p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "NO ARENAS AVAILABLE", ChatColor.WHITE +"GAME STARTS IN " + time,0,40,0);
                         }
                         time--;
                     } else {

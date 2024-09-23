@@ -27,13 +27,13 @@ public enum LayoutMenuEnum {
             ChatColor.GRAY+"Edit the trim of the item",
             ChatColor.GRAY+"in your main hand.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 18,"trim",null),
-    SAVE_ITEM("&f&lSAVE/UPLOAD ITEM", Material.BLACK_DYE, new String[]{
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 16,"trim",null),
+    SAVE_ITEM("&f&lSAVE/UPLOAD ITEM", Material.BOOK, new String[]{
             ChatColor.GRAY+"SAVE the selected item from the",
             ChatColor.GRAY+"\"saved items\" tab in the editor.",
             "",
             ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to SAVE"}, 11,"save_item",null),
-    ERASE_ITEM("&c&lERASE ITEM", Material.RED_DYE, new String[]{
+    ERASE_ITEM("&c&lERASE ITEM", Material.ENCHANTED_BOOK, new String[]{
             ChatColor.GRAY+"Remove the selected item from the ",
             ChatColor.GRAY+"\"saved items\" tab in the editor.",
             "",

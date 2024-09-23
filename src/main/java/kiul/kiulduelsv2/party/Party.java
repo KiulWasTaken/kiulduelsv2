@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.party;
 
 import kiul.kiulduelsv2.C;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -13,9 +14,9 @@ import java.util.UUID;
 public class Party {
     public static void sendPartyMessage(String message,Player recipient) {
 
-        recipient.sendMessage(C.t("&d&m                                                                "));
-        recipient.sendMessage(C.t("&7&o"+message));
-        recipient.sendMessage(C.t("&d&m                                                                "));
+        recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#c73e8b:#6d2b94><strikethrough>                                                                "));
+        recipient.sendMessage(C.t("&7"+message));
+        recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#c73e8b:#6d2b94><strikethrough>                                                                "));
     }
     private UUID leader;
     private List<UUID> members;
@@ -88,14 +89,14 @@ public class Party {
                 teamOne.remove(member);
                 teamTwo.add(member);
             } else {
-                Bukkit.getPlayer(member).sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Your team is too small for you to swap teams");
+                Bukkit.getPlayer(member).sendMessage(C.failPrefix +""+ChatColor.ITALIC+"Your team is too small for you to swap teams");
             }
         } else {
             if (teamTwo.size() > 1) {
                 teamTwo.remove(member);
                 teamOne.add(member);
             } else {
-                Bukkit.getPlayer(member).sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Your team is too small for you to swap teams");
+                Bukkit.getPlayer(member).sendMessage(C.failPrefix +""+ChatColor.ITALIC+"Your team is too small for you to swap teams");
             }
         }
     }

@@ -19,6 +19,7 @@ commands:
   save:
   party:
   recap:
+  duel:
   previewinv:
   spectate:
 permissions:

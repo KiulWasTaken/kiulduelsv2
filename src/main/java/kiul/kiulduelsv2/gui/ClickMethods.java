@@ -110,17 +110,29 @@ public class ClickMethods {
     }
 
     public static boolean itemAmountIsWithinLimit (Player p, ItemStack itemStack,String type) {
-        if (limitedItems.get(type).containsKey(itemStack.getType())) {
+        ItemStack[] items = p.getInventory().getContents();
+        ItemStack[] invItems = items.clone();
+        int totalItems = 0;
+        for (ItemStack item : items) {
+            if (item != null && item.getType() == itemStack.getType())
+                totalItems += item.getAmount();
+        }
 
-            if (p.getInventory().containsAtLeast(itemStack,limitedItems.get(type).get(itemStack.getType())) || itemStack.getAmount() > limitedItems.get(type).get(itemStack.getType())) {
-                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "The limit for this item is " + ChatColor.YELLOW + ChatColor.ITALIC + limitedItems.get(type).get(itemStack.getType()));
+        if (limitedItems.get(type).containsKey(itemStack.getType())) {
+            if (totalItems + itemStack.getAmount() > limitedItems.get(type).get(itemStack.getType())) {
+                if ((limitedItems.get(type).get(itemStack.getType()) - totalItems) > 1) {
+                    itemStack.setAmount(limitedItems.get(type).get(itemStack.getType()) - totalItems);
+                    p.sendMessage(C.failPrefix + "Amount received adjusted to meet the limit");
+                    return true;
+                }
+                p.sendMessage(C.failPrefix + "The limit for this item is " + ChatColor.YELLOW + ChatColor.ITALIC + limitedItems.get(type).get(itemStack.getType()));
                 return false;
             }
         }
         if (itemStack.getType() == Material.POTION || itemStack.getType() == Material.SPLASH_POTION || itemStack.getType() == Material.TIPPED_ARROW) {
             PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
                 if (limitedEffects.get(type).contains(potionMeta.getBasePotionType())) {
-                    p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "This potion is disabled");
+                    p.sendMessage(C.failPrefix + "This potion is disabled");
                     return false;
                 }
         }
