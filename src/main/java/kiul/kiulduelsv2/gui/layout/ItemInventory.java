@@ -3,7 +3,7 @@ package kiul.kiulduelsv2.gui.layout;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
-import kiul.kiulduelsv2.gui.ClickMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
@@ -23,10 +23,9 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 
 public class ItemInventory implements Listener {
 
@@ -167,7 +166,7 @@ public class ItemInventory implements Listener {
                                 itemMeta.setLore(null);
                                 itemStack.setAmount(e.getCurrentItem().getAmount());
                                 itemStack.setItemMeta(itemMeta);
-                                if (ClickMethods.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                                if (KitEditor.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
                                     p.getInventory().addItem(itemStack);
                                 }
                             } else {
@@ -319,7 +318,7 @@ public class ItemInventory implements Listener {
                                     itemMeta.setLore(null);
                                     itemStack.setAmount(e.getCurrentItem().getAmount());
                                     itemStack.setItemMeta(itemMeta);
-                                    if (ClickMethods.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                                    if (KitEditor.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
                                         p.getInventory().addItem(itemStack);
                                     }
                                     return;

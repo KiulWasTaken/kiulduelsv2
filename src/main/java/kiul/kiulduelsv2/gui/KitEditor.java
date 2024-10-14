@@ -3,7 +3,6 @@ package kiul.kiulduelsv2.gui;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.CustomKitData;
-import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.layout.LayoutMenuInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
@@ -12,14 +11,12 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import java.io.IOException;
 import java.util.*;
 
-public class ClickMethods {
+public class KitEditor {
 
     public static HashMap<Player,String> inEditor = new HashMap<>();
 
@@ -85,9 +82,8 @@ public class ClickMethods {
     public static void enterKitEditor (Player p,String type) {
         inEditor.put(p,type);
 
-        p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,200000,1,false,false));
         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-            onlinePlayers.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),p);
+            p.hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),onlinePlayers);
         }
         p.getInventory().clear();
 

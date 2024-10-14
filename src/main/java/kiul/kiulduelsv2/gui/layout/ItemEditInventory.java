@@ -30,7 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 
 public class ItemEditInventory implements Listener {
 

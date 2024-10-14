@@ -19,6 +19,7 @@ public enum ItemEnum {
     soul_sand(C.t(   ""), Material.SOUL_SAND,   6, "blocks", null, null),
     soul_soil(C.t(   ""), Material.SOUL_SOIL,   7, "blocks", null, null),
     hay_bale(C.t(    ""), Material.HAY_BLOCK,   8, "blocks", null, null),
+    blueIce(C.t(    ""), Material.BLUE_ICE,   9, "blocks", null, null),
     /** Potions */
     shortSwiftness(C.t(         ""), Material.POTION,  1,  "potions", null, PotionType.SWIFTNESS),
     longSwiftness(C.t(         ""), Material.POTION,  2,  "potions", null, PotionType.LONG_SWIFTNESS),

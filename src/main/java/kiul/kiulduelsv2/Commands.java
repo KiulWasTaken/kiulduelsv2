@@ -11,7 +11,7 @@ import kiul.kiulduelsv2.duel.Recap;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import kiul.kiulduelsv2.gui.layout.ItemInventory;
 import kiul.kiulduelsv2.gui.queue.QueueInventory;
-import kiul.kiulduelsv2.gui.ClickMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
@@ -196,7 +196,7 @@ public class Commands implements CommandExecutor {
                 break;
             case "spectate":
                 if (Bukkit.getPlayer(args[0]) != null) {
-                    UtilMethods.spectatePlayer(Bukkit.getPlayer(args[0]), p);
+                    UtilMethods.spectatePlayer(p,Bukkit.getPlayer(args[0]));
                 } else {
                     p.sendMessage(C.failPrefix + "player is offline or does not exist");
                 }
@@ -212,9 +212,9 @@ public class Commands implements CommandExecutor {
                 ItemEditInventory.itemEnchantInventory(p);
                 break;
             case "cancel":
-                if (ClickMethods.inEditor.containsKey(p)) {
+                if (KitEditor.inEditor.containsKey(p)) {
                     p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
-                    ClickMethods.inEditor.remove(p);
+                    KitEditor.inEditor.remove(p);
                     ItemEditInventory.currentItem.remove(p);
                     p.getActivePotionEffects().clear();
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
@@ -230,14 +230,14 @@ public class Commands implements CommandExecutor {
                     }
                 }
             case "save":
-                if (ClickMethods.inEditor.containsKey(p)) {
+                if (KitEditor.inEditor.containsKey(p)) {
                     p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
                     p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Saving kit..");
                     long timeMillis = System.currentTimeMillis();
-                    saveInventoryToSelectedKitSlot(p, ClickMethods.inEditor.get(p));
+                    saveInventoryToSelectedKitSlot(p, KitEditor.inEditor.get(p));
                     long timeFinal = System.currentTimeMillis() - timeMillis;
                     p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Complete! (" + timeFinal + "ms)");
-                    ClickMethods.inEditor.remove(p);
+                    KitEditor.inEditor.remove(p);
                     if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
                         p.removePotionEffect(PotionEffectType.BLINDNESS);
                     }

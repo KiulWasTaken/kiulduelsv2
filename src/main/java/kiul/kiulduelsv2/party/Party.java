@@ -109,6 +109,18 @@ public class Party {
             teamTwo.remove(member);
         }
     }
+    public List<Player> getTeamPlayers (UUID member) {
+        if (teamOne.contains(member)) {
+            return teamOnePlayers();
+        }
+        return teamTwoPlayers();
+    }
+    public List<Player> getEnemyTeamPlayers (UUID member) {
+        if (teamOne.contains(member)) {
+            return teamTwoPlayers();
+        }
+        return teamOnePlayers();
+    }
 
     public boolean isMember(UUID playerName) {
         return members.contains(playerName) || leader.equals(playerName);

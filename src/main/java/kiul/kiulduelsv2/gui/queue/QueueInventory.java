@@ -72,7 +72,11 @@ public class QueueInventory {
                         numEntries = placements.keySet().size();
                     }
                     for (int i = 0; i < numEntries; i++) {
-                        lore.add(C.t("&7#"+(i+1)+"&8 ⏵ &f"+Bukkit.getOfflinePlayer(placements.get(i+1)).getName() + " &7["+c+ DuelsDB.readPlayer(placements.get(i+1),"stat_elo_"+kitType)+"&7]"));
+                        if (placements.get(i+1) != null) {
+                            lore.add(C.t("&7#" + (i + 1) + "&8 ⏵ &f" + Bukkit.getOfflinePlayer(placements.get(i + 1)).getName() + " &7[" + c + DuelsDB.readPlayer(placements.get(i + 1), "stat_elo_" + kitType) + "&7]"));
+                        } else {
+                            Bukkit.broadcastMessage(placements.get(i+1) + "");
+                        }
                     }
 
                 }

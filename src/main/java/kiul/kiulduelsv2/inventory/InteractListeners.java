@@ -2,7 +2,7 @@ package kiul.kiulduelsv2.inventory;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.gui.*;
-import kiul.kiulduelsv2.gui.ClickMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.layout.KitInventory;
 import kiul.kiulduelsv2.gui.queue.PartyQueueInventory;
@@ -109,7 +109,7 @@ public class InteractListeners implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player p = event.getPlayer();
-        if (ClickMethods.inEditor.containsKey(p)) {
+        if (KitEditor.inEditor.containsKey(p)) {
             event.getItemDrop().remove();
         }
     }

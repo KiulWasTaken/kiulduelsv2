@@ -30,7 +30,8 @@ public class UtilMethods {
         p.setHealth(20);
         p.setFoodLevel(20);
         p.setSaturation(5);
-        p.setGameMode(GameMode.SURVIVAL);
+        p.setGameMode(GameMode.ADVENTURE);
+        p.clearActivePotionEffects();
         ScoreboardMethods.startLobbyScoreboardTask(p);
         try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
     }
@@ -44,29 +45,23 @@ public class UtilMethods {
                 Bukkit.getPlayer(alivePlayerUUIDs).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), player);
             }
             duel.addSpectator(player.getUniqueId());
+            List<Player> allDuelMembers = duel.getAllRedTeamPlayers();
+            allDuelMembers.addAll(duel.getAllBlueTeamPlayers());
+            boolean isPartyGame = C.partyManager.findPartyForMember(spectating.getUniqueId()).getMembers().contains(duel.getRedTeam().get(0)) && C.partyManager.findPartyForMember(spectating.getUniqueId()).getMembers().contains(duel.getBlueTeam().get(0));
+            ScoreboardMethods.startDuelSidebar(player,allDuelMembers,"Spectating",duel.getStartTime(),duel.getKitType(),isPartyGame,duel.isFfa());
+            becomeSpectator(player);
         } else {
             player.sendMessage(C.failPrefix + spectating.getName() + " is not in a duel right now");
         }
     }
 
     public static void becomeSpectator (Player player) {
-        Duel duel = C.duelManager.findDuelForMember(player.getUniqueId());
-        for (UUID alivePlayersUUID : duel.getPlayers()) {
-            Bukkit.getPlayer(alivePlayersUUID).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class),player);
-        }
-        if (duel != null) {
-            duel.addSpectator(player.getUniqueId());
-            List<UUID> playersInDuel = duel.getPlayers();
-            for (UUID alivePlayerUUIDs : playersInDuel) {
-                Bukkit.getPlayer(alivePlayerUUIDs).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), player);
-            }
-        }
-
         player.setAllowFlight(true);
         player.setFlying(true);
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(5);
+        player.setGameMode(GameMode.ADVENTURE);
         try {KitMethods.spectatorKit(player);}catch (IOException err) {err.printStackTrace();}
     }
 

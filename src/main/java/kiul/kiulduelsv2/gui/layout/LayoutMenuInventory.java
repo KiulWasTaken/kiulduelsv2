@@ -1,13 +1,8 @@
 package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
-import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.database.DuelsDB;
-import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
-import kiul.kiulduelsv2.gui.queue.QueueEnum;
 import kiul.kiulduelsv2.inventory.KitMethods;
-import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,10 +16,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
-import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 import static kiul.kiulduelsv2.gui.layout.ItemEditInventory.*;
 
 public class LayoutMenuInventory implements Listener {

@@ -47,7 +47,7 @@ public class DuelMethods {
         for (Player play : players) {
             play.setGameMode(GameMode.SURVIVAL);
             String rating = rated ? "Rated" : "Casual";
-            ScoreboardMethods.startDuelSidebar(play,players,rating,System.currentTimeMillis(),kitType);
+            ScoreboardMethods.startDuelSidebar(play,players,rating,System.currentTimeMillis(),kitType,false,false);
         }
 
         Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
@@ -71,7 +71,7 @@ public class DuelMethods {
                 teamOne.add(players.get(i).getUniqueId());
             }
         }
-        C.duelManager.createDuel(teamOne,teamTwo,rated,false,arenaName);
+        C.duelManager.createDuel(teamOne,teamTwo,rated,false,arenaName,kitType);
 
 
 //        List<List<Player>> arenaTeams = new ArrayList<>() {{
@@ -305,7 +305,7 @@ public class DuelMethods {
     }
 
 
-    public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> teamOne,List<UUID> teamTwo, boolean ffa,String kitType) {
+    public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> partyTeamOne,List<UUID> partyTeamTwo, boolean ffa,String kitType) {
         ArenaMethods.arenasInUse.add(arenaName);
         List<Player> playerList = new ArrayList<>();
         for (UUID uuid : players) {
@@ -348,9 +348,22 @@ public class DuelMethods {
 
                     Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(-56, 0, -56);
                     Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(56, 0, 56);
-                    if (!ffa) {
 
-                        C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName);
+                    List<UUID> teamOne = new ArrayList<>();
+                    for (UUID teamOneMember : partyTeamOne) {
+                        if (Bukkit.getPlayer(teamOneMember) != null) {
+                            teamOne.add(teamOneMember);
+                        }
+                    }
+                    List<UUID> teamTwo = new ArrayList<>();
+                    for (UUID teamTwoMember : partyTeamTwo) {
+                        if (Bukkit.getPlayer(teamTwoMember) != null) {
+                            teamTwo.add(teamTwoMember);
+                        }
+                    }
+
+                    if (!ffa) {
+                        C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName,kitType);
                         teamOneSpawn = getHighestBlockBelow(199,teamOneSpawn).getLocation().add(0.5,1,0.5);
                         teamTwoSpawn = getHighestBlockBelow(199,teamTwoSpawn).getLocation().add(0.5,1,0.5);
                         for (UUID p : teamOne) {
@@ -362,7 +375,7 @@ public class DuelMethods {
                         }
 
                     } else {
-                        C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName);
+                        C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName,kitType);
                         Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
                         for (UUID p : players) {
                             Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,spawn).getLocation().add(0.5,1,0.5));
@@ -376,7 +389,7 @@ public class DuelMethods {
                                 p.setFlying(false);
                                 p.setAllowFlight(false);
                                 String rating = "Party";
-                                ScoreboardMethods.startDuelSidebar(p,playerList,rating,System.currentTimeMillis(),kitType);
+                                ScoreboardMethods.startDuelSidebar(p,playerList,rating,System.currentTimeMillis(),kitType,true,ffa);
                                 KitMethods.loadSelectedKitSlot(p,kitType);
                                 preDuelCountdown(p);
                                 p.setSaturation(5);

@@ -3,7 +3,6 @@ package kiul.kiulduelsv2.duel;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.CustomKitData;
-import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.gui.queue.QueueInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
@@ -25,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 import static kiul.kiulduelsv2.inventory.KitMethods.loadGlobalKit;
 

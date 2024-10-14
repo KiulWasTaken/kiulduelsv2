@@ -2,7 +2,7 @@ package kiul.kiulduelsv2.util;
 
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
-import kiul.kiulduelsv2.gui.ClickMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,8 +14,8 @@ public class LeakPatcher implements Listener {
     @EventHandler
     public void preventLeakOnQuit (PlayerQuitEvent e) {
         Player p = e.getPlayer();
-        if (ClickMethods.inEditor.containsKey(p)) {
-            ClickMethods.inEditor.remove(p);
+        if (KitEditor.inEditor.containsKey(p)) {
+            KitEditor.inEditor.remove(p);
         }
         if (DuelListeners.duelStatistics.containsKey(p.getUniqueId())) {
             DuelListeners.duelStatistics.remove(p.getUniqueId());

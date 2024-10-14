@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.duel;
 
+import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,9 +22,11 @@ public class Duel {
     private List<UUID> redTeam;
     private List<UUID> blueTeamMembers;
     private List<UUID> redTeamMembers;
+    private long startTime;
+    private String kitType;
 
     private List<UUID> spectators;
-    public Duel(List<UUID> redTeam, List<UUID> blueTeam, boolean rated,boolean ffa,String arena) {
+    public Duel(List<UUID> redTeam, List<UUID> blueTeam, boolean rated,boolean ffa,String arena, String kitType) {
         this.players = new ArrayList<>(redTeam);
         players.addAll(blueTeam);
         this.spectators = new ArrayList<>();
@@ -35,6 +38,8 @@ public class Duel {
         this.blueTeam = blueTeam;
         this.ffa = ffa;
         this.allContained = new ArrayList<>(players);
+        this.startTime = System.currentTimeMillis();
+        this.kitType = kitType;
 
 //        for (UUID redTeamUUIDs : redTeamMembers) {
 //            Bukkit.getPlayer(redTeamUUIDs).setDisplayName(ChatColor.RED+""+ChatColor.BOLD+"[RED] "+ChatColor.RESET+Bukkit.getPlayer(redTeamUUIDs).getName());
@@ -116,6 +121,10 @@ public class Duel {
         players.remove(playerUUID);
         spectators.add(playerUUID);
 
+        List<UUID> playersInDuel = getPlayers();
+        for (UUID alivePlayerUUIDs : playersInDuel) {
+            Bukkit.getPlayer(alivePlayerUUIDs).hidePlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), Bukkit.getPlayer(playerUUID));
+        }
 
         try {
             KitMethods.spectatorKit(Bukkit.getPlayer(playerUUID));
@@ -139,6 +148,8 @@ public class Duel {
         allContained.add(playerUUID);
     }
 
+
+
     public boolean isRated() {
         return rated;
     }
@@ -148,6 +159,14 @@ public class Duel {
 
     public boolean isFfa() {
         return ffa;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public String getKitType() {
+        return kitType;
     }
 
     public List<UUID> getAllContained() {

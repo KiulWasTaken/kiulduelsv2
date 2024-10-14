@@ -78,7 +78,7 @@ public class PartyQueueInventory implements Listener {
 
         p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.2F, 0.5F);
         int invSize = 27;
-        Inventory inventory = Bukkit.createInventory(p, invSize, "Select Gamemode | " + type.toUpperCase());
+        Inventory inventory = Bukkit.createInventory(p, invSize, "Party | " + type.toUpperCase());
         List<String> emptylore = new ArrayList<>();
         emptylore.add("");
 

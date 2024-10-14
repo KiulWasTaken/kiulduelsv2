@@ -5,7 +5,7 @@ import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.ParseMethods;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.config.Userdata;
-import kiul.kiulduelsv2.gui.ClickMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
@@ -23,7 +23,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -489,7 +488,7 @@ public class DuelListeners implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if(DuelMethods.preDuel.contains(e.getPlayer()) || ClickMethods.inEditor.containsKey(e.getPlayer())) {
+        if(DuelMethods.preDuel.contains(e.getPlayer()) || KitEditor.inEditor.containsKey(e.getPlayer())) {
             Location to = e.getFrom();
             to.setPitch(e.getTo().getPitch());
             to.setYaw(e.getTo().getYaw());
@@ -499,7 +498,7 @@ public class DuelListeners implements Listener {
 
     @EventHandler
     public void preventUseItemsInEditor(PlayerInteractEvent e) {
-        if(ClickMethods.inEditor.containsKey(e.getPlayer())) {
+        if(KitEditor.inEditor.containsKey(e.getPlayer())) {
             e.setCancelled(true);
         }
     }
@@ -624,10 +623,10 @@ public class DuelListeners implements Listener {
                         String prefix = "";
                         String suffix = "";
                         if (e.getEntity() instanceof AbstractArrow) {
-                            suffix = " from";
+                            suffix = " from ";
                         } else if (e.getEntity() instanceof ExplosiveMinecart) {
                             prefix = "a ";
-                            suffix = " shot by";
+                            suffix = " shot by ";
                         }
 
                         killer = prefix+entityName+suffix;
@@ -651,7 +650,7 @@ public class DuelListeners implements Listener {
                     }
 
 
-                    Component deathMessage = Component.empty().append(Component.text(p2.getName()+" "+outcome+" by " + killer + " " + p1.getName() + " ").append(finalItemComponent));
+                    Component deathMessage = Component.empty().append(Component.text(p2.getName()+" "+outcome+" by " + killer + p1.getName() + " ").append(finalItemComponent));
 
                     // send the compiled death message to all participants
                     for (UUID allContainedUUIDs : duel.getAllContained()) {

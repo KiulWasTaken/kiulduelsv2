@@ -1,6 +1,5 @@
 package kiul.kiulduelsv2.inventory;
 
-import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
@@ -14,14 +13,13 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static kiul.kiulduelsv2.gui.ClickMethods.inEditor;
+import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 
 public class InventoryListeners implements Listener {

@@ -14,8 +14,8 @@ public class DuelManager {
         this.duels = new ArrayList<>();
     }
 
-    public Duel createDuel(List<UUID> redTeam, List<UUID> blueTeam, boolean rated,boolean ffa,String arena) {
-        Duel duel = new Duel(redTeam,blueTeam,rated,ffa,arena);
+    public Duel createDuel(List<UUID> redTeam, List<UUID> blueTeam, boolean rated,boolean ffa,String arena,String kitType) {
+        Duel duel = new Duel(redTeam,blueTeam,rated,ffa,arena,kitType);
         duels.add(duel);
         return duel;
     }
