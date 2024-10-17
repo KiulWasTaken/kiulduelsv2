@@ -1,10 +1,7 @@
 package kiul.kiulduelsv2;
 
 import kiul.kiulduelsv2.arena.ArenaListeners;
-import kiul.kiulduelsv2.config.Arenadata;
-import kiul.kiulduelsv2.config.ConfigListeners;
-import kiul.kiulduelsv2.config.CustomKitData;
-import kiul.kiulduelsv2.config.Userdata;
+import kiul.kiulduelsv2.config.*;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.Recap;
@@ -14,6 +11,7 @@ import kiul.kiulduelsv2.gui.layout.KitInventory;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.layout.LayoutMenuInventory;
 import kiul.kiulduelsv2.gui.queue.PartyQueueInventory;
+import kiul.kiulduelsv2.gui.settings.SettingsInventory;
 import kiul.kiulduelsv2.inventory.GlobalKits;
 import kiul.kiulduelsv2.inventory.InteractListeners;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
@@ -35,16 +33,23 @@ public final class Kiulduelsv2 extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+
+
+        // Config
         Userdata.setup();
         Arenadata.setup();
         CustomKitData.setup();
+        UserPreferences.setup();
+
+        // Plugin Methods
         GlobalKits.instantiate();
+
+        // Listeners
         getServer().getPluginManager().registerEvents(new LeakPatcher(), this);
         getServer().getPluginManager().registerEvents(new ConfigListeners(), this);
         getServer().getPluginManager().registerEvents(new InventoryListeners(),this);
         getServer().getPluginManager().registerEvents(new ItemInventory(),this);
         getServer().getPluginManager().registerEvents(new ItemEditInventory(),this);
-
         getServer().getPluginManager().registerEvents(new Queue(),this);
         getServer().getPluginManager().registerEvents(new KitInventory(),this);
         getServer().getPluginManager().registerEvents(new InteractListeners(),this);
@@ -54,6 +59,9 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ScoreboardListeners(),this);
         getServer().getPluginManager().registerEvents(new LayoutMenuInventory(),this);
         getServer().getPluginManager().registerEvents(new Recap(),this);
+        getServer().getPluginManager().registerEvents(new SettingsInventory(),this);
+
+        // Commands
         getCommand("kit").setExecutor(new Commands());
         getCommand("test").setExecutor(new Commands());
         getCommand("arena").setExecutor(new Commands());
@@ -72,6 +80,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getCommand("arena").setTabCompleter(new TabCompleter());
         getCommand("party").setTabCompleter(new TabCompleter());
         getCommand("duel").setTabCompleter(new TabCompleter());
+
         if (Bukkit.getOnlinePlayers() != null) {
 
             List<String> types = new ArrayList<>();

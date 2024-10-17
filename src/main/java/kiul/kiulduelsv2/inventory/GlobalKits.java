@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.inventory;
 
+import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
@@ -19,47 +20,62 @@ public class GlobalKits {
     public static void instantiate () {
         ArrayList<String> lore = new ArrayList<>();
         Inventory lobbyKit = Bukkit.createInventory(null,36,"lobby");
-        lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
+        lore.add(ChatColor.GRAY + "Right-click to select & edit your kits");
         lobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "KIT EDITOR", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
         lore.clear();
-        lore.add(ChatColor.GRAY + "Right click to Queue");
+        lore.add(ChatColor.GRAY + "Right-click to queue");
         lobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.YELLOW + "" + ChatColor.BOLD + "QUEUE", Material.GOLDEN_CARROT,1,lore,null,null,"queue"));
         lore.clear();
-        lore.add(ChatColor.GRAY + "Right click to open Settings");
-        lobbyKit.setItem(5, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "SETTINGS", Material.PAPER,1,lore,null,null,"settings"));
+        lore.add(ChatColor.GRAY + "Right-click to open settings");
+        lobbyKit.setItem(5, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "SETTINGS", Material.REPEATER,1,lore,null,null,"settings"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-click to create a party");
+        lobbyKit.setItem(0, ItemStackMethods.createItemStack(C.t(C.PINK+"CREATE PARTY") , Material.FIREWORK_ROCKET,1,lore,null,null,"party"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-click to open the shop");
+        lobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
         lore.clear();
         CustomKitData.get().set("global.lobby.inventory", InventoryToBase64.itemStackArrayToBase64(lobbyKit.getContents()));
 
         Inventory queueKit = Bukkit.createInventory(null,36,"queue");
-        lore.add(ChatColor.GRAY + "Right click to Leave Queue");
+        lore.add(ChatColor.GRAY + "Right-click to Leave Queue");
         queueKit.setItem(8,ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "LEAVE QUEUE",Material.RED_DYE,1,lore,null,null,"leavequeue"));
         lore.clear();
         CustomKitData.get().set("global.queue.inventory", InventoryToBase64.itemStackArrayToBase64(queueKit.getContents()));
 
         Inventory partyMemberLobbyKit = Bukkit.createInventory(null,36,"lobbyPM");
-        lore.add(ChatColor.GRAY + "Right click to Leave Party");
-        partyMemberLobbyKit.setItem(5,ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "LEAVE PARTY",Material.RED_DYE,1,lore,null,null,"leaveparty"));
+        lore.add(ChatColor.GRAY + "Right-click to leave party");
+        partyMemberLobbyKit.setItem(0,ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "LEAVE PARTY",Material.RED_DYE,1,lore,null,null,"leaveparty"));
         lore.clear();
-        lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
+        lore.add(ChatColor.GRAY + "Right-click to view party member info");
+        partyMemberLobbyKit.setItem(4, ItemStackMethods.createItemStack(C.t(C.PINK+"PARTY INFO"), Material.GLOBE_BANNER_PATTERN,1,lore,null,null,"partyinfo"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-click to select & edit your kits");
         partyMemberLobbyKit.setItem(4, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "KIT EDITOR", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
         lore.clear();
-        lore.add(ChatColor.GRAY + "Right click to open Settings");
+        lore.add(ChatColor.GRAY + "Right-click to open settings");
         partyMemberLobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "SETTINGS", Material.PAPER,1,lore,null,null,"partysettings"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-click to open the shop");
+        lobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
         lore.clear();
         CustomKitData.get().set("global.partymember.inventory", InventoryToBase64.itemStackArrayToBase64(partyMemberLobbyKit.getContents()));
 
         Inventory partyLeaderLobbyKit = Bukkit.createInventory(null,36,"lobbyPL");
         lore.add(ChatColor.GRAY + "Right-Click to queue for party-based gamemodes");
-        partyLeaderLobbyKit.setItem(5, ItemStackMethods.createItemStack( ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "PARTY FIGHT", Material.PINK_SHULKER_BOX,1,lore,null,null,"partyqueue"));
+        partyLeaderLobbyKit.setItem(0, ItemStackMethods.createItemStack( ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "PARTY FIGHT", Material.PINK_SHULKER_BOX,1,lore,null,null,"partyqueue"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right-Click to open Settings");
-        partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "DISBAND PARTY", Material.RED_DYE,1,lore,null,null,"partydisband"));
+        partyLeaderLobbyKit.setItem(5, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "DISBAND PARTY", Material.RED_DYE,1,lore,null,null,"partydisband"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right click to Queue");
         partyLeaderLobbyKit.setItem(4, ItemStackMethods.createItemStack( ChatColor.YELLOW + "" + ChatColor.BOLD + "QUEUE", Material.GOLDEN_CARROT,1,lore,null,null,"queue"));
         lore.clear();
         lore.add(ChatColor.GRAY + "Right click to open the Kit Menu");
         partyLeaderLobbyKit.setItem(3, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "KIT EDITOR", Material.ENCHANTED_BOOK,1,lore,null,null,"kiteditor"));
+        lore.clear();
+        lore.add(ChatColor.GRAY + "Right-click to open the shop");
+        lobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
         lore.clear();
         CustomKitData.get().set("global.partyleader.inventory", InventoryToBase64.itemStackArrayToBase64(partyLeaderLobbyKit.getContents()));
 

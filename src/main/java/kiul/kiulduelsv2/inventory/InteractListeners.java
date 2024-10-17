@@ -6,6 +6,7 @@ import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.layout.KitInventory;
 import kiul.kiulduelsv2.gui.queue.PartyQueueInventory;
+import kiul.kiulduelsv2.gui.settings.SettingsInventory;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.*;
@@ -95,6 +96,19 @@ public class InteractListeners implements Listener {
                                 break;
                             case "partydisband":
                                 p.performCommand("party disband");
+                                break;
+                            case "party":
+                                partyManager.createParty(p.getUniqueId());
+                                Party.sendPartyMessage("&7New party has been created",p);
+                                break;
+                            case "shop":
+                                p.performCommand("shop");
+                                break;
+                            case "partyinfo":
+                                // print party member info (nicely)
+                                break;
+                            case "settings":
+                                SettingsInventory.settings(p,0,Material.WHITE_STAINED_GLASS_PANE);
                                 break;
                             case "leaveparty":
                                 p.performCommand("party leave");

@@ -1,9 +1,12 @@
 package kiul.kiulduelsv2.inventory;
 
+import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
+import kiul.kiulduelsv2.gui.settings.SettingsEnum;
+import kiul.kiulduelsv2.gui.settings.SettingsInventory;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,7 +52,7 @@ public class InventoryListeners implements Listener {
         @EventHandler
         public void setSlotonPlayerJoin (PlayerJoinEvent e){
         e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
-        e.getPlayer().setGameMode(GameMode.SURVIVAL);
+        e.getPlayer().setGameMode(GameMode.ADVENTURE);
 
         if (Userdata.get().get(e.getPlayer().getUniqueId()+".stats.wins") == null) {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.wins", 0);
@@ -59,8 +62,15 @@ public class InventoryListeners implements Listener {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.kills", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.deaths", 0);
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.damagedelta", new ArrayList<Integer>());
-
         }
+
+        for (SettingsEnum settingsEnum : SettingsEnum.values()) {
+            if (UserPreferences.get().get(e.getPlayer().getUniqueId() + "." + settingsEnum.getLocalName()) == null) {
+                UserPreferences.get().set(e.getPlayer().getUniqueId() + "." + settingsEnum.getLocalName(),true);
+            }
+        }
+        UserPreferences.save();
+
         e.getPlayer().setDisplayName(null);
             List<String> types = new ArrayList<>();
             for (String key : Queue.queue.keySet()) {

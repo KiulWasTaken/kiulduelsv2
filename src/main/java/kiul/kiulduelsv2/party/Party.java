@@ -19,6 +19,7 @@ public class Party {
         recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#c73e8b:#6d2b94><strikethrough>                                                                "));
     }
     private UUID leader;
+    private List<UUID> promoted;
     private List<UUID> members;
     private List<UUID> teamOne;
     private List<UUID> teamTwo;
@@ -27,6 +28,7 @@ public class Party {
 
     public Party(UUID leader) {
         this.leader = leader;
+        this.promoted = new ArrayList<>();
         this.members = new ArrayList<>();
         this.teamOne = new ArrayList<>();
         this.teamTwo = new ArrayList<>();
@@ -64,6 +66,10 @@ public class Party {
             }
         }
         return teamTwoPlayers;
+    }
+
+    public List<UUID> getPromoted() {
+        return promoted;
     }
 
     public List<UUID> teamOne() {
@@ -121,6 +127,11 @@ public class Party {
         }
         return teamOnePlayers();
     }
+
+    public void promote(UUID playerUUID) {promoted.add(playerUUID);}
+    public void demote(UUID playerUUID) {promoted.remove(playerUUID);}
+
+    public boolean isPromoted(UUID playerUUID) {return promoted.contains(playerUUID);}
 
     public boolean isMember(UUID playerName) {
         return members.contains(playerName) || leader.equals(playerName);

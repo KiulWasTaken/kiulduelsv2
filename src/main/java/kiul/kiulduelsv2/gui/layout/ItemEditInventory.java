@@ -401,9 +401,8 @@ public class ItemEditInventory implements Listener {
 
         int[] slots = {11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42};
         for (int slot : slots) {
-            if (slot < invSize-9) {
-                inventory.setItem(slot, ItemStackMethods.createItemStack(ChatColor.GRAY + "?", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
-            }
+            if (slot > invSize-9) {break;}
+            inventory.setItem(slot, ItemStackMethods.createItemStack(ChatColor.GRAY + "?", Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
         }
 
         for (int i = 0; i <= invSize/9; i++) {

@@ -305,8 +305,9 @@ public class Commands implements CommandExecutor {
                 } else {
                     switch (args[0]) {
                         case "invite":
-                            if (partyManager.findPartyForMember(uuid) != null) {
-                                if (partyManager.findPartyForMember(uuid).isLeader(uuid)) {
+
+                            if (party != null) {
+                                if (party.isLeader(uuid) || party.isPromoted(uuid)) {
                                     if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p && !partyManager.findPartyForMember(uuid).getMembers().contains(Bukkit.getPlayer(args[1]))) {
                                         Player invited = Bukkit.getPlayer(args[1]);
                                         if (Party.invitedPlayer.get(Bukkit.getPlayer(args[1]).getUniqueId()) != uuid) {
@@ -457,6 +458,20 @@ public class Commands implements CommandExecutor {
                                 }
                             } else {
                                 p.sendMessage(C.failPrefix + "Leave your current party before attempting to join another");
+                            }
+                            break;
+                        case "promote":
+                            if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
+                                if (party != null && party.isLeader(uuid) && party.isMember(Bukkit.getPlayer(args[1]).getUniqueId())) {
+                                    party.promote(Bukkit.getPlayer(args[1]).getUniqueId());
+                                }
+                            }
+                            break;
+                        case "demote":
+                            if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
+                                if (party != null && party.isLeader(uuid) && party.isMember(Bukkit.getPlayer(args[1]).getUniqueId()) && party.isPromoted(uuid)) {
+                                    party.demote(Bukkit.getPlayer(args[1]).getUniqueId());
+                                }
                             }
                             break;
                         case "reject":
