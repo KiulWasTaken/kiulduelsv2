@@ -47,7 +47,7 @@ public class QueueInventory {
 
                     if (partyExists) {
 
-                        if (partySize > 2) {
+                        if (partySize != 2) {
                             lore.add(C.t("&7⏵ SOLO"));
                             lore.add(C.t("&7⏵ DUO (PARTY)"));
                             lore.add(C.t("&4❌ &cparty is too large"));

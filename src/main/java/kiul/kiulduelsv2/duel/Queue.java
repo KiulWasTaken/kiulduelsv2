@@ -82,10 +82,18 @@ public class Queue implements Listener {
                                 if (Bukkit.getPlayer(partyMember) != null) {
                                     Player pm = Bukkit.getPlayer(partyMember);
                                     if (inEditor.containsKey(pm)) {
-                                        p.sendMessage(C.t("&c&oCannot enter queue whilst party member is editing their kit!"));
+                                        p.sendMessage(C.failPrefix +"You cannot enter queue whilst party member is editing their kit");
+                                        return;
+                                    }
+                                    if (CustomKitData.get().get(partyMember + "." + kitType + ".kit-slot-" + kitSlot.get(pm).get(kitType)) == null) {
+                                        p.sendMessage(C.failPrefix +"You cannot enter queue whilst a party member (" + pm.getName() + ") has an empty kit slot selected");
                                         return;
                                     }
                                 }
+                            }
+                            if (party.getMembersInclusive().size() != 2) {
+                                p.sendMessage(C.failPrefix +"You cannot play this mode whilst in a party with a size of " + party.getMembersInclusive().size() +  ". Leave your party or invite more members to meet the requirement of 2.");
+                                return;
                             }
                             for (UUID partyMember : party.getMembers()) {
                                 if (Bukkit.getPlayer(partyMember) != null) {
@@ -139,6 +147,10 @@ public class Queue implements Listener {
         if (e.getItem() == null) {return;}
         if (e.getItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING)) {
             if (e.getItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING).equalsIgnoreCase("queue")) {
+                if (C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()) != null && !C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()).getMembers().isEmpty()) {
+                    p.sendMessage(C.failPrefix + "you cannot queue for party (2v2) matches with only one player in your party.");
+                    return;
+                }
                 QueueInventory.queueInventory(p);
             }
         }

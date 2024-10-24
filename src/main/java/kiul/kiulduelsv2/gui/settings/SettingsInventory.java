@@ -45,6 +45,9 @@ public class SettingsInventory implements Listener {
 
         for (int i = (20 * page); i < (20 * page)+20; i++) {
             SettingsEnum[] settingsEnumValues = SettingsEnum.values();
+            if (i >= settingsEnumValues.length) {
+                break;
+            }
             SettingsEnum item = settingsEnumValues[i];
             int slot = slots[i];
 
@@ -55,10 +58,11 @@ public class SettingsInventory implements Listener {
 
             String enabled;
             if (UserPreferences.get().getBoolean(p.getUniqueId() + "." + item.getLocalName())) {
-                enabled = "tick";
+                enabled = C.t("&#218a3c✔ &#27a33aENABLED");
             } else {
-                enabled = "cross";
+                enabled = C.t("&#a11813❌ &#e33630DISABLED");
             }
+            lore.add("");
             lore.add(enabled);
 
             String itemName = ItemStackMethods.translateHexColorCodes("&#", "", item.getDisplayName());

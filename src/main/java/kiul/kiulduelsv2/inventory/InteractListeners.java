@@ -98,7 +98,9 @@ public class InteractListeners implements Listener {
                                 p.performCommand("party disband");
                                 break;
                             case "party":
+                                e.setCancelled(true);
                                 partyManager.createParty(p.getUniqueId());
+                                try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
                                 Party.sendPartyMessage("&7New party has been created",p);
                                 break;
                             case "shop":
@@ -108,6 +110,7 @@ public class InteractListeners implements Listener {
                                 // print party member info (nicely)
                                 break;
                             case "settings":
+                                e.setCancelled(true);
                                 SettingsInventory.settings(p,0,Material.WHITE_STAINED_GLASS_PANE);
                                 break;
                             case "leaveparty":

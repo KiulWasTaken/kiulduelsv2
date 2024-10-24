@@ -3,6 +3,7 @@ package kiul.kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
+import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
@@ -305,7 +306,10 @@ public class Commands implements CommandExecutor {
                 } else {
                     switch (args[0]) {
                         case "invite":
-
+                            if (Bukkit.getPlayer(args[1]) != null && !UserPreferences.get().getBoolean(Bukkit.getPlayer(args[1]).getUniqueId()+"."+"party-invites")) {
+                                p.sendMessage(C.failPrefix + Bukkit.getPlayer(args[1]).getName() + " is not accepting party invites right now");
+                                break;
+                            }
                             if (party != null) {
                                 if (party.isLeader(uuid) || party.isPromoted(uuid)) {
                                     if (Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p && !partyManager.findPartyForMember(uuid).getMembers().contains(Bukkit.getPlayer(args[1]))) {

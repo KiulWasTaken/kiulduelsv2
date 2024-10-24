@@ -1,5 +1,6 @@
 package kiul.kiulduelsv2.gui.settings;
 
+import kiul.kiulduelsv2.C;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
@@ -8,10 +9,10 @@ public enum SettingsEnum {
      * Queue
      */
 
-    DUEL_REQUESTS("&aDuel Requests", Material.REDSTONE, new String[]{
+    DUEL_REQUESTS(C.t(C.GOLD+"Duel Requests"), Material.GOLD_INGOT, new String[]{
             ChatColor.GRAY+"Click to toggle whether other players can",
             ChatColor.GRAY+"send you duel requests"},1,"duel-requests"),
-    PARTY_INVITES("&dParty Invites", Material.REDSTONE, new String[]{
+    PARTY_INVITES(C.t(C.RED+"Party Invites"), Material.FIREWORK_ROCKET, new String[]{
             ChatColor.GRAY+"Click to toggle whether other players can",
             ChatColor.GRAY+"send you party invites"},2,"party-invites");
 

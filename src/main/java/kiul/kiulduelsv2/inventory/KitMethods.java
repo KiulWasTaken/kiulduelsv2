@@ -51,6 +51,18 @@ public class KitMethods {
                 p.getInventory().setItem(0, ItemStackMethods.createItemStack(ChatColor.BLUE + "" + ChatColor.BOLD + "BLUE", Material.BLUE_WOOL, 1, lore, null, null, "partyteam"));
                 lore.clear();
             }
+            if (party.isLeader(p.getUniqueId()) && party.getMembersInclusive().size() > 2) {
+                lore.add(ChatColor.GRAY + "Right-Click to queue for party-based gamemodes");
+                p.getInventory().setItem(4, ItemStackMethods.createItemStack( ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "PARTY FIGHT", Material.PINK_SHULKER_BOX,1,lore,null,null,"partyqueue"));
+                lore.clear();
+                lore.add(ChatColor.GRAY + "Right-click to open the shop");
+                p.getInventory().setItem(1, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
+                lore.clear();
+            } else {
+                lore.add(ChatColor.GRAY + "Right-click to open the shop");
+                p.getInventory().setItem(4, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
+                lore.clear();
+            }
         }
     }
 

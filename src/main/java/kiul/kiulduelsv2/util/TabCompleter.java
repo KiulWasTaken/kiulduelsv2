@@ -61,9 +61,12 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
 
             oneArgList.add("invite");
             oneArgList.add("accept");
+            oneArgList.add("promote");
             oneArgList.add("kick");
             oneArgList.add("disband");
             oneArgList.add("leave");
+            oneArgList.add("demote");
+
 
             if (args.length == 1){
                 StringUtil.copyPartialMatches(args[0], oneArgList, completions);

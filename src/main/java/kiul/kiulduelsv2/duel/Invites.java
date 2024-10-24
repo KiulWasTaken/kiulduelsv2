@@ -2,6 +2,7 @@ package kiul.kiulduelsv2.duel;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
+import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.gui.layout.KitEnum;
 import kiul.kiulduelsv2.gui.layout.KitInventory;
 import kiul.kiulduelsv2.party.Party;
@@ -22,18 +23,20 @@ public class Invites {
     public static HashMap<Player,HashMap<Player,String>> duelInviteMap = new HashMap<>();
 
     public static void sendDuelMessage (Player recipient, String message, Component clickComponent) {
-
-
-
-        recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#ebbc3d:#b59a4e><strikethrough>                                                                "));
-        recipient.sendMessage(C.t("&7&o"+message));
-        if (clickComponent != null) {
-        recipient.sendMessage(clickComponent);
-        }
-        recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#ebbc3d:#b59a4e><strikethrough>                                                                "));
+            recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#ebbc3d:#b59a4e><strikethrough>                                                                "));
+            recipient.sendMessage(C.t("&7&o" + message));
+            if (clickComponent != null) {
+                recipient.sendMessage(clickComponent);
+            }
+            recipient.sendMessage(MiniMessage.miniMessage().deserialize("<gradient:#ebbc3d:#b59a4e><strikethrough>                                                                "));
     }
 
     public static void duelInviteSend (Player sentFrom, Player sentTo, boolean isPartyFight, boolean statsEnabled, String type) {
+        if (!UserPreferences.get().getBoolean(sentTo.getUniqueId()+"."+"duel-requests")) {
+            sentFrom.sendMessage(C.failPrefix + sentTo.getName() + " is not accepting duel requests right now");
+            return;
+        }
+
         String stats = statsEnabled ? C.t(C.GREEN+"&lENABLED") :  C.t(C.RED+"&lDISABLED");
         String mode = C.t("&f&lNULL");
 
