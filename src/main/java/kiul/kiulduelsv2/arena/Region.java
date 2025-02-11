@@ -28,4 +28,12 @@ public class Region
         return location.toVector().isInAABB(minimum, maximum);
 
     }
+
+    public Vector getMaximum() {
+        return maximum;
+    }
+
+    public Vector getMinimum() {
+        return minimum;
+    }
 }

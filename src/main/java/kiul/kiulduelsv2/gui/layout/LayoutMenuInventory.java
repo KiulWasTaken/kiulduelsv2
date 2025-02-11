@@ -64,6 +64,7 @@ public class LayoutMenuInventory implements Listener {
                     case "save":
                         if (e.getClick() == ClickType.LEFT) {
                             if (KitEditor.inEditor.containsKey(p)) {
+                                p.playSound(p,Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER,0.5f,1.2f);
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Saving kit..");
                                 long timeMillis = System.currentTimeMillis();
@@ -86,8 +87,10 @@ public class LayoutMenuInventory implements Listener {
                             }
                         }
                         if (e.getClick() == ClickType.RIGHT) {
+                            String type;
                             if (KitEditor.inEditor.containsKey(p)) {
-                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
+                                p.playSound(p,Sound.ENTITY_VILLAGER_WORK_LIBRARIAN,0.5f,1.2f);
+                                type = inEditor.get(p);
                                 KitEditor.inEditor.remove(p);
                                 ItemEditInventory.currentItem.remove(p);
                                 p.getActivePotionEffects().clear();
@@ -102,6 +105,8 @@ public class LayoutMenuInventory implements Listener {
                                 } catch (IOException err) {
                                     err.printStackTrace();
                                 }
+                                KitInventory.selectSlotToEdit(p,type);
+                                break;
                             }
                         }
                         p.closeInventory();
@@ -110,15 +115,19 @@ public class LayoutMenuInventory implements Listener {
                         if (ItemEditInventory.isArmor(p.getInventory().getItemInMainHand())) {
                             currentItem.put(p, p.getInventory().getItemInMainHand());
                             trim(p, 1, Material.LIME_STAINED_GLASS_PANE);
+                            p.playSound(p,Sound.BLOCK_SMITHING_TABLE_USE,0.5f,1.2f);
                         } else {
                             p.sendMessage(C.failPrefix +"You cannot trim an item that is not armour!");
                         }
                         break;
                     case "item":
+                        p.playSound(p,Sound.BLOCK_CHEST_OPEN,0.5f,1.2f);
                         ItemInventory.itemInventory(p);
                         break;
                     case "rename":
+
                         if (p.getInventory().getItemInMainHand().getType() != Material.AIR) {
+                            p.playSound(p,Sound.BLOCK_ANVIL_PLACE,0.5f,1.2f);
                             takeTextFromNextChat.add(p);
                             p.closeInventory();
                             p.sendMessage(ChatColor.GRAY + "Send the name of your item as a chat message.");
@@ -127,10 +136,11 @@ public class LayoutMenuInventory implements Listener {
                         }
                         break;
                     case "enchant":
+
                         if (p.getInventory().getItemInMainHand().getType() != Material.AIR) {
 
-
-                        ItemEditInventory.open(p,p.getInventory().getItemInMainHand());
+                            p.playSound(p,Sound.BLOCK_ENDER_CHEST_OPEN,0.5f,1.2f);
+                            ItemEditInventory.open(p,p.getInventory().getItemInMainHand());
                         } else {
                             p.sendMessage(C.failPrefix +"You cannot do this without an item in your hand!");
                         }

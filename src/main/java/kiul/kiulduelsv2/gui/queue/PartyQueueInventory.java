@@ -109,7 +109,7 @@ public class PartyQueueInventory implements Listener {
     @EventHandler
     public void onGUIClick (InventoryClickEvent e) {
         Player p = (Player)e.getView().getPlayer();
-        if (e.getView().getTitle().contains("Party Games") || e.getView().getTitle().contains("Select Gamemode")) {
+        if (e.getView().getTitle().contains("Party")) {
             e.setCancelled(true);
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                 String localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);

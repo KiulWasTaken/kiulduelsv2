@@ -284,7 +284,8 @@ public class ItemEditInventory implements Listener {
                 }
                 if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"))) {
                     if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.TRIM_ITEM.getLocalName())) {
-                        trim(p, 1,Material.LIME_STAINED_GLASS_PANE);
+                        trim(p, 1,Material.WHITE_STAINED_GLASS_PANE);
+                        p.playSound(p,Sound.BLOCK_SMITHING_TABLE_USE,0.5f,1.2f);
                         return;
                     }
                     if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals("save_item")) {
@@ -302,6 +303,7 @@ public class ItemEditInventory implements Listener {
                     if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING).equals(HeadEnum.RENAME_ITEM.getLocalName())) {
                         p.closeInventory();
                         takeTextFromNextChat.add(p);
+                        p.playSound(p,Sound.BLOCK_ANVIL_PLACE,0.4f,1.2f);
                         p.sendMessage(ChatColor.GRAY+"Send the name of your item as a chat message.");
                         return;
                     }
@@ -341,7 +343,7 @@ public class ItemEditInventory implements Listener {
                                 }
                                 currentItem.get(p).addEnchantment(entry.getKey(), entry.getValue());
                                 e.getInventory().setItem(e.getInventory().getSize()-1,currentItem.get(p));
-                                p.playSound(p, Sound.BLOCK_ENCHANTMENT_TABLE_USE,0.3f,1.2f);
+                                p.playSound(p, Sound.BLOCK_ENCHANTMENT_TABLE_USE,0.5f,0.9f);
                             } else {
                                 p.sendMessage(C.t("&7[&4⏩&7] &cYou cannot add this enchant to this item"));
                             }
@@ -522,14 +524,14 @@ public class ItemEditInventory implements Listener {
                 ItemStack clickedItem = e.getCurrentItem();
                 if (clickedItem.getType().name().contains("TRIM")) {
                     currentPattern.put(p,getTrimPatternFromItemStack(clickedItem));
-                    p.playSound(p,Sound.ITEM_ARMOR_EQUIP_CHAIN,1,1);
+                    p.playSound(p,Sound.BLOCK_SMITHING_TABLE_USE,0.5f,1.2f);
                     trim(p,0,Material.GREEN_STAINED_GLASS_PANE);
                 } else {
                     TrimMaterial trimMaterial = getTrimMaterialFromItemStack(e.getCurrentItem());
                     armorMeta.setTrim(new ArmorTrim(trimMaterial,currentPattern.get(p)));
                     currentPattern.remove(p);
                     armor.setItemMeta(armorMeta);
-                    p.playSound(p,Sound.ENTITY_VILLAGER_WORK_TOOLSMITH,1,1);
+                    p.playSound(p,Sound.ENTITY_VILLAGER_WORK_TOOLSMITH,0.5f,1.2f);
                     open(p,currentItem.get(p));
                 }
             }
@@ -554,6 +556,7 @@ public class ItemEditInventory implements Listener {
                 @Override
                 public void run() {
                     open(p,currentItem.get(p));
+                    p.playSound(p,Sound.BLOCK_ANVIL_USE,0.5f,1.2f);
                 }
             }.runTask(C.plugin);
         } else {

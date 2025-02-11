@@ -26,11 +26,12 @@ public class ScoreboardMethods {
 
 
     public static void startLobbyScoreboardTask(Player p) {
-        if (!UserPreferences.get().getBoolean(p.getUniqueId()+".scoreboard")) {return;}
         if (activeBoard.get(p) != null) {
             activeBoard.get(p).cancel();
             activeBoard.remove(p);
+            p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
+        if (!UserPreferences.get().getBoolean(p.getUniqueId()+".scoreboard")) {return;}
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {

@@ -550,7 +550,7 @@ public class DuelListeners implements Listener {
     /**
      * "announcePlayerDeathsAndResurrections"
      * checks for whenever a player is killed or resurrects using a totem and broadcasts it to all players in the duel.
-     * also broadcasts the killer/pop-er's weapon and method used if applicable.
+     * also broadcasts the killer/popper's weapon and method used if applicable.
      **/
     @EventHandler (priority = EventPriority.LOWEST)
     public void announcePlayerDeathsAndResurrections (EntityDamageByEntityEvent e) {
@@ -631,26 +631,36 @@ public class DuelListeners implements Listener {
 
                         killer = prefix+entityName+suffix;
                     }
-
+                    Component finalPrefixComponent = Component.empty();
                     Component finalItemComponent = Component.empty();
                     ItemStack item = p1.getInventory().getItemInMainHand();
                     if (item.hasItemMeta() && item.getType() != Material.AIR) {
                             ItemMeta itemMeta = item.getItemMeta();
                         String displayName = itemMeta.getDisplayName();
-                        if (displayName == null || displayName.length() == 0) {
+                        if (displayName.isEmpty()) {
                             if (item.getMaxStackSize() > 1) {
                                 displayName = item.getItemMeta().getItemName() + " x" + item.getAmount();
                             } else {
+
                                 displayName = item.getItemMeta().getItemName();
+                                if (item.getItemMeta().getItemName().isEmpty()) {
+                                    displayName = item.getType().name().toLowerCase();
+                                    displayName.replaceAll("\\_"," ");
+                                }
                             }
+                        }
+                        Component prefix = MiniMessage.miniMessage().deserialize("<#e33630>⚔ ");
+                        if (wasResurrected) {
+                             prefix = MiniMessage.miniMessage().deserialize("<#ebbc3d>⚔ ");
                         }
                         Component name = MiniMessage.miniMessage().deserialize(ParseMethods.parseLegacyHexToMiniMessage(displayName));
                         Component itemPreviewComponent = Component.empty().append(Component.text("using ")).append(Component.text("[").color(NamedTextColor.AQUA).append(name).append(Component.text("]").color(NamedTextColor.AQUA)));
                         finalItemComponent = Component.empty().append(itemPreviewComponent).hoverEvent(item.asHoverEvent(UnaryOperator.identity()));
+                        finalPrefixComponent = prefix;
                     }
 
 
-                    Component deathMessage = Component.empty().append(Component.text(p2.getName()+" "+outcome+" by " + killer + p1.getName() + " ").append(finalItemComponent));
+                    Component deathMessage = Component.empty().append(finalPrefixComponent).append(Component.text(p2.getName()+" "+outcome+" by " + killer + p1.getName() + " ").append(finalItemComponent));
 
                     // send the compiled death message to all participants
                     for (UUID allContainedUUIDs : duel.getAllContained()) {
@@ -680,7 +690,7 @@ public class DuelListeners implements Listener {
                     if (event.getEntity() instanceof EnderPearl) {
                         event.setCancelled(true);
                         EnderPearl enderPearl = (EnderPearl) event.getEntity();
-                        enderPearl.teleport(DuelMethods.getHighestBlockBelow(199, enderPearl.getLocation()).getLocation().add(0, 1, 0));
+                        enderPearl.teleport(DuelMethods.getHighestBlockBelow(198,enderPearl.getLocation()).getLocation().add(0, 1, 0));
                         enderPearl.setVelocity(new Vector(0, -20, 0));
                         return;
                     }

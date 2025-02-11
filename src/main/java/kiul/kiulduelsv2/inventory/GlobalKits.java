@@ -165,7 +165,7 @@ public class GlobalKits {
 
             Inventory partyLeaderLobbyKit = Bukkit.createInventory(null, 36, "lobbyPL");
             lore.add(ChatColor.GRAY + "Right-Click to queue for party-based gamemodes");
-            partyLeaderLobbyKit.setItem(4, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "PARTY FIGHT", Material.PINK_SHULKER_BOX, 1, lore, null, null, "partyqueue"));
+            partyLeaderLobbyKit.setItem(2, ItemStackMethods.createItemStack(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "PARTY FIGHT", Material.PINK_SHULKER_BOX, 1, lore, null, null, "partyqueue"));
             lore.clear();
             lore.add(ChatColor.GRAY + "Right-Click to disband the party");
             partyLeaderLobbyKit.setItem(8, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "DISBAND PARTY", Material.RED_DYE, 1, lore, null, null, "partydisband"));

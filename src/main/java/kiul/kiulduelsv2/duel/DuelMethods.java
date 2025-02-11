@@ -100,10 +100,16 @@ public class DuelMethods {
             try {
                 KitMethods.loadSelectedKitSlot(p,kitType);
                 preDuelCountdown(p);
-                    p.setSaturation(5);
-                    p.setFoodLevel(20);
-                    p.setHealth(20);
-                    p.setGameMode(GameMode.SURVIVAL);
+                p.setInvulnerable(false);
+                p.setAllowFlight(false);
+                p.setGameMode(GameMode.SURVIVAL);
+                p.setLevel(0);
+                p.setFoodLevel(20);
+                p.setSaturation(5);
+                p.setHealth(20);
+                p.setArrowsInBody(0);
+                p.setCollidable(true);
+                p.setExpCooldown(0);
                     for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                         p.removePotionEffect(potionEffect.getType());
                     }
@@ -190,10 +196,16 @@ public class DuelMethods {
                 ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64(kitInventoryBase64);
                 p.getInventory().setContents(kitContents);
                 preDuelCountdown(p);
-                p.setSaturation(5);
-                p.setFoodLevel(20);
-                p.setHealth(20);
+                p.setInvulnerable(false);
+                p.setAllowFlight(false);
                 p.setGameMode(GameMode.SURVIVAL);
+                p.setLevel(0);
+                p.setFoodLevel(20);
+                p.setSaturation(5);
+                p.setHealth(20);
+                p.setArrowsInBody(0);
+                p.setCollidable(true);
+                p.setExpCooldown(0);
                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                     p.removePotionEffect(potionEffect.getType());
                 }
@@ -514,19 +526,27 @@ public class DuelMethods {
                         C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName,kitType);
                         teamOneSpawn = getHighestBlockBelow(199,teamOneSpawn).getLocation().add(0.5,1,0.5);
                         teamTwoSpawn = getHighestBlockBelow(199,teamTwoSpawn).getLocation().add(0.5,1,0.5);
+                        teleportPlayersAroundLocation(teamOneSpawn,teamOne,3);
+                        teleportPlayersAroundLocation(teamTwoSpawn,teamTwo,3);
                         for (UUID p : teamOne) {
-                            Bukkit.getPlayer(p).teleport(teamOneSpawn.setDirection(teamTwoSpawn.toVector().subtract(teamOneSpawn.toVector())));
+                            Player t1p = Bukkit.getPlayer(p);
+                            t1p.teleport(t1p.getLocation().setDirection(teamTwoSpawn.toVector().subtract(teamOneSpawn.toVector())));
                         }
                         for (UUID p : teamTwo) {
-                            Bukkit.getPlayer(p).teleport(teamTwoSpawn.setDirection(teamOneSpawn.toVector().subtract(teamTwoSpawn.toVector())));
+                            Player t2p = Bukkit.getPlayer(p);
+                            t2p.teleport(t2p.getLocation().setDirection(teamOneSpawn.toVector().subtract(teamTwoSpawn.toVector())));
 
                         }
 
                     } else {
                         C.duelManager.createDuel(teamOne,teamTwo,false,true,arenaName,kitType);
                         Location spawn = Arenadata.get().getLocation("arenas."+arenaName+".center");
-                        for (UUID p : players) {
-                            Bukkit.getPlayer(p).teleport(getHighestBlockBelow(199,spawn).getLocation().add(0.5,1,0.5));
+                        teleportPlayersAroundLocation(spawn,players,16);
+
+                        for (UUID uuid : players) {
+                            Player p = Bukkit.getPlayer(uuid);
+                            Location eyeAnchor = new Location(spawn.getWorld(),spawn.getX(),p.getEyeHeight(),spawn.getZ());
+                            p.teleport(p.getLocation().setDirection(eyeAnchor.toVector().subtract(p.getLocation().toVector())));
                         }
                     }
                     for (UUID uuid : players) {
@@ -540,10 +560,17 @@ public class DuelMethods {
                                 ScoreboardMethods.startDuelSidebar(p,playerList,rating,System.currentTimeMillis(),kitType,true,ffa);
                                 KitMethods.loadSelectedKitSlot(p,kitType);
                                 preDuelCountdown(p);
-                                p.setSaturation(5);
-                                p.setFoodLevel(20);
-                                p.setHealth(20);
+                                p.setInvulnerable(false);
+                                p.setAllowFlight(false);
                                 p.setGameMode(GameMode.SURVIVAL);
+                                p.setLevel(0);
+                                p.setFoodLevel(20);
+                                p.setSaturation(5);
+                                p.setHealth(20);
+                                p.setArrowsInBody(0);
+                                p.setCollidable(true);
+                                p.setExpCooldown(0);
+
                                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                                     p.removePotionEffect(potionEffect.getType());
                                 }
@@ -570,18 +597,42 @@ public class DuelMethods {
 
     }
 
+
+
     public static Block getHighestBlockBelow (int y, Location location) {
 
         for (int i = y; i > -63; i--) {
             Location newLoc = new Location(location.getWorld(), location.getX(), i, location.getZ());
-            if (newLoc.getBlock().getType().toString() != "AIR") {
+            if (newLoc.getBlock().getType().toString() != "AIR" && newLoc.getBlock().getType() != Material.SHORT_GRASS && newLoc.getBlock().getType() != Material.TALL_GRASS) {
             return newLoc.getBlock();
             }
         }
         return location.getBlock();
     }
 
+    public static void teleportPlayersAroundLocation(Location centerLocation, List<UUID> players, double radius) {
+        Random random = new Random();
 
+        // Loop through each player and teleport them to a random point on the circle
+        for (UUID uuid : players) {
+            Player player = Bukkit.getPlayer(uuid);
+            // Random angle between 0 and 360 degrees (in radians)
+            double angle = random.nextDouble() * Math.PI * 2;
+
+            // Calculate the new x and z coordinates using trigonometry
+            double xOffset = radius * Math.cos(angle);
+            double zOffset = radius * Math.sin(angle);
+
+            // Get the current y-coordinate of the center location (or use the player's y position)
+            double yOffset = centerLocation.getY();
+
+            // Create the new location based on the calculated x, y, and z offsets
+            Location newLocation = new Location(centerLocation.getWorld(), centerLocation.getX() + xOffset, yOffset, centerLocation.getZ() + zOffset);
+
+            // Teleport the player to the new location
+            player.teleport(getHighestBlockBelow(199,newLocation).getLocation().add(0.5,0,0.5));
+        }
+    }
 
 
     public static void updateElo(List<UUID> losingTeam, List<UUID> winningTeam) {

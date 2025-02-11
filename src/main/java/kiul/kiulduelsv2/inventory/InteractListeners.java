@@ -99,7 +99,7 @@ public class InteractListeners implements Listener {
                                 p.performCommand("party disband");
                                 break;
                             case "party":
-                                if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {
+                                if (C.PAT_MODE && !PattyEventV2.sittingOut.contains(p.getUniqueId())) {
                                     p.sendMessage(C.failPrefix+"you need to sit out of events before you can create a party");
                                     return;
                                 }

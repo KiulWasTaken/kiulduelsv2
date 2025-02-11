@@ -3,6 +3,7 @@ package kiul.kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelListeners;
@@ -61,10 +62,10 @@ public class Commands implements CommandExecutor {
                     case "loadglobal":
                         try {
                             ItemStack[] armourContents;
-                            ItemStack[] kitContents = InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".inventory")).getContents();
+                            ItemStack[] kitContents = InventoryToBase64.fromBase64(CustomKitData.get().getString("global." + args[1] + ".inventory")).getContents();
 
-                            if (Userdata.get().getString("kits.global." + args[1] + ".armour") != null) {
-                                armourContents = InventoryToBase64.fromBase64(Userdata.get().getString("kits.global." + args[1] + ".armour")).getContents();
+                            if (CustomKitData.get().getString("global." + args[1] + ".armour") != null) {
+                                armourContents = InventoryToBase64.fromBase64(CustomKitData.get().getString("global." + args[1] + ".armour")).getContents();
                                 p.getInventory().setArmorContents(armourContents);
                             }
                             p.getInventory().setContents(kitContents);
@@ -128,9 +129,10 @@ public class Commands implements CommandExecutor {
                         p.sendMessage("size: " + Arenadata.get().getInt("arenas." + args[1] + ".size"));
                         p.sendMessage("southeast corner: " + Arenadata.get().getLocation("arenas." + args[1] + ".southeast").toString());
                         p.sendMessage("northwest corner:" + Arenadata.get().getLocation("arenas." + args[1] + ".northwest").toString());
-
+                        p.sendMessage("vector maximum:" + ArenaMethods.getArenaRegion(args[1]).getMaximum().toLocation(p.getWorld()));
+                        p.sendMessage("vector minimum:" + ArenaMethods.getArenaRegion(args[1]).getMinimum().toLocation(p.getWorld()));
                         long finalTime2 = System.currentTimeMillis() - timeMillis2;
-                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "finished printing (" + finalTime2 + ")");
+                        p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "finished printing (" + finalTime2 + "ms)");
 
                         break;
                 }
@@ -220,7 +222,7 @@ public class Commands implements CommandExecutor {
                 break;
             case "cancel":
                 if (KitEditor.inEditor.containsKey(p)) {
-                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
+
                     KitEditor.inEditor.remove(p);
                     ItemEditInventory.currentItem.remove(p);
                     p.getActivePotionEffects().clear();
@@ -298,7 +300,7 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "party":
-                if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {
+                if (C.PAT_MODE && !PattyEventV2.sittingOut.contains(p.getUniqueId())) {
                     p.sendMessage(C.failPrefix+"you need to sit out of events before you can join a party");
                     return false;
                 }

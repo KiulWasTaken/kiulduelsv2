@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.pattychips.pattyeventv2.Methods.JoinSpectatorMethod;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +35,11 @@ public class UtilMethods {
         p.setSaturation(5);
         p.setGameMode(GameMode.ADVENTURE);
         p.clearActivePotionEffects();
+
         ScoreboardMethods.startLobbyScoreboardTask(p);
+        if (C.PAT_MODE) {
+            JoinSpectatorMethod.joinSpectators(p);
+        }
         try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}
     }
 

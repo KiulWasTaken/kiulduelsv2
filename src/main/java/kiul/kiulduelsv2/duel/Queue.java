@@ -150,7 +150,7 @@ public class Queue implements Listener {
             if (e.getItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING).equalsIgnoreCase("queue")) {
                 if (C.PAT_MODE) {
                     if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {
-                        p.sendMessage(C.failPrefix + "you need to sit out of events before you can join a party");
+                        p.sendMessage(C.failPrefix + "you need to sit out of events before you can queue for duels");
                         return;
                     }
                 }
