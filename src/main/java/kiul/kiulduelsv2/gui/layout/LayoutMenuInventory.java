@@ -76,7 +76,7 @@ public class LayoutMenuInventory implements Listener {
                                 }
 
                                 for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                                    onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);
+                                    p.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), onlinePlayers);
                                 }
                                 try {
                                     lobbyKit(p);
@@ -92,7 +92,7 @@ public class LayoutMenuInventory implements Listener {
                                 ItemEditInventory.currentItem.remove(p);
                                 p.getActivePotionEffects().clear();
                                 for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                                    onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);
+                                    p.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), onlinePlayers);
                                 }
                                 if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
                                     p.removePotionEffect(PotionEffectType.BLINDNESS);

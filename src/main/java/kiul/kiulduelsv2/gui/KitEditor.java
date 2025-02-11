@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -20,7 +21,7 @@ public class KitEditor {
 
     public static HashMap<Player,String> inEditor = new HashMap<>();
 
-    static Map<String,HashMap<Material,Integer>> limitedItems = new HashMap() {{
+    public static Map<String,HashMap<Material,Integer>> limitedItems = new HashMap() {{
        put("smp", new HashMap<Material,Integer>() {{
            put(Material.EXPERIENCE_BOTTLE,128);
            put(Material.ENCHANTED_GOLDEN_APPLE,3);
@@ -48,7 +49,7 @@ public class KitEditor {
             put(Material.MACE,0);
         }});
     }};
-    static Map<String,ArrayList<PotionType>> limitedEffects = new HashMap() {{
+    public static Map<String,ArrayList<PotionType>> limitedEffects = new HashMap() {{
         put("shield",new ArrayList<PotionType>() {{
             add(PotionType.SLOW_FALLING);
             add(PotionType.LONG_SLOW_FALLING);
@@ -103,8 +104,7 @@ public class KitEditor {
         LayoutMenuInventory.open(p);
     }
 
-    public static boolean itemAmountIsWithinLimit (Player p, ItemStack itemStack,String type) {
-        ItemStack[] items = p.getInventory().getContents();
+    public static boolean itemAmountIsWithinLimit (@Nullable Player p,ItemStack[] items, ItemStack itemStack, String type) {
         ItemStack[] invItems = items.clone();
         int totalItems = 0;
         for (ItemStack item : items) {
@@ -116,17 +116,17 @@ public class KitEditor {
             if (totalItems + itemStack.getAmount() > limitedItems.get(type).get(itemStack.getType())) {
                 if ((limitedItems.get(type).get(itemStack.getType()) - totalItems) > 1) {
                     itemStack.setAmount(limitedItems.get(type).get(itemStack.getType()) - totalItems);
-                    p.sendMessage(C.failPrefix + "Amount received adjusted to meet the limit");
+                    if (p != null) {p.sendMessage(C.failPrefix + "Amount received adjusted to meet the limit");}
                     return true;
                 }
-                p.sendMessage(C.failPrefix + "The limit for this item is " + ChatColor.YELLOW + ChatColor.ITALIC + limitedItems.get(type).get(itemStack.getType()));
+                    if (p != null) {p.sendMessage(C.failPrefix + "The limit for this item is " + ChatColor.YELLOW + ChatColor.ITALIC + limitedItems.get(type).get(itemStack.getType()));}
                 return false;
             }
         }
         if (itemStack.getType() == Material.POTION || itemStack.getType() == Material.SPLASH_POTION || itemStack.getType() == Material.TIPPED_ARROW) {
             PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
                 if (limitedEffects.get(type).contains(potionMeta.getBasePotionType())) {
-                    p.sendMessage(C.failPrefix + "This potion is disabled");
+                    if (p != null) {p.sendMessage(C.failPrefix + "This potion is disabled");}
                     return false;
                 }
         }

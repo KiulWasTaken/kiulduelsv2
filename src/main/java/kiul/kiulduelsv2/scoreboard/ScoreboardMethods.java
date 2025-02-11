@@ -87,7 +87,7 @@ public class ScoreboardMethods {
                     Score eleventh = objective.getScore("  " + C.t("&7Standard&8 » &f" + smpElo + smpPlacement));
                     Score twelfth = objective.getScore("  " + C.t("&7Attrition&8 » &f" + shieldElo + shieldPlacement));
                     Score thirteenth = objective.getScore("  " + C.t("&7Vanilla&8 » &f" + crystalElo + crystalPlacement));
-                    Score fourteenth = objective.getScore("  " + C.t("&7Cart&8 » &f" + cartElo + cartPlacement));
+                    //Score fourteenth = objective.getScore("  " + C.t("&7Cart&8 » &f" + cartElo + cartPlacement));
                     Score fifteenth = objective.getScore("  " + C.t(" "));
                     Score sixteenth = objective.getScore(C.t("&7kiul.net &8(" + p.getPing() + "ms)"));
 
@@ -105,7 +105,7 @@ public class ScoreboardMethods {
                     eleventh.setScore(6);
                     twelfth.setScore(5);
                     thirteenth.setScore(4);
-                    fourteenth.setScore(3);
+                    //fourteenth.setScore(3);
                     fifteenth.setScore(2);
                     sixteenth.setScore(1);
                     p.setScoreboard(scoreboard);

@@ -31,9 +31,9 @@ public class KitInventory implements Listener {
             inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null,null));
         }
 
-        inventory.setItem(0,C.createItemStack(KitEnum.SMP.getDisplayName(),KitEnum.SMP.getMaterial(),1,KitEnum.SMP.getLore(),null,null,KitEnum.SMP.getlocalName(),null));
-        inventory.setItem(1,C.createItemStack(KitEnum.SHIELD.getDisplayName(),KitEnum.SHIELD.getMaterial(),1,KitEnum.SHIELD.getLore(),null,null,KitEnum.SHIELD.getlocalName(),null));
-        inventory.setItem(2,C.createItemStack(KitEnum.CART.getDisplayName(),KitEnum.CART.getMaterial(),1,KitEnum.CART.getLore(),null,null,KitEnum.CART.getlocalName(),null));
+        inventory.setItem(1,C.createItemStack(KitEnum.SMP.getDisplayName(),KitEnum.SMP.getMaterial(),1,KitEnum.SMP.getLore(),null,null,KitEnum.SMP.getlocalName(),null));
+        inventory.setItem(2,C.createItemStack(KitEnum.SHIELD.getDisplayName(),KitEnum.SHIELD.getMaterial(),1,KitEnum.SHIELD.getLore(),null,null,KitEnum.SHIELD.getlocalName(),null));
+        //inventory.setItem(2,C.createItemStack(KitEnum.CART.getDisplayName(),KitEnum.CART.getMaterial(),1,KitEnum.CART.getLore(),null,null,KitEnum.CART.getlocalName(),null));
         inventory.setItem(3,C.createItemStack(KitEnum.CRYSTAL.getDisplayName(),KitEnum.CRYSTAL.getMaterial(),1,KitEnum.CRYSTAL.getLore(),null,null,KitEnum.CRYSTAL.getlocalName(),null));
         p.openInventory(inventory);
     }

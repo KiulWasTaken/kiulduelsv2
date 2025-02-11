@@ -166,7 +166,7 @@ public class ItemInventory implements Listener {
                                 itemMeta.setLore(null);
                                 itemStack.setAmount(e.getCurrentItem().getAmount());
                                 itemStack.setItemMeta(itemMeta);
-                                if (KitEditor.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                                if (KitEditor.itemAmountIsWithinLimit(p,p.getInventory().getContents(), itemStack, inEditor.get(p))) {
                                     p.getInventory().addItem(itemStack);
                                 }
                             } else {
@@ -318,7 +318,7 @@ public class ItemInventory implements Listener {
                                     itemMeta.setLore(null);
                                     itemStack.setAmount(e.getCurrentItem().getAmount());
                                     itemStack.setItemMeta(itemMeta);
-                                    if (KitEditor.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
+                                    if (KitEditor.itemAmountIsWithinLimit(p,p.getInventory().getContents(), itemStack, inEditor.get(p))) {
                                         p.getInventory().addItem(itemStack);
                                     }
                                     return;

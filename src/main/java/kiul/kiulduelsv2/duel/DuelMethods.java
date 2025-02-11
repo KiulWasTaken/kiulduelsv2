@@ -10,6 +10,8 @@ import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.party.Party;
+import kiul.kiulduelsv2.party.PartyManager;
 import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
 import net.kyori.adventure.title.TitlePart;
@@ -32,6 +34,8 @@ import org.pattychips.pattyeventv2.PattyEventV2;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.*;
+
+import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 
 
 public class DuelMethods {
@@ -112,6 +116,22 @@ public class DuelMethods {
     }
 
     public static void duelFromBase64 (String kitName, List<Player> players,String kitInventoryBase64) {
+        for (Player p : players) {
+            if (C.partyManager.findPartyForMember(p.getUniqueId()) != null) {
+                Party party = C.partyManager.findPartyForMember(p.getUniqueId());
+                for (UUID memberUUIDs : party.getMembersInclusive()) {
+                    if (Bukkit.getPlayer(memberUUIDs) != null) {
+                        if (inEditor.containsKey(Bukkit.getPlayer(memberUUIDs))) {
+                            for (Player recipients : players) {
+                                recipients.sendMessage(C.failPrefix+"game cannot start because a player is in the kit editor");
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         String arenaName = ArenaMethods.getSuitableArena();
         if (arenaName == null) {
             for (Player play : players) {
@@ -215,7 +235,21 @@ public class DuelMethods {
 
     public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled, boolean rated,String kitType) {
 
-
+        for (Player p : players) {
+            if (C.partyManager.findPartyForMember(p.getUniqueId()) != null) {
+                Party party = C.partyManager.findPartyForMember(p.getUniqueId());
+                for (UUID memberUUIDs : party.getMembersInclusive()) {
+                    if (Bukkit.getPlayer(memberUUIDs) != null) {
+                        if (inEditor.containsKey(Bukkit.getPlayer(memberUUIDs))) {
+                            for (Player recipients : players) {
+                             recipients.sendMessage(C.failPrefix+"game cannot start because a player is in the kit editor");
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+        }
 
         ArenaMethods.arenasInUse.add(arenaName);
         int size = players.size();
@@ -402,6 +436,24 @@ public class DuelMethods {
 
 
     public static void startPartyDuel (String arenaName,List<UUID> players,List<UUID> partyTeamOne,List<UUID> partyTeamTwo, boolean ffa,String kitType) {
+        for (UUID p : players) {
+            if (C.partyManager.findPartyForMember(p) != null) {
+                Party party = C.partyManager.findPartyForMember(p);
+                for (UUID memberUUIDs : party.getMembersInclusive()) {
+                    if (Bukkit.getPlayer(memberUUIDs) != null) {
+                        if (inEditor.containsKey(Bukkit.getPlayer(memberUUIDs))) {
+                            for (UUID recipients : players) {
+                                if (Bukkit.getPlayer(recipients) != null) {
+                                    Bukkit.getPlayer(recipients).sendMessage(C.failPrefix+"game cannot start because a player is in the kit editor");
+                                }
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         ArenaMethods.arenasInUse.add(arenaName);
         List<Player> playerList = new ArrayList<>();
         for (UUID uuid : players) {

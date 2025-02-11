@@ -25,14 +25,14 @@ public enum QueueEnum {
             ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Debuff Effects",
             ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Mace",
             ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" TNT Minecarts",
-            ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Crystals & Anchors"}, 17,"CRYSTAL-RATED",null),
-    CART_RATED("&#FF4800&lT&#FF4402&lN&#FF3F05&lT &#FF3709&lM&#FF330B&lI&#FF2E0E&lN&#FF2A10&lE&#FF2612&lC&#FF2214&lA&#FF1D17&lR&#FF1919&lT&#FF1919", Material.TNT_MINECART, new String[]{
+            ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Crystals & Anchors"}, 16,"CRYSTAL-RATED",null),
+    /*CART_RATED("&#FF4800&lT&#FF4402&lN&#FF3F05&lT &#FF3709&lM&#FF330B&lI&#FF2E0E&lN&#FF2A10&lE&#FF2612&lC&#FF2214&lA&#FF1D17&lR&#FF1919&lT&#FF1919", Material.TNT_MINECART, new String[]{
             ChatColor.GRAY+"Debuff/Mace-less Cart Practice Kit ",
             "",
             ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" TNT Minecarts",
             ChatColor.RED+"❌"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Debuff Effects",
             ChatColor.RED+"❌"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Mace",
-            ChatColor.RED+"❌"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Crystals & Anchors"}, 16,"CART-RATED",null),
+            ChatColor.RED+"❌"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Crystals & Anchors"}, 16,"CART-RATED",null),*/
     //    CRYSTAL_UNRATED("&#65B34E&lS&#5EA743&lM&#569B38&lP", Material.END_CRYSTAL, new String[]{""}, 5,"CRYSTAL-UNRATED",null),
     ATTRITION_RATED("&#2623FA&lA&#2D32FB&lT&#3441FD&lT&#3B4FFE&lR&#425EFF&lI&#425EFF&lT&#425EFF&lI&#425EFF&lO&#425EFF&lN&#425EFF", Material.SHIELD, new String[]{
             ChatColor.GRAY+"Shield-Based SMP Kit designed for practice mains",
