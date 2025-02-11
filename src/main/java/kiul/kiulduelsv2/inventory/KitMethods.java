@@ -33,7 +33,7 @@ public class KitMethods {
     public static void lobbyKit (Player p) throws IOException {
         ItemStack[] kitContents;
         List<String> lore = new ArrayList<>();
-        lore.add(C.t("&7&lRight-Click &6- &8to enabled/disable spectator visibility"));
+        lore.add(C.t("&7Click to enable/disable spectator visibility"));
         ItemStack specVisibility = ItemStackMethod.createItemStack(togglespecName, ((PattyEventV2.hidingSpectators.contains(p.getUniqueId())) ? Material.RED_CANDLE:Material.LIME_CANDLE), 1, lore, null, 0, false, false);
         lore.clear();
 
@@ -67,10 +67,10 @@ public class KitMethods {
             }
         }
         if (C.PAT_MODE) {
+            p.getInventory().setItem(8, specVisibility);
             if (p.getWorld().getName().equalsIgnoreCase("practice")) {
                 Practice.loadPracKit(p.getPlayer());
             }
-            p.getInventory().setItem(8, specVisibility);
         }
     }
 

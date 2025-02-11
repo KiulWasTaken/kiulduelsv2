@@ -26,6 +26,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
+import org.pattychips.pattyeventv2.Methods.JoinSpectatorMethod;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -145,6 +147,7 @@ public class DuelMethods {
             } else {
                 teamOne.add(players.get(i).getUniqueId());
             }
+
         }
         C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName,kitName);
 
@@ -173,6 +176,13 @@ public class DuelMethods {
                 p.setGameMode(GameMode.SURVIVAL);
                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                     p.removePotionEffect(potionEffect.getType());
+                }
+
+                if (C.PAT_MODE) {
+                    if (PattyEventV2.hidingSpectators.contains(p.getUniqueId())) {
+                        PattyEventV2.hidingSpectators.remove(p.getUniqueId());
+                        JoinSpectatorMethod.showSpectators(p);
+                    }
                 }
             } catch (IOException err) {
                 err.printStackTrace();
@@ -204,6 +214,9 @@ public class DuelMethods {
     }
 
     public static void startRealisticDuel (List<Player> players, String arenaName,boolean reRolled, boolean rated,String kitType) {
+
+
+
         ArenaMethods.arenasInUse.add(arenaName);
         int size = players.size();
 
@@ -219,6 +232,13 @@ public class DuelMethods {
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
             p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
+
+            if (C.PAT_MODE) {
+                if (PattyEventV2.hidingSpectators.contains(p.getUniqueId())) {
+                    PattyEventV2.hidingSpectators.remove(p.getUniqueId());
+                    JoinSpectatorMethod.showSpectators(p);
+                }
+            }
         }
 
 
@@ -474,6 +494,13 @@ public class DuelMethods {
                                 p.setGameMode(GameMode.SURVIVAL);
                                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                                     p.removePotionEffect(potionEffect.getType());
+                                }
+
+                                if (C.PAT_MODE) {
+                                    if (PattyEventV2.hidingSpectators.contains(p.getUniqueId())) {
+                                        PattyEventV2.hidingSpectators.remove(p.getUniqueId());
+                                        JoinSpectatorMethod.showSpectators(p);
+                                    }
                                 }
                             } catch (IOException err) {
                                 err.printStackTrace();
