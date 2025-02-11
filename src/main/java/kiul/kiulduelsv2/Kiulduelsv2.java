@@ -19,8 +19,12 @@ import kiul.kiulduelsv2.scoreboard.ScoreboardListeners;
 import kiul.kiulduelsv2.util.LeakPatcher;
 import kiul.kiulduelsv2.util.TabCompleter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +36,16 @@ public final class Kiulduelsv2 extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+        String worldName = "kiulduels";
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            WorldCreator worldCreator = new WorldCreator(worldName);
+            worldCreator = worldCreator.generator(new EmptyChunkGenerator()); // Adjust the environment if needed
+            worldCreator = worldCreator.generateStructures(false); // Enable or disable structures as needed
+            worldCreator.createWorld();
+        }
 
+         C.PAT_MODE = getServer().getPluginManager().getPlugin("PattyEventV2") != null;
 
         // Config
         Userdata.setup();
@@ -62,21 +74,19 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SettingsInventory(),this);
 
         // Commands
-        getCommand("kit").setExecutor(new Commands());
         getCommand("test").setExecutor(new Commands());
         getCommand("arena").setExecutor(new Commands());
         getCommand("testgeneration").setExecutor(new Commands());
         getCommand("t").setExecutor(new Commands());
         getCommand("party").setExecutor(new Commands());
         getCommand("e").setExecutor(new Commands());
-        getCommand("cancel").setExecutor(new Commands());
         getCommand("previewinv").setExecutor(new Commands());
         getCommand("reroll").setExecutor(new Commands());
         getCommand("recap").setExecutor(new Commands());
         getCommand("spectate").setExecutor(new Commands());
-        getCommand("save").setExecutor(new Commands());
         getCommand("duel").setExecutor(new Commands());
-        getCommand("kit").setTabCompleter(new TabCompleter());
+        getCommand("duels-kit").setExecutor(new Commands());
+        getCommand("duels-kit").setTabCompleter(new TabCompleter());
         getCommand("arena").setTabCompleter(new TabCompleter());
         getCommand("party").setTabCompleter(new TabCompleter());
         getCommand("duel").setTabCompleter(new TabCompleter());

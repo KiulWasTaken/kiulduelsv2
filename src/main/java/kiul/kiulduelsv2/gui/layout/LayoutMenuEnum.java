@@ -8,36 +8,36 @@ public enum LayoutMenuEnum {
      * Queue
      */
 
-    EXPORT("&f&lSAVE / EXIT", Material.WRITABLE_BOOK, new String[]{
-            ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Save",
-            ChatColor.GRAY + "Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Exit"}, 12,"save",null),
+    EXPORT("&f&lSAVE/EXIT KIT", Material.WRITABLE_BOOK, new String[]{
+            ChatColor.GRAY + "Left Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Save Kit to Selected Slot",
+            ChatColor.GRAY + "Right Click " + ChatColor.GOLD + "⏵" + ChatColor.WHITE + " Exit Without Saving"}, 5,"save",null),
     ITEM_INV("&6&lADD ITEMS", Material.CHEST, new String[]{
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 14,"item",null),
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 1,"item",null),
     ENCHANT_ITEM("&4&lENCHANT ITEM", Material.ENCHANTING_TABLE, new String[]{
             ChatColor.GRAY+"Edit the enchantments of the item",
             ChatColor.GRAY+"in your main hand.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 15,"enchant",null),
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 2,"enchant",null),
     RENAME_ITEM("&7&lRENAME", Material.ANVIL, new String[]{
             ChatColor.GRAY+"Change the name of the item",
             ChatColor.GRAY+"in your main hand.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Edit"}, 17,"rename",null),
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Edit"}, 3,"rename",null),
     TRIM_ITEM("&f&lCUSTOMIZE", Material.SMITHING_TABLE, new String[]{
             ChatColor.GRAY+"Edit the trim of the item",
             ChatColor.GRAY+"in your main hand.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 16,"trim",null),
-    SAVE_ITEM("&f&lSAVE/UPLOAD ITEM", Material.BOOK, new String[]{
-            ChatColor.GRAY+"SAVE the selected item from the",
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to Expand"}, 4,"trim",null),
+    SAVE_ITEM("&f&lSAVE ITEM", Material.BOOK, new String[]{
+            ChatColor.GRAY+"SAVE the selected item to the",
             ChatColor.GRAY+"\"saved items\" tab in the editor.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to SAVE"}, 11,"save_item",null),
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to SAVE"}, null,"save_item",null),
     ERASE_ITEM("&c&lERASE ITEM", Material.ENCHANTED_BOOK, new String[]{
             ChatColor.GRAY+"Remove the selected item from the ",
             ChatColor.GRAY+"\"saved items\" tab in the editor.",
             "",
-            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to ERASE"}, 11,"erase_item",null);
+            ChatColor.GOLD+"⏵ "+ChatColor.GRAY+"Click to ERASE"}, null,"erase_item",null);
 
     private String displayName;
     private Material material;

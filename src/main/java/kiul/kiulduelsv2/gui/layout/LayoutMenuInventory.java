@@ -1,7 +1,9 @@
 package kiul.kiulduelsv2.gui.layout;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -9,16 +11,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffectType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 import static kiul.kiulduelsv2.gui.layout.ItemEditInventory.*;
+import static kiul.kiulduelsv2.inventory.KitMethods.lobbyKit;
+import static kiul.kiulduelsv2.inventory.KitMethods.saveInventoryToSelectedKitSlot;
 
 public class LayoutMenuInventory implements Listener {
 
@@ -28,22 +35,12 @@ public class LayoutMenuInventory implements Listener {
 
         p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1F, 0.8F);
 
-        Inventory inventory = Bukkit.createInventory(p, 27, "Edit Kit");
+        Inventory inventory = Bukkit.createInventory(p, InventoryType.HOPPER, "Edit Kit");
         List<String> emptylore = new ArrayList<>();
         emptylore.add("");
 
         for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, ItemStackMethods.createItemStack("", Material.GRAY_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
-            if (i >= 27) {
-                inventory.setItem(i, ItemStackMethods.createItemStack("", Material.LIME_STAINED_GLASS_PANE, 1, emptylore, null, null, null));
-            }
-        }
-
-
-        if (p.getInventory().getItemInMainHand().getType() != Material.AIR && KitMethods.savedItemsArrayContains(p,p.getInventory().getItemInMainHand()) ) {
-            inventory.setItem(10, C.createItemStack(C.t(LayoutMenuEnum.ERASE_ITEM.getDisplayName()), LayoutMenuEnum.ERASE_ITEM.getMaterial(), 1, LayoutMenuEnum.ERASE_ITEM.getLore(), null, null, LayoutMenuEnum.ERASE_ITEM.getlocalName(), null));
-        } else {
-            inventory.setItem(10, C.createItemStack(C.t(LayoutMenuEnum.SAVE_ITEM.getDisplayName()), LayoutMenuEnum.SAVE_ITEM.getMaterial(), 1, LayoutMenuEnum.SAVE_ITEM.getLore(), null, null, LayoutMenuEnum.SAVE_ITEM.getlocalName(), null));
         }
 
         for (LayoutMenuEnum item : LayoutMenuEnum.values()) {
@@ -66,10 +63,46 @@ public class LayoutMenuInventory implements Listener {
                 switch (localName) {
                     case "save":
                         if (e.getClick() == ClickType.LEFT) {
-                            p.performCommand("save");
+                            if (KitEditor.inEditor.containsKey(p)) {
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Saving kit..");
+                                long timeMillis = System.currentTimeMillis();
+                                saveInventoryToSelectedKitSlot(p, KitEditor.inEditor.get(p));
+                                long timeFinal = System.currentTimeMillis() - timeMillis;
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Complete! (" + timeFinal + "ms)");
+                                KitEditor.inEditor.remove(p);
+                                if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+                                    p.removePotionEffect(PotionEffectType.BLINDNESS);
+                                }
+
+                                for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                                    onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);
+                                }
+                                try {
+                                    lobbyKit(p);
+                                } catch (IOException err) {
+                                    err.printStackTrace();
+                                }
+                            }
                         }
                         if (e.getClick() == ClickType.RIGHT) {
-                            p.performCommand("cancel");
+                            if (KitEditor.inEditor.containsKey(p)) {
+                                p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Exiting kit editor..");
+                                KitEditor.inEditor.remove(p);
+                                ItemEditInventory.currentItem.remove(p);
+                                p.getActivePotionEffects().clear();
+                                for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                                    onlinePlayers.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), p);
+                                }
+                                if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+                                    p.removePotionEffect(PotionEffectType.BLINDNESS);
+                                }
+                                try {
+                                    lobbyKit(p);
+                                } catch (IOException err) {
+                                    err.printStackTrace();
+                                }
+                            }
                         }
                         p.closeInventory();
                         break;

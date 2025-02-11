@@ -14,7 +14,9 @@ public enum SettingsEnum {
             ChatColor.GRAY+"send you duel requests"},1,"duel-requests"),
     PARTY_INVITES(C.t(C.RED+"Party Invites"), Material.FIREWORK_ROCKET, new String[]{
             ChatColor.GRAY+"Click to toggle whether other players can",
-            ChatColor.GRAY+"send you party invites"},2,"party-invites");
+            ChatColor.GRAY+"send you party invites"},2,"party-invites"),
+    SCOREBOARD(C.t(C.GREEN+"Scoreboard"), Material.GLOBE_BANNER_PATTERN, new String[]{
+        ChatColor.GRAY+"Click to toggle lobby sidebar",},2,"scoreboard");
 
     private String displayName;
     private Material material;

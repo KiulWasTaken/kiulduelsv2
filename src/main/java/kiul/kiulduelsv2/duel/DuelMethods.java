@@ -5,8 +5,10 @@ import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.arena.ArenaMethods;
 import kiul.kiulduelsv2.arena.TerrainArena;
 import kiul.kiulduelsv2.config.Arenadata;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
+import kiul.kiulduelsv2.inventory.InventoryToBase64;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import kiul.kiulduelsv2.util.UtilMethods;
@@ -18,6 +20,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
@@ -106,6 +109,79 @@ public class DuelMethods {
 
     }
 
+    public static void duelFromBase64 (String kitName, List<Player> players,String kitInventoryBase64) {
+        String arenaName = ArenaMethods.getSuitableArena();
+        if (arenaName == null) {
+            for (Player play : players) {
+                play.sendMessage(C.failPrefix+"no arenas are currently available - please try again later.");
+            }
+            return;
+        }
+
+        for (Player play : players) {
+            play.setGameMode(GameMode.SURVIVAL);
+            String rating = "Casual";
+            ScoreboardMethods.startDuelSidebar(play,players,rating,System.currentTimeMillis(),kitName,false,false);
+        }
+
+
+        Location center = Arenadata.get().getLocation("arenas."+arenaName+".center");
+        int size = Arenadata.get().getInt("arenas."+arenaName+".size");
+        World world = center.getWorld();
+
+        Chunk SEChunk = world.getChunkAt(center.getChunk().getX()+size,center.getChunk().getZ()+size);
+        Chunk NWChunk = world.getChunkAt(center.getChunk().getX()-size,center.getChunk().getZ()-size);
+
+
+        Location teamOneSpawn = new Location(SEChunk.getWorld(), SEChunk.getX() << 4, 64, SEChunk.getZ() << 4).add(-56, 0, -56);
+        Location teamTwoSpawn = new Location(NWChunk.getWorld(), NWChunk.getX() << 4, 64, NWChunk.getZ() << 4).add(56, 0, 56);
+//        playersInMap.put(arenaName,players);
+        ArrayList<UUID> teamOne = new ArrayList<>();
+        ArrayList<UUID> teamTwo = new ArrayList<>();
+
+        for (int i = 0; i < players.size(); i++) {
+            if (i >= players.size()/2) {
+                teamTwo.add(players.get(i).getUniqueId());
+            } else {
+                teamOne.add(players.get(i).getUniqueId());
+            }
+        }
+        C.duelManager.createDuel(teamOne,teamTwo,false,false,arenaName,kitName);
+
+
+//        List<List<Player>> arenaTeams = new ArrayList<>() {{
+//            add(teamOne);
+//            add(teamTwo);
+//        }};
+//        mapTeams.put(arenaName,arenaTeams);
+        teamOneSpawn = getHighestBlockBelow(199,teamOneSpawn).getLocation().add(0.5,1,0.5);
+        teamTwoSpawn = getHighestBlockBelow(199,teamTwoSpawn).getLocation().add(0.5,1,0.5);
+        for (UUID p : teamOne) {
+            Bukkit.getPlayer(p).teleport(teamOneSpawn.setDirection(teamTwoSpawn.toVector().subtract(teamOneSpawn.toVector())));
+        }
+        for (UUID p : teamTwo) {
+            Bukkit.getPlayer(p).teleport(teamTwoSpawn.setDirection(teamOneSpawn.toVector().subtract(teamTwoSpawn.toVector())));
+        }
+        for (Player p : players) {
+            try {
+                ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64(kitInventoryBase64);
+                p.getInventory().setContents(kitContents);
+                preDuelCountdown(p);
+                p.setSaturation(5);
+                p.setFoodLevel(20);
+                p.setHealth(20);
+                p.setGameMode(GameMode.SURVIVAL);
+                for (PotionEffect potionEffect : p.getActivePotionEffects()) {
+                    p.removePotionEffect(potionEffect.getType());
+                }
+            } catch (IOException err) {
+                err.printStackTrace();
+            }
+
+        }
+
+    }
+
     public static void preDuelCountdown (Player p) {
         preDuel.add(p);
          new BukkitRunnable() {
@@ -113,7 +189,7 @@ public class DuelMethods {
             @Override
             public void run() {
                 if (this.time > 0 && C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
-                    p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "" + time,  "STEEL YOURSELF", 0, 15, 5);
+                    p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "" + time,  "STEEL YOURSELF!", 0, 15, 5);
                     if (this.time == 1) {
                         p.sendTitle(net.md_5.bungee.api.ChatColor.of(new java.awt.Color(39, 163, 58)) + "" + ChatColor.BOLD + "" + time, "FIGHT", 0, 15, 5);
                     }

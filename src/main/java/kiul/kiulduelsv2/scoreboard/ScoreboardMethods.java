@@ -1,6 +1,7 @@
 package kiul.kiulduelsv2.scoreboard;
 
 import kiul.kiulduelsv2.C;
+import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.party.Party;
@@ -25,6 +26,7 @@ public class ScoreboardMethods {
 
 
     public static void startLobbyScoreboardTask(Player p) {
+        if (!UserPreferences.get().getBoolean(p.getUniqueId()+".scoreboard")) {return;}
         if (activeBoard.get(p) != null) {
             activeBoard.get(p).cancel();
             activeBoard.remove(p);

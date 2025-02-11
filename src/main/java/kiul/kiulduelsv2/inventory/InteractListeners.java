@@ -17,6 +17,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.persistence.PersistentDataType;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class InteractListeners implements Listener {
                             case "kiteditor":
                                 e.setCancelled(true);
                                 p.playSound(p, Sound.ENTITY_VILLAGER_WORK_LIBRARIAN,0.8f,1f);
-                                KitInventory.kitInventory(e.getPlayer());
+                                KitInventory.selectKitToEdit(e.getPlayer());
                                 break;
                             case "partyqueue":
                                 e.setCancelled(true);
@@ -98,6 +99,10 @@ public class InteractListeners implements Listener {
                                 p.performCommand("party disband");
                                 break;
                             case "party":
+                                if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {
+                                    p.sendMessage(C.failPrefix+"you need to sit out of events before you can create a party");
+                                    return;
+                                }
                                 e.setCancelled(true);
                                 partyManager.createParty(p.getUniqueId());
                                 try {KitMethods.lobbyKit(p);} catch (IOException err) {err.printStackTrace();}

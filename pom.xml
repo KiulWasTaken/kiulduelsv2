@@ -118,6 +118,13 @@
                 <version>1.0.7</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>org.pat</groupId>
+                <artifactId>PattyEventV2</artifactId>
+                <version>1.0</version>
+                <scope>system</scope>
+                <systemPath>C:\Users\kiul\IdeaProjects\dependencies\PattyEventV2-1.0.jar</systemPath>
+            </dependency>
         </dependencies>
 </project>
 

@@ -28,6 +28,7 @@ public class C {
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-fA-F])");
     public static int K = 30;
 
+    public static Boolean PAT_MODE = false;
 
     public static String GOLD = "&#ebbc3d";
     public static String LIGHT_RED = "&#f5633b";

@@ -13,6 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.pattychips.pattyeventv2.Commands.Practice;
+import org.pattychips.pattyeventv2.Methods.ItemStackMethod;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import java.util.List;
 
 import static kiul.kiulduelsv2.C.partyManager;
 import static kiul.kiulduelsv2.C.t;
+import static org.pattychips.pattyeventv2.Methods.JoinSpectatorMethod.togglespecName;
 
 public class KitMethods {
 
@@ -29,6 +33,10 @@ public class KitMethods {
     public static void lobbyKit (Player p) throws IOException {
         ItemStack[] kitContents;
         List<String> lore = new ArrayList<>();
+        lore.add(C.t("&7&lRight-Click &6- &8to enabled/disable spectator visibility"));
+        ItemStack specVisibility = ItemStackMethod.createItemStack(togglespecName, ((PattyEventV2.hidingSpectators.contains(p.getUniqueId())) ? Material.RED_CANDLE:Material.LIME_CANDLE), 1, lore, null, 0, false, false);
+        lore.clear();
+
         if (partyManager.findPartyForMember(p.getUniqueId()) != null) {
             if (partyManager.findPartyForMember(p.getUniqueId()).isLeader(p.getUniqueId())) {
                 kitContents = InventoryToBase64.fromBase64((String) CustomKitData.get().get("global.partyleader.inventory")).getContents();
@@ -36,33 +44,33 @@ public class KitMethods {
                 kitContents = InventoryToBase64.fromBase64((String) CustomKitData.get().get("global.partymember.inventory")).getContents();
             }
         } else {
-            kitContents = InventoryToBase64.fromBase64((String) CustomKitData.get().get("global.lobby.inventory")).getContents();
+            {
+                kitContents = InventoryToBase64.fromBase64((String) CustomKitData.get().get("global.lobby.inventory")).getContents();
+            }
         }
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(null);
         if (partyManager.findPartyForMember(p.getUniqueId()) != null) {
             Party party = partyManager.findPartyForMember(p.getUniqueId());
+            int teamSwitchSlot = 0;
+            if (C.PAT_MODE) {teamSwitchSlot = 4;}
             if (party.teamOne().contains(p.getUniqueId())) {
+
                 lore.add(ChatColor.GRAY + "Right-Click to change party team");
-                p.getInventory().setItem(0, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "RED", Material.RED_WOOL, 1, lore, null, null, "partyteam"));
+                p.getInventory().setItem(teamSwitchSlot, ItemStackMethods.createItemStack(ChatColor.RED + "" + ChatColor.BOLD + "RED", Material.RED_WOOL, 1, lore, null, null, "partyteam"));
                 lore.clear();
+
             } else {
                 lore.add(ChatColor.GRAY + "Right-Click to change party team");
-                p.getInventory().setItem(0, ItemStackMethods.createItemStack(ChatColor.BLUE + "" + ChatColor.BOLD + "BLUE", Material.BLUE_WOOL, 1, lore, null, null, "partyteam"));
+                p.getInventory().setItem(teamSwitchSlot, ItemStackMethods.createItemStack(ChatColor.BLUE + "" + ChatColor.BOLD + "BLUE", Material.BLUE_WOOL, 1, lore, null, null, "partyteam"));
                 lore.clear();
             }
-            if (party.isLeader(p.getUniqueId()) && party.getMembersInclusive().size() > 2) {
-                lore.add(ChatColor.GRAY + "Right-Click to queue for party-based gamemodes");
-                p.getInventory().setItem(4, ItemStackMethods.createItemStack( ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "PARTY FIGHT", Material.PINK_SHULKER_BOX,1,lore,null,null,"partyqueue"));
-                lore.clear();
-                lore.add(ChatColor.GRAY + "Right-click to open the shop");
-                p.getInventory().setItem(1, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
-                lore.clear();
-            } else {
-                lore.add(ChatColor.GRAY + "Right-click to open the shop");
-                p.getInventory().setItem(4, ItemStackMethods.createItemStack(ChatColor.WHITE + "" + ChatColor.BOLD + "STORE", Material.NETHER_STAR,1,lore,null,null,"shop"));
-                lore.clear();
+        }
+        if (C.PAT_MODE) {
+            if (p.getWorld().getName().equalsIgnoreCase("practice")) {
+                Practice.loadPracKit(p.getPlayer());
             }
+            p.getInventory().setItem(8, specVisibility);
         }
     }
 

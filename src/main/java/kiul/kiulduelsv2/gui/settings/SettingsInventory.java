@@ -4,6 +4,7 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
 import kiul.kiulduelsv2.gui.layout.CosmeticEnum;
+import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static kiul.kiulduelsv2.scoreboard.ScoreboardMethods.activeBoard;
 
 public class SettingsInventory implements Listener {
 
@@ -79,11 +82,21 @@ public class SettingsInventory implements Listener {
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
                 Player p = (Player) e.getView().getPlayer();
                 String localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING);
-                ItemStack clickedItem = e.getCurrentItem();
-
                 UserPreferences.get().set(p.getUniqueId()+"."+localName,!UserPreferences.get().getBoolean(p.getUniqueId()+"."+localName));
                 UserPreferences.save();
                 settings(p,0,Material.WHITE_STAINED_GLASS_PANE);
+
+                if (localName.equalsIgnoreCase("scoreboard")) {
+                    if (UserPreferences.get().getBoolean(p.getUniqueId()+"."+localName)) {
+                        ScoreboardMethods.startLobbyScoreboardTask(p);
+                    } else {
+                        if (activeBoard.get(p) != null) {
+                            activeBoard.get(p).cancel();
+                            activeBoard.remove(p);
+                        }
+                        p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+                    }
+                }
             }
         }
     }

@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -147,6 +148,9 @@ public class Queue implements Listener {
         if (e.getItem() == null) {return;}
         if (e.getItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING)) {
             if (e.getItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING).equalsIgnoreCase("queue")) {
+                if (C.PAT_MODE) {
+                    if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {return;}
+                }
                 if (C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()) != null && !C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()).getMembers().isEmpty()) {
                     p.sendMessage(C.failPrefix + "you cannot queue for party (2v2) matches with only one player in your party.");
                     return;

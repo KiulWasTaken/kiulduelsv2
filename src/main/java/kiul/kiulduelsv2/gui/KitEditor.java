@@ -92,8 +92,6 @@ public class KitEditor {
         p.sendMessage(C.t("&#4DBA4B→ &fSNEAK&7 to re-open the &fEXPLORER GUI"));
         p.sendMessage(C.t("&#4DBA4B→ &fRIGHT-CLICK&7 on items in your inventory to &dENCHANT&7"));
         p.sendMessage(C.t("&#4DBA4B→ &fSHIFT-RIGHT-CLICK&7 on an empty slot to &eADD ITEMS"));
-        p.sendMessage(C.t("&#4DBA4B→ &f/save &7to &fSAVE &7your kit"));
-        p.sendMessage(C.t("&#4DBA4B→ &f/cancel &7to &cCANCEL &7editing."));
         p.sendMessage(C.t("&#4DBA4B&m                                                                "));
         if (CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + KitMethods.kitSlot.get(p).get(type)) != null) {
             try {

@@ -44,7 +44,6 @@ public enum KitEnum {
             ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Crystals & Anchors"}, 37,"crystal"),
     CART("&#FF4800&lT&#FF4402&lN&#FF3F05&lT &#FF3709&lM&#FF330B&lI&#FF2E0E&lN&#FF2A10&lE&#FF2612&lC&#FF2214&lA&#FF1D17&lR&#FF1919&lT",null,null, Material.TNT_MINECART,null, new String[]{
             ChatColor.GRAY+"Debuff/Mace-less Cart Practice Kit ",
-            ChatColor.GRAY+"no restrictions on weapons or gear.",
             "",
             ChatColor.GREEN+"✔"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" TNT Minecarts",
             ChatColor.RED+"❌"+ChatColor.DARK_GRAY+" -" + ChatColor.GRAY+" Debuff Effects",

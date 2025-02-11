@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,7 +41,8 @@ public class Commands implements CommandExecutor {
         Player p = (Player) commandSender;
         Party party = partyManager.findPartyForMember(p.getUniqueId());
         switch (label) {
-            case "kit":
+            case "duels-kit":
+                if (!p.hasPermission("kiulduels.admin")) {return false;}
                 switch (args[0]) {
                     /*case "save":
                         saveInventoryToSelectedKitSlot(p);
@@ -75,6 +77,7 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "arena":
+                if (!p.hasPermission("kiulduels.admin")) {return false;}
                 switch (args[0]) {
                     case "create":
                         if (args[1] != null) {
@@ -133,6 +136,7 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "testgeneration":
+                if (!p.hasPermission("kiulduels.admin")) {return false;}
                 TerrainArena.generateTerrainPerformant(p.getLocation(), 4);
 
 //      TerrainArena.generateTerrain(p.getWorld(), new Location(p.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 4, p, null);
@@ -207,9 +211,11 @@ public class Commands implements CommandExecutor {
                 //ItemInventory.itemInventory(p);
                 break;
             case "t":
+                if (!p.hasPermission("kiulduels.admin")) {return false;}
                 ItemInventory.itemInventory(p);
                 break;
             case "e":
+                if (!p.hasPermission("kiulduels.admin")) {return false;}
                 ItemEditInventory.itemEnchantInventory(p);
                 break;
             case "cancel":
@@ -254,6 +260,9 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "duel":
+                if (C.PAT_MODE) {
+                    if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {return false;}
+                }
                 if (args.length > 0 && args[0] != null && args[1] != null && Bukkit.getPlayer(args[1]) != null && Bukkit.getPlayer(args[1]) != p) {
                     Player args1 = Bukkit.getPlayer(args[1]);
                     boolean statsEnabled = false;
@@ -289,7 +298,10 @@ public class Commands implements CommandExecutor {
                 }
                 break;
             case "party":
-
+                if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {
+                    p.sendMessage(C.failPrefix+"you need to sit out of events before you can join a party");
+                    return false;
+                }
                 UUID uuid = p.getUniqueId();
                 if (partyManager.findPartyForMember(p.getUniqueId()) == null && !args[0].equalsIgnoreCase("invite") && !args[0].equalsIgnoreCase("accept") && !args[0].equalsIgnoreCase("reject")) {
                     p.sendMessage(C.failPrefix + "You are not in a party!");

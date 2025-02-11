@@ -92,17 +92,10 @@ public class InventoryListeners implements Listener {
                 for (String type : types) {
                     kitSlot.get(e.getPlayer()).put(type,Userdata.get().getInt(e.getPlayer().getUniqueId()+".selected-slot."+type));
                 }
-
-                try {KitMethods.lobbyKit(e.getPlayer());} catch (IOException er) {er.printStackTrace();}
             } else {
                 for (String type : types) {
                     kitSlot.get(e.getPlayer()).put(type,Userdata.get().getInt(e.getPlayer().getUniqueId()+".selected-slot."+type));
                 }
-            }
-            try {
-                KitMethods.lobbyKit(e.getPlayer());
-            } catch (IOException er) {
-                er.printStackTrace();
             }
         }
 

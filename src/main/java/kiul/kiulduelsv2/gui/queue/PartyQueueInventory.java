@@ -118,8 +118,9 @@ public class PartyQueueInventory implements Listener {
                         selectMode(p,localName);
                         break;
                     case "versus":
-                        String rawItemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getItemName());
+                        String rawItemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
                         String[] splitName = rawItemName.split("'");
+                        if (Bukkit.getPlayer(splitName[0]) == p) {return;}
                         selectMode(p,localName+" → " + splitName[0]);
                         break;
                     case "smp","shield","crystal":
@@ -128,6 +129,7 @@ public class PartyQueueInventory implements Listener {
                         String partyFightType = strings[1].toLowerCase().trim();
                         if (partyFightType.contains("versus")) {
                             String[] split = partyFightType.split("→");
+                            p.sendMessage(Bukkit.getPlayer(split[1].trim()).getName());
                             Invites.duelInviteSend(p,Bukkit.getPlayer(split[1].trim()),true,false,localName);
                             return;
                         }

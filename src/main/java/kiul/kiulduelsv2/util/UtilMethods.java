@@ -13,6 +13,7 @@ import kiul.kiulduelsv2.scoreboard.ScoreboardMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -26,7 +27,8 @@ public class UtilMethods {
         if (C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
             C.duelManager.findDuelForMember(p.getUniqueId()).remove(p.getUniqueId());
         }
-        p.teleport(p.getWorld().getSpawnLocation());
+        World mainWorld = Bukkit.getWorld("world");
+        p.teleport(mainWorld.getSpawnLocation());
         p.setHealth(20);
         p.setFoodLevel(20);
         p.setSaturation(5);
