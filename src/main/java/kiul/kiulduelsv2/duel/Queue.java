@@ -149,7 +149,10 @@ public class Queue implements Listener {
         if (e.getItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING)) {
             if (e.getItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"),PersistentDataType.STRING).equalsIgnoreCase("queue")) {
                 if (C.PAT_MODE) {
-                    if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {return;}
+                    if (!PattyEventV2.sittingOut.contains(p.getUniqueId())) {
+                        p.sendMessage(C.failPrefix + "you need to sit out of events before you can join a party");
+                        return;
+                    }
                 }
                 if (C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()) != null && !C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()).getMembers().isEmpty()) {
                     p.sendMessage(C.failPrefix + "you cannot queue for party (2v2) matches with only one player in your party.");

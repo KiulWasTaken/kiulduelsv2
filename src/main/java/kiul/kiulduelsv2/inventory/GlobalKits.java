@@ -48,7 +48,7 @@ public class GlobalKits {
             ItemStack kitEditor = ItemStackMethod.createItemStack("&#9e369bKit-Editor", Material.ENCHANTED_BOOK, 1, lore, null, 0, false, false);
             lore.clear();
             lore.add(ChatColor.GRAY + "Click to queue for duels");
-            ItemStack queue = ItemStackMethod.createItemStack("&#bae60eDuels-Queue", Material.GOLDEN_CARROT, 1, lore, null, 0, false, false);
+            ItemStack queue = C.createItemStack(C.LIGHT_GREEN+"Duels-Queue", Material.EMERALD, 1, lore.toArray(String[]::new), null, 0, "queue", null);
             lore.clear();
             lore.add(ChatColor.GRAY + "Click to queue");
             ItemStack duelQueueButton = ItemStackMethods.createItemStack(C.t(C.LIGHT_GREEN + "Queue"), Material.EMERALD, 1, lore, null, null, "queue");
