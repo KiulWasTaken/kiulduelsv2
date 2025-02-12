@@ -9,6 +9,7 @@ import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Invites;
+import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.duel.Recap;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import kiul.kiulduelsv2.gui.layout.ItemInventory;
@@ -304,6 +305,10 @@ public class Commands implements CommandExecutor {
                     p.sendMessage(C.failPrefix+"you need to sit out of events before you can join a party");
                     return false;
                 }
+                if (Queue.findPlayerQueue(p) != null) {
+                    p.sendMessage(C.failPrefix+"you need to leave duel queue before you can run party commands");
+                    return false;
+                }
                 UUID uuid = p.getUniqueId();
                 if (partyManager.findPartyForMember(p.getUniqueId()) == null && !args[0].equalsIgnoreCase("invite") && !args[0].equalsIgnoreCase("accept") && !args[0].equalsIgnoreCase("reject")) {
                     p.sendMessage(C.failPrefix + "You are not in a party!");
@@ -339,9 +344,11 @@ public class Commands implements CommandExecutor {
                                             new BukkitRunnable() {
                                                 @Override
                                                 public void run() {
-                                                    Party.invitedPlayer.remove(invited.getUniqueId());
-                                                    if (partyManager.findPartyForMember(invited.getUniqueId()) == null) {
-                                                        Party.sendPartyMessage(C.t("&7party invite from "+C.PINK+p.getName()+"&7 has expired."),Bukkit.getPlayer(args[1]));
+                                                    if (Party.invitedPlayer.containsKey(invited.getUniqueId())) {
+                                                        Party.invitedPlayer.remove(invited.getUniqueId());
+                                                        if (partyManager.findPartyForMember(invited.getUniqueId()) == null) {
+                                                            Party.sendPartyMessage(C.t("&7party invite from " + C.PINK + p.getName() + "&7 has expired."), Bukkit.getPlayer(args[1]));
+                                                        }
                                                     }
                                                 }
                                             }.runTaskLater(C.plugin,600);

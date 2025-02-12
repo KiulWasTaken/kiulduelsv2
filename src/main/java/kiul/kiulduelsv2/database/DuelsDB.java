@@ -109,6 +109,9 @@ public class DuelsDB {
             if (placements.size() > 10) {
                 break;
             }
+            if (readPlayer(offlinePlayers.getUniqueId(),stat+"_placement") == null) {
+                continue;
+            }
             placements.put((int)readPlayer(offlinePlayers.getUniqueId(),stat+"_placement"),offlinePlayers.getUniqueId());
         }
         return placements;

@@ -9,6 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
@@ -17,7 +20,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-public class KitEditor {
+public class KitEditor implements Listener {
 
     public static HashMap<Player,String> inEditor = new HashMap<>();
 
@@ -131,4 +134,12 @@ public class KitEditor {
                 }
         }
     return true;}
+
+    @EventHandler
+    public void makeNewJoinsInvisible (PlayerJoinEvent e) {
+        Player newJoin = e.getPlayer();
+        for (Player p : inEditor.keySet()) {
+            p.hidePlayer(C.plugin,newJoin);
+        }
+    }
 }

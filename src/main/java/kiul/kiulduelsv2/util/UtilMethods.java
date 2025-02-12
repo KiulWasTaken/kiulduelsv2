@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.pattychips.pattyeventv2.Commands.Practice;
 import org.pattychips.pattyeventv2.Methods.JoinSpectatorMethod;
 
 import java.io.IOException;
@@ -28,8 +29,12 @@ public class UtilMethods {
         if (C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
             C.duelManager.findDuelForMember(p.getUniqueId()).remove(p.getUniqueId());
         }
-        World mainWorld = Bukkit.getWorld("world");
-        p.teleport(mainWorld.getSpawnLocation());
+        if (C.PAT_MODE) {
+            Practice.tpWorld(p, false);
+        } else {
+            World mainWorld = Bukkit.getWorld("world");
+            p.teleport(mainWorld.getSpawnLocation());
+        }
         p.setHealth(20);
         p.setFoodLevel(20);
         p.setSaturation(5);

@@ -474,6 +474,12 @@ public class DuelMethods {
                 playerList.add(p);
             }
         }
+        if (playerList.size() < 2) {
+            if (playerList.get(0) != null) {
+                playerList.get(0).sendMessage(C.failPrefix+"cannot start party match with less than 2 players");
+            }
+            return;
+        }
         Location duelCentre = Arenadata.get().getLocation("arenas." + arenaName + ".center");
         Location teleportTo = new Location(duelCentre.getWorld(),duelCentre.getX(),150,duelCentre.getZ());
         UUID duelUUID = UUID.randomUUID();
@@ -489,9 +495,24 @@ public class DuelMethods {
         }
         new BukkitRunnable() {
             int time = 5; //or any other number you want to start countdown from
-
+            boolean allPlayersPresent = true;
             @Override
             public void run() {
+                for (Player p : playerList) {
+                    if (!p.isOnline()) {
+                        allPlayersPresent = false;
+                    }
+                }
+                if (!allPlayersPresent) {
+                    for (Player p : playerList) {
+                        p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "GAME CANCELLED",ChatColor.DARK_RED + "" + ChatColor.BOLD + "PARTY MEMBER LEFT",0,40,20);
+                        UtilMethods.teleportLobby(p);
+                        ArenaMethods.arenasInUse.remove(arenaName);
+                    }
+                    cancel();
+                    return;
+                }
+
                 for (Player p : playerList) {
                     String message = "§7" + time;
                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
@@ -630,7 +651,7 @@ public class DuelMethods {
             Location newLocation = new Location(centerLocation.getWorld(), centerLocation.getX() + xOffset, yOffset, centerLocation.getZ() + zOffset);
 
             // Teleport the player to the new location
-            player.teleport(getHighestBlockBelow(199,newLocation).getLocation().add(0.5,0,0.5));
+            player.teleport(getHighestBlockBelow(199,newLocation).getLocation().add(0.5,1,0.5));
         }
     }
 

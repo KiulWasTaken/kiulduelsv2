@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.pattychips.pattyeventv2.Commands.Practice;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +56,8 @@ public class InventoryListeners implements Listener {
         if (!C.PAT_MODE) {
             e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
             e.getPlayer().setGameMode(GameMode.ADVENTURE);
+        } else {
+            Practice.tpWorld(e.getPlayer(),false);
         }
         if (Userdata.get().get(e.getPlayer().getUniqueId()+".stats.wins") == null) {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.wins", 0);

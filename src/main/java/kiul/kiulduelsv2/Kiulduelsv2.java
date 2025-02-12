@@ -5,6 +5,7 @@ import kiul.kiulduelsv2.config.*;
 import kiul.kiulduelsv2.database.DuelsDB;
 import kiul.kiulduelsv2.duel.DuelListeners;
 import kiul.kiulduelsv2.duel.Recap;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import kiul.kiulduelsv2.gui.layout.ItemInventory;
 import kiul.kiulduelsv2.gui.layout.KitInventory;
@@ -72,6 +73,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LayoutMenuInventory(),this);
         getServer().getPluginManager().registerEvents(new Recap(),this);
         getServer().getPluginManager().registerEvents(new SettingsInventory(),this);
+        getServer().getPluginManager().registerEvents(new KitEditor(),this);
 
         // Commands
         getCommand("test").setExecutor(new Commands());

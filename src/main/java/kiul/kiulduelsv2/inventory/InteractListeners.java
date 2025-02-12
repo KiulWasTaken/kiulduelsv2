@@ -52,6 +52,19 @@ public class InteractListeners implements Listener {
                                 break;
                             case "partyqueue":
                                 e.setCancelled(true);
+                                List<Player> playerList = new ArrayList<>();
+                                for (UUID partyUUID : party.getMembersInclusive()) {
+                                    Player partyMember = Bukkit.getPlayer(partyUUID);
+                                    if (partyMember != null) {
+                                        playerList.add(partyMember);
+                                    }
+                                }
+                                if (playerList.size() < 2) {
+                                    if (playerList.get(0) != null) {
+                                        playerList.get(0).sendMessage(C.failPrefix+"cannot start party match with less than 2 players");
+                                    }
+                                    return;
+                                }
                                 PartyQueueInventory.main(p);
                                 break;
                             case "partyteam":
