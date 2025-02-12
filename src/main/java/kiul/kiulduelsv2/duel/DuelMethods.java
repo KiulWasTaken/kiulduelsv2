@@ -277,7 +277,6 @@ public class DuelMethods {
             DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
-            p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
 
             if (C.PAT_MODE) {
                 if (PattyEventV2.hidingSpectators.contains(p.getUniqueId())) {
@@ -491,7 +490,6 @@ public class DuelMethods {
             DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
             DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
-            p.sendMessage(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString());
         }
         new BukkitRunnable() {
             int time = 5; //or any other number you want to start countdown from

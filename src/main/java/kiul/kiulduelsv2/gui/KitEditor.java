@@ -5,9 +5,11 @@ import kiul.kiulduelsv2.Kiulduelsv2;
 import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.gui.layout.LayoutMenuInventory;
 import kiul.kiulduelsv2.inventory.KitMethods;
+import kiul.kiulduelsv2.util.UtilMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +17,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
+import org.pattychips.pattyeventv2.Commands.Practice;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -137,6 +140,7 @@ public class KitEditor implements Listener {
 
     @EventHandler
     public void makeNewJoinsInvisible (PlayerJoinEvent e) {
+        UtilMethods.teleportLobby(e.getPlayer());
         Player newJoin = e.getPlayer();
         for (Player p : inEditor.keySet()) {
             p.hidePlayer(C.plugin,newJoin);

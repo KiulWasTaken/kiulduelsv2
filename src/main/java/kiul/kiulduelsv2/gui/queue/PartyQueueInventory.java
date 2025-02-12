@@ -2,9 +2,11 @@ package kiul.kiulduelsv2.gui.queue;
 
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.arena.ArenaMethods;
+import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.duel.DuelMethods;
 import kiul.kiulduelsv2.duel.Invites;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
+import kiul.kiulduelsv2.inventory.KitMethods;
 import kiul.kiulduelsv2.party.Party;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -17,6 +19,8 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
 
 public class PartyQueueInventory implements Listener {
 
@@ -112,6 +116,7 @@ public class PartyQueueInventory implements Listener {
         if (e.getView().getTitle().contains("Party")) {
             e.setCancelled(true);
             if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING)) {
+                Party party = C.partyManager.findPartyForMember(p.getUniqueId());
                 String localName = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
                 switch (localName) {
                     case "split", "ffa":
@@ -124,6 +129,16 @@ public class PartyQueueInventory implements Listener {
                         selectMode(p,localName+" → " + splitName[0]);
                         break;
                     case "smp","shield","crystal":
+
+                        if (party == null) {return;}
+                        for (UUID uuid : party.getMembersInclusive()) {
+                            if (CustomKitData.get().get(uuid + "." + localName + ".kit-slot-" + kitSlot.get(p).get(localName)) == null) {
+                                p.closeInventory();
+                                p.sendMessage(C.failPrefix + Bukkit.getPlayer(uuid).getName() +"'s selected kit slot (" + KitMethods.kitSlot.get(p).get(localName) + ") for " + localName + " is empty!");
+                                return;
+                            }
+                        }
+
                         if (ArenaMethods.getSuitableArena() != null) {
                         String[] strings = e.getView().getTitle().split("\\|");
                         String partyFightType = strings[1].toLowerCase().trim();
@@ -133,7 +148,6 @@ public class PartyQueueInventory implements Listener {
                             Invites.duelInviteSend(p,Bukkit.getPlayer(split[1].trim()),true,false,localName);
                             return;
                         }
-                        Party party = C.partyManager.findPartyForMember(p.getUniqueId());
                         boolean ffa = partyFightType.equalsIgnoreCase("ffa");
 
 

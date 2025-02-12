@@ -677,32 +677,50 @@ public class DuelListeners implements Listener {
     @EventHandler
     public void onEnderPearlHit(ProjectileHitEvent event) {
         // Check if the projectile is an Ender Pearl
+        if (event.getEntity() instanceof EnderPearl) {
+            EnderPearl enderPearl = (EnderPearl) event.getEntity();
 
             // Check if the entity who threw the Ender Pearl is a player
-            if (event.getEntity().getShooter() instanceof Player) {
-                Location hitLocation = event.getEntity().getLocation();
-                Location blockHitLocation = event.getHitBlock() != null ? event.getHitBlock().getLocation() : null;
+            if (enderPearl.getShooter() instanceof Player) {
+                Player p = (Player) enderPearl.getShooter();
+                if (C.duelManager.findDuelForMember(p.getUniqueId()) != null) {
+                    Vector center = ArenaMethods.getArenaRegion(C.duelManager.findDuelForMember(p.getUniqueId()).getArena()).getCenter();
 
-                // Check if it hit a barrier block
-                if (blockHitLocation != null && blockHitLocation.getBlock().getType() == Material.BARRIER) {
-                    // Teleport the ender pearl to the highest block location
+                    Location hitLocation = event.getEntity().getLocation();
+                    Location blockHitLocation = event.getHitBlock() != null ? event.getHitBlock().getLocation() : null;
 
-                    if (event.getEntity() instanceof EnderPearl) {
+                    // Check if it hit a barrier block
+                    if (blockHitLocation != null && blockHitLocation.getBlock().getType() == Material.BARRIER) {
+                        // Cancel the event so the pearl doesn't do the default behavior
                         event.setCancelled(true);
-                        EnderPearl enderPearl = (EnderPearl) event.getEntity();
-                        enderPearl.teleport(DuelMethods.getHighestBlockBelow(198,enderPearl.getLocation()).getLocation().add(0, 1, 0));
-                        enderPearl.setVelocity(new Vector(0, -20, 0));
-                        return;
+
+                        // Calculate the vector to move the pearl toward the center of the arena
+                        // Move the Ender Pearl back a couple of blocks towards the center of the arena
+                        double distanceToMove = 1.0; // Adjust this for how far you want to move it
+                        Vector directionToCenter = center.subtract(hitLocation.toVector()).normalize().multiply(distanceToMove);
+
+                        // Calculate the new teleport location
+                        Location newLocation = hitLocation.add(directionToCenter);
+
+                        // Ensure the Ender Pearl stays above the ground (optional, depending on how you want it to land)
+                        if (newLocation.getBlock().getType() == Material.AIR) {
+                            // If the location is air, move it to the nearest solid block beneath it
+                            while (newLocation.getBlock().getType() == Material.AIR && newLocation.getBlockY() > 0) {
+                                newLocation.subtract(0, 1, 0); // Move down one block at a time
+                            }
+                        }
+
+                        // Teleport the Ender Pearl to the new location
+                        enderPearl.teleport(newLocation.add(0,1,0));
+
+                        // Optional: Adjust the velocity to make it fall more naturally instead of shooting downwards
+                        enderPearl.setVelocity(enderPearl.getVelocity().multiply(0.8).setY(-0.5)); // Lower Y velocity, adjusted for falling
                     }
-
-                    Vector reversedVelocity = event.getEntity().getVelocity().multiply(-1);
-                    event.getEntity().teleport(event.getEntity().getLocation().add(reversedVelocity.normalize()));
-                    event.getEntity().setVelocity(reversedVelocity);
-                    event.getEntity().getLocation().setDirection(reversedVelocity);
-
                 }
             }
+        }
     }
+
 
     public static HashMap<UUID, Map<String,Object>> duelStatistics = new HashMap<>();
 
