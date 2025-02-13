@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
+import static kiul.kiulduelsv2.gui.KitEditor.*;
 
 public class ItemInventory implements Listener {
 
@@ -80,6 +80,13 @@ public class ItemInventory implements Listener {
                     }
                     List<String> lore = new ArrayList<>();
                     lore.add(C.t("&6⏵ &7Click to take " + amount + "x " + item.getMaterial()));
+                    if (KitEditor.penaltyItems.get(inEditor.get(p)).containsKey(item.getMaterial())) {
+                        if (getAmountOfItemInInventory(p, item.getMaterial()) > 0) {
+                            lore.add("");
+                            lore.add(C.t(C.GOLD + "⚠ taking more of this item will"));
+                            lore.add(C.t(C.GOLD + "reduce the maximum xp in your kit by &o" + C.RED + penaltyItems.get(inEditor.get(p)).get(item.getMaterial())));
+                        }
+                    }
 
                     String displayName = C.t(item.getMaterial().toString() + (potion ? " of " + item.getPotionType():"") + " &7x" + amount).toLowerCase().replaceAll("_", " ");
                     displayName = "&r&l" + displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
@@ -166,7 +173,7 @@ public class ItemInventory implements Listener {
                                 itemMeta.setLore(null);
                                 itemStack.setAmount(e.getCurrentItem().getAmount());
                                 itemStack.setItemMeta(itemMeta);
-                                if (KitEditor.itemAmountIsWithinLimit(p,p.getInventory().getContents(), itemStack, inEditor.get(p))) {
+                                if (KitEditor.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
                                     p.getInventory().addItem(itemStack);
                                 }
                             } else {
@@ -311,14 +318,33 @@ public class ItemInventory implements Listener {
                     } else {
                         if (e.getClickedInventory() != null && e.getClickedInventory().equals(p.getOpenInventory().getTopInventory())) {
                             if (e.getCurrentItem() != null) {
+                                if (KitEditor.penaltyItems.get(inEditor.get(p)).containsKey(e.getCurrentItem().getType())) {
+                                    if (getAmountOfItemInInventory(p,item.getMaterial()) > 0) {
+                                        ItemMeta meta = e.getCurrentItem().getItemMeta();
+                                        List<String> lore = meta.getLore();
+                                        if (lore.size() < 3) {
+                                            lore.add("");
+                                            lore.add(C.t(C.GOLD + "⚠ taking more of this item will"));
+                                            lore.add(C.t(C.GOLD + "reduce the maximum xp in your kit by &o" + C.RED + penaltyItems.get(inEditor.get(p)).get(item.getMaterial())));
+                                            meta.setLore(lore);
+                                            e.getCurrentItem().setItemMeta(meta);
+                                        }
+                                    }
+                                }
                                 if (ChatColor.stripColor(e.getCurrentItem().getItemMeta().getItemName()).endsWith("x" + e.getCurrentItem().getAmount())) {
                                     ItemStack itemStack = e.getCurrentItem().clone();
                                     ItemMeta itemMeta = itemStack.getItemMeta();
                                     itemMeta.setItemName(null);
                                     itemMeta.setLore(null);
+                                    if (itemStack.getType() == Material.ENDER_CHEST || itemStack.getType().name().contains("SHULKER_BOX")) {
+                                        List<String> lore = new ArrayList<>();
+                                        lore.add(C.t("&#258273⏵ &7Right click to add items to enderchest"));
+                                        itemMeta.setLore(lore);
+                                        itemMeta.setDisplayName(C.t("&#258273Ender Chest"));
+                                    }
                                     itemStack.setAmount(e.getCurrentItem().getAmount());
                                     itemStack.setItemMeta(itemMeta);
-                                    if (KitEditor.itemAmountIsWithinLimit(p,p.getInventory().getContents(), itemStack, inEditor.get(p))) {
+                                    if (KitEditor.itemAmountIsWithinLimit(p, itemStack, inEditor.get(p))) {
                                         p.getInventory().addItem(itemStack);
                                     }
                                     return;

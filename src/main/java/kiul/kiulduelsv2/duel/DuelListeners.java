@@ -496,9 +496,21 @@ public class DuelListeners implements Listener {
         }
     }
 
+    List<String> allowedInteractions = new ArrayList<>() {{
+        add("HELMET");
+        add("CHESTPLATE");
+        add("LEGGINGS");
+        add("BOOTS");
+    }};
+
     @EventHandler
     public void preventUseItemsInEditor(PlayerInteractEvent e) {
         if(KitEditor.inEditor.containsKey(e.getPlayer())) {
+            for (String allowedTypes : allowedInteractions) {
+                if (e.getPlayer().getInventory().getItemInMainHand().getType().name().contains(allowedTypes)) {
+                    return;
+                }
+            }
             e.setCancelled(true);
         }
     }

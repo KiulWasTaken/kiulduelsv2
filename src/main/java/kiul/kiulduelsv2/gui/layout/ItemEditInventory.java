@@ -4,6 +4,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.gui.HeadEnum;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.inventory.InventoryListeners;
 import kiul.kiulduelsv2.inventory.KitMethods;
 import net.kyori.adventure.text.Component;
@@ -30,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
+import static kiul.kiulduelsv2.gui.KitEditor.editMode;
 import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 
 public class ItemEditInventory implements Listener {
@@ -376,6 +378,10 @@ public class ItemEditInventory implements Listener {
                                 && e.getCurrentItem().getType() != Material.SPLASH_POTION && e.getCurrentItem().getType() != Material.TOTEM_OF_UNDYING) {
                             e.setCancelled(true);
                             open(p, e.getCurrentItem());
+                        }
+                        if (e.getCurrentItem().getType() == Material.ENDER_CHEST && !KitEditor.editorMode.get(p)) {
+                            e.setCancelled(true);
+                            editMode(p,true);
                         }
                     }
                     break;

@@ -56,8 +56,9 @@ public class LayoutMenuInventory implements Listener {
     public void layoutMenuInventoryClickListener (InventoryClickEvent e) {
         Player p = (Player) e.getView().getPlayer();
         ItemStack clickedItem = e.getCurrentItem();
-        if (e.getView().getTitle().equalsIgnoreCase("Edit Kit")) {
+        if (e.getView().getTitle().equalsIgnoreCase("Edit Kit") && e.getClickedInventory().equals(p.getOpenInventory().getTopInventory())) {
             e.setCancelled(true);
+            if (clickedItem == null) {return;}
             if (clickedItem.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(C.plugin, "local"))) {
                 String localName = clickedItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(C.plugin,"local"), PersistentDataType.STRING);
                 switch (localName) {
@@ -72,6 +73,10 @@ public class LayoutMenuInventory implements Listener {
                                 long timeFinal = System.currentTimeMillis() - timeMillis;
                                 p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "Complete! (" + timeFinal + "ms)");
                                 KitEditor.inEditor.remove(p);
+                                KitEditor.editorEnderchest.remove(p);
+                                KitEditor.editorInventory.remove(p);
+                                KitEditor.editorMode.remove(p);
+                                KitEditor.editModeSwapCooldown.remove(p);
                                 if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
                                     p.removePotionEffect(PotionEffectType.BLINDNESS);
                                 }
@@ -92,7 +97,11 @@ public class LayoutMenuInventory implements Listener {
                                 p.playSound(p,Sound.ENTITY_VILLAGER_WORK_LIBRARIAN,0.5f,1.2f);
                                 type = inEditor.get(p);
                                 KitEditor.inEditor.remove(p);
+                                KitEditor.editorEnderchest.remove(p);
+                                KitEditor.editorInventory.remove(p);
+                                KitEditor.editorMode.remove(p);
                                 ItemEditInventory.currentItem.remove(p);
+                                KitEditor.editModeSwapCooldown.remove(p);
                                 p.getActivePotionEffects().clear();
                                 for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                                     p.showPlayer(Kiulduelsv2.getPlugin(Kiulduelsv2.class), onlinePlayers);

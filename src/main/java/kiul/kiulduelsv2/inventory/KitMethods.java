@@ -4,6 +4,7 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.CustomKitData;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.gui.ItemStackMethods;
+import kiul.kiulduelsv2.gui.KitEditor;
 import kiul.kiulduelsv2.party.Party;
 import kiul.kiulduelsv2.party.PartyManager;
 import org.bukkit.ChatColor;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static kiul.kiulduelsv2.C.partyManager;
 import static kiul.kiulduelsv2.C.t;
+import static kiul.kiulduelsv2.gui.KitEditor.editorMode;
 import static org.pattychips.pattyeventv2.Methods.JoinSpectatorMethod.togglespecName;
 
 public class KitMethods {
@@ -99,9 +101,24 @@ public class KitMethods {
     }
 
     public static void saveInventoryToSelectedKitSlot (Player p,String type) {
-            CustomKitData.get().set(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".inventory", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
-            CustomKitData.get().set(p.getUniqueId() + "." + type +  ".kit-slot-" + kitSlot.get(p).get(type) + ".armour", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
-            CustomKitData.save();
+        ItemStack[] enderchestItems = editorMode.get(p) ? p.getInventory().getContents() : KitEditor.editorEnderchest.get(p);
+        ItemStack[] inventoryItems = editorMode.get(p) ? KitEditor.editorInventory.get(p) : p.getInventory().getContents();
+
+        for (ItemStack items : inventoryItems) {
+            if (items == null) {continue;}
+            if (items.getType().equals(Material.ENDER_CHEST)) {
+                ItemMeta meta = items.getItemMeta();
+                meta.setLore(null);
+                meta.setDisplayName(C.t("&#258273Ender Chest"));
+                items.setItemMeta(meta);
+            }
+        }
+        if (enderchestItems != null) {
+            CustomKitData.get().set(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".enderchest", InventoryToBase64.itemStackArrayToBase64(enderchestItems));
+        }
+        CustomKitData.get().set(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".inventory", InventoryToBase64.itemStackArrayToBase64(inventoryItems));
+        CustomKitData.get().set(p.getUniqueId() + "." + type +  ".kit-slot-" + kitSlot.get(p).get(type) + ".armour", InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+        CustomKitData.save();
     }
 
     public static void saveItemToSavedItemsArray (Player p, ItemStack givenItemStack) {
@@ -200,10 +217,16 @@ public class KitMethods {
     }
 
     public static void loadSelectedKitSlot (Player p,String type) throws IOException {
+
         ItemStack[] kitContents = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".inventory"));
         ItemStack[] armourContents = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".armour"));
+        if (CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".enderchest")!= null) {
+            ItemStack[] enderchestContents = InventoryToBase64.itemStackArrayFromBase64((String) CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".enderchest"));
+            p.getEnderChest().setContents(enderchestContents);
+        }
         p.getInventory().setContents(kitContents);
         p.getInventory().setArmorContents(armourContents);
+
     }
 
     public static void loadGlobalKit (Player p, String kitName) throws IOException {

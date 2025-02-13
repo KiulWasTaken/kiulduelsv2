@@ -110,6 +110,9 @@ public class DuelsDB {
                 break;
             }
             if (readPlayer(offlinePlayers.getUniqueId(),stat+"_placement") == null) {
+                if (stat.contains("elo")) {
+                    writePlayer(offlinePlayers.getUniqueId(), stat + "_placement", 700);
+                }
                 continue;
             }
             placements.put((int)readPlayer(offlinePlayers.getUniqueId(),stat+"_placement"),offlinePlayers.getUniqueId());

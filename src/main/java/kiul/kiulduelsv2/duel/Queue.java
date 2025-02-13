@@ -131,6 +131,7 @@ public class Queue implements Listener {
                     p.closeInventory();
                     for (String queueType : queue.keySet()) {
                         if (queueType.equals("MAP-QUEUE")) {continue;}
+                        if (CustomKitData.get().get(p.getUniqueId() + "." + type + ".kit-slot-" + kitSlot.get(p).get(type) + ".inventory") == null) {continue;}
                         boolean rated = false;
                         if (queueType.toLowerCase().contains("rated")) {
                             rated = true;
@@ -154,7 +155,7 @@ public class Queue implements Listener {
                         return;
                     }
                 }
-                if (C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()) != null && !C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()).getMembers().isEmpty()) {
+                if (C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()) != null && C.partyManager.findPartyForMember(e.getPlayer().getUniqueId()).getMembers().isEmpty()) {
                     p.sendMessage(C.failPrefix + "you cannot queue for party (2v2) matches with only one player in your party.");
                     return;
                 }
