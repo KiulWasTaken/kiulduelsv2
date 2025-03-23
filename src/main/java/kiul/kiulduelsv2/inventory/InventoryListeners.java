@@ -4,6 +4,8 @@ import kiul.kiulduelsv2.C;
 import kiul.kiulduelsv2.config.UserPreferences;
 import kiul.kiulduelsv2.config.Userdata;
 import kiul.kiulduelsv2.database.DuelsDB;
+import kiul.kiulduelsv2.duel.Duel;
+import kiul.kiulduelsv2.duel.DuelManager;
 import kiul.kiulduelsv2.duel.Queue;
 import kiul.kiulduelsv2.gui.layout.ItemEditInventory;
 import kiul.kiulduelsv2.gui.settings.SettingsEnum;
@@ -19,12 +21,14 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.pattychips.pattyeventv2.Commands.Practice;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import static kiul.kiulduelsv2.gui.KitEditor.inEditor;
 import static kiul.kiulduelsv2.inventory.KitMethods.kitSlot;
@@ -60,6 +64,16 @@ public class InventoryListeners implements Listener {
             e.getPlayer().setGameMode(GameMode.ADVENTURE);
         } else {
             Practice.tpWorld(e.getPlayer(),false);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (Duel duel : C.duelManager.getDuels()) {
+                        for (UUID playerUUID : duel.getPlayers()) {
+                            if (Bukkit.getPlayer(playerUUID) != null) Bukkit.getPlayer(playerUUID).setInvulnerable(false);
+                        }
+                    }
+                }
+            }.runTaskLater(C.plugin,1);
         }
         if (Userdata.get().get(e.getPlayer().getUniqueId()+".stats.wins") == null) {
             Userdata.get().set(e.getPlayer().getUniqueId()+".stats.wins", 0);
