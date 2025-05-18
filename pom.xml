@@ -123,7 +123,7 @@
                 <artifactId>PattyEventV2</artifactId>
                 <version>1.0</version>
                 <scope>system</scope>
-                <systemPath>C:\Users\kiul\IdeaProjects\dependencies\PattyEventV2-1.0.jar</systemPath>
+                <systemPath>C:\Users\Kyle\IdeaProjects\dependencies\PattyEventV2-1.0.jar</systemPath>
             </dependency>
         </dependencies>
 </project>

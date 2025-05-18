@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -43,198 +44,27 @@ public class DuelListeners implements Listener {
                 String arenaName = ArenaMethods.findPlayerArena(p);
                 Duel duel = C.duelManager.findDuelForMember(p.getUniqueId());
                 if (duel != null) {
-                    e.setCancelled(true);
-                    DuelMethods.inventoryPreview.put(p, InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
-                    DuelMethods.armourPreview.put(p, InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+                    e.setDamage(0);
+                    p.setHealth(20);
+                    p.setFoodLevel(20);
+                    p.setSaturation(5);
                     duel.killPlayer(p.getUniqueId());
 
-                    DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead", true);
+                    duel.getIsDead().put(p.getUniqueId().toString(),true);
                     if (p.getKiller() != null) {
                         Userdata.get().set(p.getKiller().getUniqueId() + ".stats.kills", Userdata.get().getInt(p.getKiller().getUniqueId() + ".stats.kills") + 1);
                     }
                     Userdata.get().set(p.getUniqueId() + ".stats.deaths", Userdata.get().getInt(p.getUniqueId() + ".stats.deaths") + 1);
 
-
-                    // Create a firework effect with the specified colors
-                    FireworkEffect effect = FireworkEffect.builder()
-                            .with(FireworkEffect.Type.BALL_LARGE) // You can choose different types like STAR, CREEPER, etc.
-                            .withColor(Color.LIME)
-                            .withColor(Color.WHITE)
-                            .build();
-
-                    // Apply the effect to the firework
-
                     if (!duel.isFfa()) {
-
                         List<UUID> team1 = duel.getRedTeam();
                         List<UUID> team2 = duel.getBlueTeam();
 
-
                         // if only one team has players, end the game.
-                        if (team2.size() == 0) {
-                            Firework firework = (Firework) p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK_ROCKET);
-                            FireworkMeta meta = firework.getFireworkMeta();
-                            meta.addEffect(effect);
-
-                            // Set the power of the firework
-                            meta.setPower(0); // Power 0 means instant explosion
-
-                            // Apply the meta to the firework
-                            firework.setFireworkMeta(meta);
-                            firework.detonate();
-                            if (duel.isRated()) {
-                                DuelMethods.updateElo(duel.getBlueTeamMembers(), duel.getRedTeamMembers());
-                            }
-                            DuelMethods.updateCareer(duel.getBlueTeamMembers(), duel.getRedTeamMembers(), duel.isRated());
-                            // team 1 wins
-                            for (UUID team1UUIDs : duel.getRedTeam()) {
-                                if (Bukkit.getPlayer(team1UUIDs) != null) {
-                                    Player team1Members = Bukkit.getPlayer(team1UUIDs);
-                                    team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                                    DuelMethods.inventoryPreview.put(team1Members, InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getContents()));
-                                    DuelMethods.armourPreview.put(team1Members, InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getArmorContents()));
-                                    int wins = Userdata.get().getInt(team1UUIDs + ".stats.wins");
-                                    int streak = Userdata.get().getInt(team1UUIDs + ".stats.streak");
-                                    Userdata.get().set(team1UUIDs + ".stats.wins", wins + 1);
-                                    Userdata.get().set(team1UUIDs + ".stats.streak", streak + 1);
-                                    int getDamageDealt = (int) duelStatistics.get(team1UUIDs).get("damage_dealt");
-                                    int getDamageTaken = (int) duelStatistics.get(team1UUIDs).get("damage_taken");
-                                    int damageDelta = getDamageDealt - getDamageTaken;
-                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(team1UUIDs + ".stats.damagedelta");
-                                    damageDeltaPerRound.add(0, damageDelta);
-                                    if (damageDeltaPerRound.size() > 10) {
-                                        damageDeltaPerRound.remove(10);
-                                    }
-                                    Userdata.get().set(team1UUIDs + ".stats.damagedelta", damageDeltaPerRound);
-                                    if (Userdata.get().getInt(team1UUIDs + ".stats.streak") > Userdata.get().getInt(team1UUIDs + ".stats.best_streak")) {
-                                        Userdata.get().set(team1UUIDs + ".stats.best_streak", Userdata.get().getInt(team1UUIDs + ".stats.streak"));
-                                    }
-                                    team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                                    new BukkitRunnable() {
-                                        @Override
-                                        public void run() {
-                                            duel.remove(team1Members.getUniqueId());
-                                            UtilMethods.teleportLobby(team1Members);
-                                        }
-                                    }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 41);
-                                } else {
-                                    duel.remove(team1UUIDs);
-                                }
-                            }
-                            ArenaMethods.regenerateArena(arenaName);
-
-                            for (UUID allUUIDs : duel.getAllContained()) {
-                                Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-
-                                if (duel.getBlueTeamMembers().contains(allUUIDs)) {
-                                    onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                                    int losses = Userdata.get().getInt(allUUIDs + ".stats.losses");
-                                    Userdata.get().set(allUUIDs + ".stats.losses", losses + 1);
-                                    Userdata.get().set(allUUIDs + ".stats.streak", 0);
-                                    int getDamageDealt = (int) duelStatistics.get(allUUIDs).get("damage_dealt");
-                                    int getDamageTaken = (int) duelStatistics.get(allUUIDs).get("damage_taken");
-                                    int damageDelta = getDamageDealt - getDamageTaken;
-                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(allUUIDs + ".stats.damagedelta");
-                                    damageDeltaPerRound.add(0, damageDelta);
-                                    if (damageDeltaPerRound.size() > 10) {
-                                        damageDeltaPerRound.remove(10);
-                                    }
-                                    Userdata.get().set(allUUIDs + ".stats.damagedelta", damageDeltaPerRound);
-                                    Userdata.save();
-                                }
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        Recap.sendMatchRecap(onlinePlayers, duel.getAllRedTeamPlayers(), duel.isRated());
-                                        UtilMethods.becomeNotSpectator(onlinePlayers);
-                                        UtilMethods.teleportLobby(onlinePlayers);
-                                        duel.remove(allUUIDs);
-                                    }
-                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            }
-
-
-                        } else if (team1.size() == 0) {
-                            Firework firework = (Firework) p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK_ROCKET);
-                            FireworkMeta meta = firework.getFireworkMeta();
-                            meta.addEffect(effect);
-
-                            // Set the power of the firework
-                            meta.setPower(0); // Power 0 means instant explosion
-
-                            // Apply the meta to the firework
-                            firework.setFireworkMeta(meta);
-                            firework.detonate();
-                            if (duel.isRated()) {
-                                DuelMethods.updateElo(duel.getRedTeamMembers(), duel.getBlueTeamMembers());
-                            }
-                            DuelMethods.updateCareer(duel.getRedTeamMembers(), duel.getBlueTeamMembers(), duel.isRated());
-                            for (UUID team2UUIDs : team2) {
-                                if (Bukkit.getPlayer(team2UUIDs) != null) {
-                                    Player team2Members = Bukkit.getPlayer(team2UUIDs);
-                                    team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                                    DuelMethods.inventoryPreview.put(team2Members, InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getContents()));
-                                    DuelMethods.armourPreview.put(team2Members, InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getArmorContents()));
-                                    int wins = Userdata.get().getInt(team2UUIDs + ".stats.wins");
-                                    int streak = Userdata.get().getInt(team2UUIDs + ".stats.streak");
-                                    Userdata.get().set(team2UUIDs + ".stats.wins", wins + 1);
-                                    Userdata.get().set(team2UUIDs + ".stats.streak", streak + 1);
-                                    int getDamageDealt = (int) duelStatistics.get(team2UUIDs).get("damage_dealt");
-                                    int getDamageTaken = (int) duelStatistics.get(team2UUIDs).get("damage_taken");
-                                    int damageDelta = getDamageDealt - getDamageTaken;
-                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(team2UUIDs + ".stats.damagedelta");
-                                    damageDeltaPerRound.add(0, damageDelta);
-                                    if (damageDeltaPerRound.size() > 10) {
-                                        damageDeltaPerRound.remove(10);
-                                    }
-                                    Userdata.get().set(team2UUIDs + ".stats.damagedelta", damageDeltaPerRound);
-                                    if (Userdata.get().getInt(team2UUIDs + ".stats.streak") > Userdata.get().getInt(team2UUIDs + ".stats.best_streak")) {
-                                        Userdata.get().set(team2UUIDs + ".stats.best_streak", Userdata.get().getInt(team2UUIDs + ".stats.streak"));
-                                    }
-                                    Userdata.save();
-                                    team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                                    new BukkitRunnable() {
-                                        @Override
-                                        public void run() {
-                                            duel.remove(team2Members.getUniqueId());
-                                            UtilMethods.teleportLobby(team2Members);
-
-                                        }
-                                    }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 41);
-                                }
-                            }
-                            ArenaMethods.regenerateArena(arenaName);
-
-                            for (UUID allUUIDs : duel.getAllContained()) {
-                                Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                if (duel.getRedTeamMembers().contains(allUUIDs)) {
-                                    onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                                    int losses = Userdata.get().getInt(allUUIDs + ".stats.losses");
-                                    Userdata.get().set(allUUIDs + ".stats.losses", losses + 1);
-                                    Userdata.get().set(allUUIDs + ".stats.streak", 0);
-                                    int getDamageDealt = (int) duelStatistics.get(allUUIDs).get("damage_dealt");
-                                    int getDamageTaken = (int) duelStatistics.get(allUUIDs).get("damage_taken");
-                                    int damageDelta = getDamageDealt - getDamageTaken;
-                                    ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(allUUIDs + ".stats.damagedelta");
-                                    damageDeltaPerRound.add(0, damageDelta);
-                                    if (damageDeltaPerRound.size() > 10) {
-                                        damageDeltaPerRound.remove(10);
-                                    }
-                                    Userdata.get().set(allUUIDs + ".stats.damagedelta", damageDeltaPerRound);
-                                    Userdata.save();
-                                }
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
-                                        UtilMethods.becomeNotSpectator(onlinePlayers);
-                                        UtilMethods.teleportLobby(onlinePlayers);
-                                        duel.remove(allUUIDs);
-                                    }
-                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-
-                            }
-
+                        if (team2.isEmpty()) {
+                            duel.endGame(team2,team1,p);
+                        } else if (team1.isEmpty()) {
+                            duel.endGame(team1,team2,p);
                         }
                     } else {
                         try {
@@ -247,65 +77,10 @@ public class DuelListeners implements Listener {
                         Userdata.get().set(p.getUniqueId() + ".stats.losses", losses + 1);
                         Userdata.get().set(p.getUniqueId() + ".stats.streak", 0);
                         if (duel.getPlayers().size() <= 1) {
-                            Firework firework = (Firework) p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK_ROCKET);
-                            FireworkMeta meta = firework.getFireworkMeta();
-                            meta.addEffect(effect);
+                            List<UUID> winners = duel.getPlayers();
+                            List<UUID> losers = duel.getAllContained();
+                            duel.endGame(winners,losers,p);
 
-                            // Set the power of the firework
-                            meta.setPower(0); // Power 0 means instant explosion
-
-                            // Apply the meta to the firework
-                            firework.setFireworkMeta(meta);
-                            firework.detonate();
-                            Player victor = Bukkit.getPlayer(duel.getPlayers().get(0));
-                            victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                            int wins = Userdata.get().getInt(victor.getUniqueId() + ".stats.wins");
-                            int streak = Userdata.get().getInt(victor.getUniqueId() + ".stats.streak");
-                            Userdata.get().set(victor.getUniqueId() + ".stats.wins", wins + 1);
-                            Userdata.get().set(victor.getUniqueId() + ".stats.streak", streak + 1);
-                            int getDamageDealt = (int) duelStatistics.get(victor.getUniqueId()).get("damage_dealt");
-                            int getDamageTaken = (int) duelStatistics.get(victor.getUniqueId()).get("damage_taken");
-                            int damageDelta = getDamageDealt - getDamageTaken;
-                            ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(victor.getUniqueId() + ".stats.damagedelta");
-                            damageDeltaPerRound.add(0, damageDelta);
-                            if (damageDeltaPerRound.size() > 10) {
-                                damageDeltaPerRound.remove(10);
-                            }
-                            Userdata.get().set(victor.getUniqueId() + ".stats.damagedelta", damageDeltaPerRound);
-                            if (Userdata.get().getInt(victor.getUniqueId() + ".stats.streak") > Userdata.get().getInt(victor.getUniqueId() + ".stats.best_streak")) {
-                                Userdata.get().set(victor.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(victor.getUniqueId() + ".stats.streak"));
-                            }
-                            Userdata.save();
-                            victor.playSound(victor, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                            DuelMethods.inventoryPreview.put(victor, InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getContents()));
-                            DuelMethods.armourPreview.put(victor, InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getArmorContents()));
-                            for (UUID allUUIDs : duel.getAllContained()) {
-                                Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                new BukkitRunnable() {
-                                    List<Player> winners = new ArrayList<>() {{
-                                        add(victor);
-                                    }};
-
-                                    @Override
-                                    public void run() {
-                                        Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
-                                        UtilMethods.becomeNotSpectator(onlinePlayers);
-                                        UtilMethods.teleportLobby(onlinePlayers);
-                                        int getDamageDealt = (int) duelStatistics.get(allUUIDs).get("damage_dealt");
-                                        int getDamageTaken = (int) duelStatistics.get(allUUIDs).get("damage_taken");
-                                        int damageDelta = getDamageDealt - getDamageTaken;
-                                        ArrayList<Integer> damageDeltaPerRound = (ArrayList<Integer>) Userdata.get().get(allUUIDs + ".stats.damagedelta");
-                                        damageDeltaPerRound.add(0, damageDelta);
-                                        if (damageDeltaPerRound.size() > 10) {
-                                            damageDeltaPerRound.remove(10);
-                                        }
-                                        Userdata.get().set(allUUIDs + ".stats.damagedelta", damageDeltaPerRound);
-                                        duel.remove(allUUIDs);
-                                    }
-                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-
-                            }
-                            ArenaMethods.regenerateArena(arenaName);
                         }
                     }
                 }
@@ -324,9 +99,7 @@ public class DuelListeners implements Listener {
             Duel duel = C.duelManager.findDuelForMember(p.getUniqueId());
             if (duel != null) {
                 duel.remove(p.getUniqueId());
-                if (duelStatistics.get(p.getUniqueId()) != null) {
-                    DuelListeners.duelStatistics.get(p.getUniqueId()).put("dead", true);
-                }
+                duel.getIsDead().put(p.getUniqueId().toString(),true);
                 if (p.getLastDamageCause() != null) {
                     if (p.getLastDamageCause().getEntity() instanceof Player) {
                         Userdata.get().set(p.getLastDamageCause().getEntity().getUniqueId()+".stats.kills",Userdata.get().getInt((p.getLastDamageCause().getEntity().getUniqueId()+".stats.kills"))+1);
@@ -334,108 +107,17 @@ public class DuelListeners implements Listener {
                 }
 
                 Userdata.get().set(p.getUniqueId()+".stats.deaths",Userdata.get().getInt(p.getUniqueId()+".stats.deaths")+1);
-                DuelMethods.inventoryPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
-                DuelMethods.armourPreview.put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getArmorContents()));
+                duel.getInventoryPreview().put(p,InventoryToBase64.itemStackArrayToBase64(p.getInventory().getContents()));
+                duel.getEnderchestPreview().put(p,InventoryToBase64.itemStackArrayToBase64(p.getEnderChest().getContents()));
                 if (!duel.isFfa()) {
-
                     List<UUID> team1 = duel.getRedTeam();
                     List<UUID> team2 = duel.getBlueTeam();
 
-
                     // if only one team has players, end the game.
-                    if (team2.size() == 0) {
-                        // team 1 wins
-                        for (UUID team1UUIDs : duel.getRedTeam()) {
-                            if (Bukkit.getPlayer(team1UUIDs) != null) {
-                                Player team1Members = Bukkit.getPlayer(team1UUIDs);
-                                team1Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                                DuelMethods.inventoryPreview.put(team1Members, InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getContents()));
-                                DuelMethods.armourPreview.put(team1Members, InventoryToBase64.itemStackArrayToBase64(team1Members.getInventory().getArmorContents()));
-                                int wins = Userdata.get().getInt(team1Members.getUniqueId() + ".stats.wins");
-                                int streak = Userdata.get().getInt(team1Members.getUniqueId() + ".stats.streak");
-                                Userdata.get().set(team1Members.getUniqueId() + ".stats.wins", wins + 1);
-                                Userdata.get().set(team1Members.getUniqueId() + ".stats.streak", streak + 1);
-                                if (Userdata.get().getInt(team1Members.getUniqueId() + ".stats.streak") > Userdata.get().getInt(team1Members.getUniqueId() + ".stats.best_streak")) {
-                                    Userdata.get().set(team1Members.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(team1Members.getUniqueId() + ".stats.streak"));
-                                }
-                                team1Members.playSound(team1Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        duel.remove(team1Members.getUniqueId());
-                                        UtilMethods.teleportLobby(team1Members);
-                                    }
-                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            } else {
-                                duel.remove(team1UUIDs);
-                            }
-                        }
-                        ArenaMethods.regenerateArena(arenaName);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                for (UUID allUUIDs : duel.getAllContained()) {
-                                    Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
-                                    if (duel.getRedTeamMembers().contains(allUUIDs)) {
-                                        onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                                        int losses = Userdata.get().getInt(onlinePlayers.getUniqueId() + ".stats.losses");
-                                        Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.losses", losses + 1);
-                                        Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.streak", 0);
-                                    }
-                                    duel.remove(allUUIDs);
-                                    UtilMethods.becomeNotSpectator(onlinePlayers);
-                                    UtilMethods.teleportLobby(onlinePlayers);
-                                }
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                        Userdata.save();
-                    } else if (team1.size() == 0) {
-                        for (UUID team2UUIDs : team2) {
-                            if (Bukkit.getPlayer(team2UUIDs) != null) {
-                                Player team2Members = Bukkit.getPlayer(team2UUIDs);
-                                team2Members.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                                DuelMethods.inventoryPreview.put(team2Members, InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getContents()));
-                                DuelMethods.armourPreview.put(team2Members, InventoryToBase64.itemStackArrayToBase64(team2Members.getInventory().getArmorContents()));
-                                int wins = Userdata.get().getInt(team2Members.getUniqueId() + ".stats.wins");
-                                int streak = Userdata.get().getInt(team2Members.getUniqueId() + ".stats.streak");
-                                Userdata.get().set(team2Members.getUniqueId() + ".stats.wins", wins + 1);
-                                Userdata.get().set(team2Members.getUniqueId() + ".stats.streak", streak + 1);
-                                if (Userdata.get().getInt(team2Members.getUniqueId() + ".stats.streak") > Userdata.get().getInt(team2Members.getUniqueId() + ".stats.best_streak")) {
-                                    Userdata.get().set(team2Members.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(team2Members.getUniqueId() + ".stats.streak"));
-                                }
-                                Userdata.save();
-                                team2Members.playSound(team2Members, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        duel.remove(team2Members.getUniqueId());
-                                        UtilMethods.teleportLobby(team2Members);
-
-                                    }
-                                }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                            }
-                        }
-                        ArenaMethods.regenerateArena(arenaName);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                for (UUID allUUIDs : duel.getAllContained()) {
-                                    Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    Recap.sendMatchRecap(onlinePlayers, duel.getAllBlueTeamPlayers(), duel.isRated());
-                                    if (duel.getRedTeamMembers().contains(allUUIDs)) {
-                                        onlinePlayers.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "DEFEAT", "");
-                                        int losses = Userdata.get().getInt(onlinePlayers.getUniqueId() + ".stats.losses");
-                                        Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.losses", losses + 1);
-                                        Userdata.get().set(onlinePlayers.getUniqueId() + ".stats.streak", 0);
-                                    }
-                                    duel.remove(allUUIDs);
-                                    UtilMethods.becomeNotSpectator(onlinePlayers);
-                                    UtilMethods.teleportLobby(onlinePlayers);
-                                }
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                        Userdata.save();
+                    if (team2.isEmpty()) {
+                        duel.endGame(team2,team1,p);
+                    } else if (team1.isEmpty()) {
+                        duel.endGame(team1,team2,p);
                     }
                 } else {
                     try {
@@ -448,38 +130,10 @@ public class DuelListeners implements Listener {
                     Userdata.get().set(p.getUniqueId() + ".stats.losses", losses + 1);
                     Userdata.get().set(p.getUniqueId() + ".stats.streak", 0);
                     if (duel.getPlayers().size() <= 1) {
-                        Player victor = Bukkit.getPlayer(duel.getPlayers().get(0));
-                        victor.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY!", "");
-                        int wins = Userdata.get().getInt(victor.getUniqueId() + ".stats.wins");
-                        int streak = Userdata.get().getInt(victor.getUniqueId() + ".stats.streak");
-                        Userdata.get().set(victor.getUniqueId() + ".stats.wins", wins + 1);
-                        Userdata.get().set(victor.getUniqueId() + ".stats.streak", streak + 1);
-                        if (Userdata.get().getInt(victor.getUniqueId() + ".stats.streak") > Userdata.get().getInt(victor.getUniqueId() + ".stats.best_streak")) {
-                            Userdata.get().set(victor.getUniqueId() + ".stats.best_streak", Userdata.get().getInt(victor.getUniqueId() + ".stats.streak"));
-                        }
-                        Userdata.save();
-                        victor.playSound(victor, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-                        DuelMethods.inventoryPreview.put(victor, InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getContents()));
-                        DuelMethods.armourPreview.put(victor, InventoryToBase64.itemStackArrayToBase64(victor.getInventory().getArmorContents()));
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                for (UUID allUUIDs : duel.getAllContained()) {
-                                    Player onlinePlayers = Bukkit.getPlayer(allUUIDs);
-                                    if (onlinePlayers != null) {
-                                        List<Player> winners = new ArrayList<>() {{
-                                            add(victor);
-                                        }};
-                                        Recap.sendMatchRecap(onlinePlayers, winners, duel.isRated());
-                                        UtilMethods.becomeNotSpectator(onlinePlayers);
-                                        UtilMethods.teleportLobby(onlinePlayers);
-                                    }
-                                    duel.remove(allUUIDs);
-                                }
+                        List<UUID> winners = duel.getPlayers();
+                        List<UUID> losers = duel.getAllContained();
+                        duel.endGame(winners,losers,p);
 
-                            }
-                        }.runTaskLater(Kiulduelsv2.getPlugin(Kiulduelsv2.class), 40);
-                        ArenaMethods.regenerateArena(arenaName);
                     }
                 }
             }
@@ -733,89 +387,128 @@ public class DuelListeners implements Listener {
         }
     }
 
+    private HashMap<Entity, Player> entityOwner = new HashMap<>();
 
-    public static HashMap<UUID, Map<String,Object>> duelStatistics = new HashMap<>();
+    public void increaseStat (HashMap<String, HashMap<String, Double>> statMap,Player primary,Player secondary, double amount) {
+        if (statMap.get(primary.getUniqueId().toString()) == null) {
+            statMap.put(primary.getUniqueId().toString(),new HashMap<>());
+        }
+        if (statMap.get(primary.getUniqueId().toString()).get(secondary.getUniqueId().toString()) == null) {
+            statMap.get(primary.getUniqueId().toString()).put(secondary.getUniqueId().toString(),amount);
+            return;
+        }
+        statMap.get(primary.getUniqueId().toString()).put(secondary.getUniqueId().toString(),statMap.get(primary.getUniqueId().toString()).get(secondary.getUniqueId().toString())+amount);
 
-    public static Map<String,Object> createStatsArraylist() {
-        UUID duelUUID = UUID.randomUUID();
-        Map<String,Object> duelStats = new HashMap<>() {{
-           put("hits_dealt",0);
-           put("hits_taken",0);
-           put("combo",0);
-           put("longest_combo",0);
-           put("damage_dealt",0);
-           put("damage_taken",0);
-           put("dead",false);
-           put("uuid",duelUUID);
-
-
-        }};
-        return duelStats;
+    }
+    public void increaseStat (HashMap<String, Double> statMap,Player primary, double amount) {
+        if (statMap.get(primary.getUniqueId().toString()) == null) {
+            statMap.put(primary.getUniqueId().toString(),amount);
+            return;
+        }
+        statMap.put(primary.getUniqueId().toString(),statMap.get(primary.getUniqueId().toString())+amount);
     }
 
     @EventHandler
-    public void hitStatTracker (EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player) {
+    public void playerPlaceEntity (EntityPlaceEvent e) {
+        Player p = e.getPlayer();
+        if (e.getEntity() instanceof ExplosiveMinecart cart) {
+            entityOwner.put(cart,p);
+        }
+    }
+
+
+    @EventHandler
+    public void onEntityDamageByEntity(VehicleDamageEvent event) {
+        // Check if the damaged entity is a minecart
+        if (event.getVehicle() instanceof ExplosiveMinecart) {
+            // Check if the damaging entity is a player
+            Player attacker;
+            ExplosiveMinecart minecart = (ExplosiveMinecart) event.getVehicle();
+            if (event.getAttacker() instanceof Player p) {
+                attacker = p;
+            } else if (event.getAttacker() instanceof Projectile arrow) {
+                if (arrow.getShooter() instanceof Player) {
+                    attacker = (Player) arrow.getShooter();
+                } else return;
+            } else return;
+            // Handle the event, for example, you can send a message when the player punches the minecart
+            entityOwner.put(minecart, attacker);
+        }
+    }
+    @EventHandler
+    public void playerHitMinecart (EntityCombustByEntityEvent e) {
+        if (e.getCombuster() instanceof Projectile arrow && e.getEntity() instanceof ExplosiveMinecart cart) {
+            Player attacker;
+            if (arrow.getShooter() instanceof Player) {
+                attacker = (Player) arrow.getShooter();
+            } else return;
+            entityOwner.put(cart,attacker);
+        }
+    }
+    @EventHandler
+    public void incrementStatsInFight(EntityDamageByEntityEvent e) {
+        boolean isMarkedDown = false;
+        if (e.getEntity() instanceof Player p2) {
             Player p1 = null;
+            Duel fight = C.duelManager.findDuelForMember(p2.getUniqueId());
+            if (fight == null) return;
             if (e.getDamager() instanceof ExplosiveMinecart cart) {
-                if (cart.getLastDamageCause() instanceof EntityDamageByEntityEvent lastDamageCause) {
-                    if ((lastDamageCause.getDamager().getType() == EntityType.ARROW || lastDamageCause.getDamager().getType() == EntityType.SPECTRAL_ARROW || lastDamageCause.getDamager().getType() == EntityType.PLAYER)) {
-                        Player damager = null;
-                        if ((lastDamageCause.getDamager() instanceof Projectile arrow)) {
-                            damager = (Player) arrow.getShooter();
-                        }
-                        if (lastDamageCause.getDamager() instanceof Player) {
-                            damager = (Player) lastDamageCause.getDamager();
-                        }
-                        p1 = damager;
-                    }
+                if (entityOwner.get(cart) != null) {
+                    Player damager = entityOwner.get(cart);
+                    p1 = damager;
+                    fight.increaseStat(fight.getDamageTypeDealt(),p1,"explosive",e.getFinalDamage());
+                    fight.increaseStat(fight.getDamageTypeDealtToPlayer(),p1,p2.getUniqueId().toString(),"explosive",e.getFinalDamage());
+                    isMarkedDown = true;
                 }
             }
-            if (e.getDamager() instanceof AbstractArrow arrow) {
+
+            if (e.getDamager() instanceof Projectile arrow) {
                 if (arrow.getShooter() instanceof Player) {
                     p1 = (Player) arrow.getShooter();
+                    fight.increaseStat(fight.getDamageTypeDealt(),p1,"ranged",e.getFinalDamage());
+                    fight.increaseStat(fight.getDamageTypeDealtToPlayer(),p1,p2.getUniqueId().toString(),"ranged",e.getFinalDamage());
+                    isMarkedDown = true;
                 }
             }
             if (e.getDamager() instanceof Player) {
                 p1 = (Player) e.getDamager();
-            }
-
-            Player p2 = (Player) e.getEntity();
-            if (p1 == null) {
-                return;
-            }
-
-            Player damaged = p2;
-            Player damager = p1;
-            Duel damagedDuel = C.duelManager.findDuelForMember(damaged.getUniqueId());
-            Duel damagerDuel = C.duelManager.findDuelForMember(damager.getUniqueId());
-            if (damagerDuel != null && damagedDuel != null) {
-
-                int getDamagerHitsDealt = (int) duelStatistics.get(damager.getUniqueId()).get("hits_dealt");
-
-                int getDamagerCombo = (int) duelStatistics.get(damager.getUniqueId()).get("combo");
-                int getDamagerDamageDealt = (int) duelStatistics.get(damager.getUniqueId()).get("damage_dealt");
-
-                int getDamagedHitsTaken = (int) duelStatistics.get(damaged.getUniqueId()).get("hits_taken");
-                int getDamagedDamageTaken = (int) duelStatistics.get(damaged.getUniqueId()).get("damage_taken");
-
-
-                duelStatistics.get(damager.getUniqueId()).put("hits_dealt", getDamagerHitsDealt + 1);
-                duelStatistics.get(damager.getUniqueId()).put("combo", getDamagerCombo + 1);
-                duelStatistics.get(damager.getUniqueId()).put("damage_dealt", getDamagerDamageDealt + (int) e.getFinalDamage());
-                duelStatistics.get(damaged.getUniqueId()).put("hits_taken", getDamagedHitsTaken + 1);
-                duelStatistics.get(damaged.getUniqueId()).put("damage_taken", getDamagedDamageTaken + (int) e.getFinalDamage());
-                if ((int) duelStatistics.get(damager.getUniqueId()).get("combo") > (int) duelStatistics.get(damager.getUniqueId()).get("longest_combo")) {
-                    duelStatistics.get(damager.getUniqueId()).put("longest_combo", duelStatistics.get(damager.getUniqueId()).get("combo"));
+                if (p1.getInventory().getItemInMainHand().getType().equals(Material.MACE)) {
+                    fight.increaseStat(fight.getDamageTypeDealt(),p1,"mace",e.getFinalDamage());
+                    fight.increaseStat(fight.getDamageTypeDealtToPlayer(),p1,p2.getUniqueId().toString(),"mace",e.getFinalDamage());
+                } else {
+                    fight.increaseStat(fight.getDamageTypeDealt(),p1,"melee",e.getFinalDamage());
+                    fight.increaseStat(fight.getDamageTypeDealtToPlayer(),p1,p2.getUniqueId().toString(),"melee",e.getFinalDamage());
                 }
-                duelStatistics.get(damaged.getUniqueId()).put("combo", 0);
-                if (damaged.getHealth() <= e.getFinalDamage() && damaged.getInventory().getItemInMainHand().getType() != Material.TOTEM_OF_UNDYING && damaged.getInventory().getItemInOffHand().getType() != Material.TOTEM_OF_UNDYING) {
-                    int kills = Userdata.get().getInt(damager.getUniqueId() + ".stats.kills");
-                    Userdata.get().set(damager.getUniqueId() + ".stats.kills", kills + 1);
-                    Userdata.save();
-                }
+                isMarkedDown = true;
             }
+            if (p1 != null) {
+                fight.increaseStat(fight.getDamageDealt(), p1, e.getFinalDamage());
+                fight.increaseStat(fight.getDamageDealtToPlayer(),p1,p2.getUniqueId().toString(),e.getFinalDamage());
+                fight.increaseStat(fight.getDamageTakenFromPlayer(),p2,p1.getUniqueId().toString(),e.getFinalDamage());
+            }
+            fight.increaseStat(fight.getDamageTaken(),p2,e.getFinalDamage());
+
+
+            if (!isMarkedDown) {
+                //fight.increaseStat(fight.getDamageTypeDealt(),p1,"unknown",e.getFinalDamage());
+                fight.increaseStat(fight.getDamageTypeDealtToPlayer(),p1,p2.getUniqueId().toString(),"unknown",e.getFinalDamage());
+            }
+            int p2preDurability = totalArmourDurability(p2);
+            Player finalP = p1;
+            Bukkit.getScheduler().scheduleSyncDelayedTask(C.plugin, new Runnable() {
+                @Override
+                public void run() {
+                    int p2postDurability = totalArmourDurability(p2);
+                    if (p2postDurability > p2preDurability) {
+                        int difference = p2postDurability - p2preDurability;
+                        // increase stats by difference
+                        fight.increaseStat(fight.getDurabilityDamageDealtToPlayer(), finalP, p2.getUniqueId().toString(), difference);
+                        fight.increaseStat(fight.getDurabilityDamageTakenFromPlayer(), p2, finalP.getUniqueId().toString(), difference);
+                    }
+                }
+            }, 1);
         }
+
     }
 
     @EventHandler
@@ -828,5 +521,18 @@ public class DuelListeners implements Listener {
                 }
             }
         }
+    }
+
+    public static int totalArmourDurability(Player p) {
+
+        int totalDamage = 0;
+
+        for (ItemStack armour : p.getInventory().getArmorContents()) {
+            if (armour != null) {
+                totalDamage += armour.getDurability();
+            }
+        }
+
+        return totalDamage;
     }
 }

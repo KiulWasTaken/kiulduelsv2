@@ -48,6 +48,8 @@ public class DuelMethods {
 
     public static HashMap<Player,String> inventoryPreview = new HashMap<>();
     public static HashMap<Player,String> armourPreview = new HashMap<>();
+    public static HashMap<Player,String> enderchestPreview = new HashMap<>();
+    public static HashMap<UUID,Duel> lastDuel = new HashMap<>();
 
     public static ArrayList<Player> preDuel = new ArrayList<>();
 
@@ -274,9 +276,6 @@ public class DuelMethods {
             p.setGameMode(GameMode.SPECTATOR);
             p.setAllowFlight(true);
             p.setFlying(true);
-            DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
-            DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
-            DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
 
             if (C.PAT_MODE) {
                 if (PattyEventV2.hidingSpectators.contains(p.getUniqueId())) {
@@ -487,9 +486,6 @@ public class DuelMethods {
             p.setGameMode(GameMode.SPECTATOR);
             p.setAllowFlight(true);
             p.setFlying(true);
-            DuelListeners.duelStatistics.put(p.getUniqueId(),DuelListeners.createStatsArraylist());
-            DuelListeners.duelStatistics.get(p.getUniqueId()).put("uuid",duelUUID);
-            DuelListeners.duelStatistics.get(p.getUniqueId()).put("type",kitType.toLowerCase());
         }
         new BukkitRunnable() {
             int time = 5; //or any other number you want to start countdown from
@@ -654,20 +650,20 @@ public class DuelMethods {
     }
 
 
-    public static void updateElo(List<UUID> losingTeam, List<UUID> winningTeam) {
-        Map<UUID, Integer> loserScoreboard = new HashMap<>();
-        Map<UUID, Integer> winnerScoreboard = new HashMap<>();
+    public static void updateElo(List<UUID> losingTeam, List<UUID> winningTeam,Duel duel) {
+        Map<UUID, Double> loserScoreboard = new HashMap<>();
+        Map<UUID, Double> winnerScoreboard = new HashMap<>();
         Map<UUID, Integer> eloChange = new HashMap<>();
-        String eloType = (String) DuelListeners.duelStatistics.get(losingTeam.get(0)).get("type");
+        String eloType = duel.getKitType();
 
         // Setup
         for (UUID uuid : losingTeam) {
-            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+            double damageDealt = duel.getDamageDealt().get(uuid);
             loserScoreboard.put(uuid, damageDealt);
             eloChange.put(uuid, 0);
         }
         for (UUID uuid : winningTeam) {
-            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+            double damageDealt = duel.getDamageDealt().get(uuid);
             winnerScoreboard.put(uuid, damageDealt);
             eloChange.put(uuid, 0);
         }
@@ -675,7 +671,7 @@ public class DuelMethods {
         // Calculate Elo change for the winning team
         for (UUID uuid : winningTeam) {
             int elo = (int) DuelsDB.readPlayer(uuid, "stat_elo_"+eloType);
-            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+            double damageDealt = duel.getDamageDealt().get(uuid);
 
             for (UUID playedAgainst : winnerScoreboard.keySet()) {
                 if (playedAgainst.equals(uuid)) continue;
@@ -699,14 +695,15 @@ public class DuelMethods {
                 eloChange.put(uuid, 100 - elo);
             }
 
-            DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
+
+            duel.getEloChange().put(uuid,eloChange.get(uuid));
             DuelsDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
         }
 
         // Calculate Elo change for the losing team
         for (UUID uuid : losingTeam) {
             int elo = (int) DuelsDB.readPlayer(uuid, "stat_elo_"+eloType);
-            int damageDealt = (int) DuelListeners.duelStatistics.get(uuid).get("damage_dealt");
+            double damageDealt = duel.getDamageDealt().get(uuid);
 
             for (UUID playedAgainst : loserScoreboard.keySet()) {
                 if (playedAgainst.equals(uuid)) continue;
@@ -730,16 +727,17 @@ public class DuelMethods {
                 eloChange.put(uuid, 100 - elo);
             }
 
-            DuelListeners.duelStatistics.get(uuid).put("elo", eloChange.get(uuid));
+            duel.getEloChange().put(uuid,eloChange.get(uuid));
             DuelsDB.writePlayer(uuid, "stat_elo_"+eloType, newElo);
         }
     }
 
-    public static void updateCareer (List<UUID> losingTeam, List<UUID> winningTeam,boolean rated) {
+    public static void updateCareer (List<UUID> losingTeam, List<UUID> winningTeam,boolean rated,Duel duel) {
+
         String losingTeamMembers = "";
         String winningTeamMembers = "";
         String comma = ", ";
-        String type = (String) DuelListeners.duelStatistics.get(losingTeam.get(0)).get("type");
+        String type = duel.getKitType();
         String typeText = "";
         String victory = "&a&lVICTORY &7vs. ";
         String defeat = "&c&lDEFEAT &7vs. ";
@@ -785,7 +783,7 @@ public class DuelMethods {
         for (UUID uuid : losingTeam) {
             String playerElo = "";
             if (rated) {
-                int eloChange = (int) DuelListeners.duelStatistics.get(uuid).get("elo");
+                int eloChange = duel.getEloChange().get(uuid);
                     playerElo = ChatColor.WHITE + " (" + ChatColor.GREEN + "+" + eloChange + ChatColor.WHITE + ")";
                 if (eloChange < 0) {
                     playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";
@@ -805,7 +803,7 @@ public class DuelMethods {
         for (UUID uuid : winningTeam) {
             String playerElo = "";
             if (rated) {
-                int eloChange = (int) DuelListeners.duelStatistics.get(uuid).get("elo");
+                int eloChange = duel.getEloChange().get(uuid);
                     playerElo = ChatColor.WHITE + " (" + ChatColor.GREEN + "+" + eloChange + ChatColor.WHITE + ")";
                 if (eloChange < 0) {
                     playerElo = ChatColor.WHITE + " (" + ChatColor.RED + eloChange + ChatColor.WHITE + ")";

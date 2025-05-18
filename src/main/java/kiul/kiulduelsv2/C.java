@@ -17,13 +17,14 @@ import org.bukkit.profile.PlayerProfile;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // not used in my user, implement it yourself.
 public class C {
-
+    public static DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
     public static Plugin plugin = Kiulduelsv2.getPlugin(Kiulduelsv2.class);
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-fA-F])");
     public static int K = 30;

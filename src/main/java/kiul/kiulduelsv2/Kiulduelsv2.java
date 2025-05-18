@@ -37,6 +37,7 @@ public final class Kiulduelsv2 extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Bukkit.broadcastMessage("\uefe9");
         String worldName = "kiulduels";
         World world = Bukkit.getWorld(worldName);
         if (world == null) {

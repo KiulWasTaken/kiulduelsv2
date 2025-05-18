@@ -33,6 +33,7 @@ import org.pattychips.pattyeventv2.PattyEventV2;
 import java.io.IOException;
 import java.util.*;
 
+import static kiul.kiulduelsv2.C.duelManager;
 import static kiul.kiulduelsv2.C.partyManager;
 import static kiul.kiulduelsv2.inventory.KitMethods.*;
 
@@ -145,26 +146,11 @@ public class Commands implements CommandExecutor {
 //      TerrainArena.generateTerrain(p.getWorld(), new Location(p.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 4, p, null);
 
                 break;
-            case "recap":
-                if (DuelListeners.duelStatistics.get(p) != null) {
-                    ArrayList<Player> duelMembers = new ArrayList<>();
-                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                        if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
-                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString().equalsIgnoreCase(args[0])) {
-                                duelMembers.add(onlinePlayers);
-                            }
-                        }
-                    }
-                    Recap.openStatsGUI(duelMembers, p);
-                } else {
-                    p.sendMessage(C.failPrefix + "game recap has expired or does not exist");
-                }
-                break;
             case "previewinv":
                 Player target = Bukkit.getPlayer(args[0]);
                 String type = args[1];
                 if (target != null) {
-                    Recap.open(p, target, true, type);
+                    Recap.open(p, target, true,false,false,DuelMethods.lastDuel.get(p.getUniqueId()));
                 } else {
                     p.sendMessage(C.failPrefix + "player is offline or does not exist");
                 }
@@ -179,12 +165,11 @@ public class Commands implements CommandExecutor {
                             DuelMethods.reRollNo.get(ArenaMethods.findPlayerArena(p)).add(false);
                             DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).remove(p);
                         }
+                        String arena = ArenaMethods.findPlayerArena(p);
                         List<Player> playersInMap = new ArrayList<>();
                         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                            if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()) != null) {
-                                if (DuelListeners.duelStatistics.get(onlinePlayers.getUniqueId()).get("uuid").toString().equalsIgnoreCase(DuelListeners.duelStatistics.get(p.getUniqueId()).get("uuid").toString())) {
-                                    playersInMap.add(onlinePlayers);
-                                }
+                            if (ArenaMethods.findPlayerArena(onlinePlayers) == arena) {
+                                playersInMap.add(onlinePlayers);
                             }
                         }
                         for (Player mapPlayers : playersInMap) {
@@ -193,7 +178,7 @@ public class Commands implements CommandExecutor {
                             String votes = ChatColor.GRAY + "■";
                             String arenaName = ArenaMethods.findPlayerArena(p);
                             mapPlayers.sendTitle("", reRollYes.repeat(DuelMethods.reRollYes.get(arenaName).size()) + reRollNo.repeat(DuelMethods.reRollNo.get(arenaName).size()) + votes.repeat(DuelMethods.allowedToReRoll.get(ArenaMethods.findPlayerArena(p)).size()));
-                            mapPlayers.playSound(mapPlayers, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 0.5f, 1f);
+                            mapPlayers.playSound(mapPlayers, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 0.3f, 1f);
                         }
                     } else {
                         p.sendMessage(C.failPrefix + "You cannot do this right now");

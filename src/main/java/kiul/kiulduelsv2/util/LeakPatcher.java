@@ -17,9 +17,6 @@ public class LeakPatcher implements Listener {
         if (KitEditor.inEditor.containsKey(p)) {
             KitEditor.inEditor.remove(p);
         }
-        if (DuelListeners.duelStatistics.containsKey(p.getUniqueId())) {
-            DuelListeners.duelStatistics.remove(p.getUniqueId());
-        }
         if (DuelMethods.inventoryPreview.containsKey(p)) {
             DuelMethods.inventoryPreview.remove(p);
             DuelMethods.armourPreview.remove(p);

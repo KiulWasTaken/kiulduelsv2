@@ -64,6 +64,19 @@ public class ItemStackMethods {
         return item;
     }
 
+    public static ItemStack createSkullItem(String displayName,OfflinePlayer player,ArrayList<String> lore,String localizedName) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        meta.setDisplayName(displayName);
+        meta.setLore(lore);
+        meta.setOwningPlayer(player);
+        if (localizedName != null) {
+            meta.getPersistentDataContainer().set(new NamespacedKey(C.plugin, "local"), PersistentDataType.STRING, localizedName);
+        }
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public static ItemStack createPotion(String displayName, Material mat, int amount, PotionType potionType) {
         ItemStack itemStack = new ItemStack(mat);
         itemStack.setAmount(amount);
