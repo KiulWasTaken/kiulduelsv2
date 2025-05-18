@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
+import org.pattychips.pattyeventv2.PattyEventV2;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -32,9 +33,13 @@ public class ScoreboardMethods {
             p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
         if (!UserPreferences.get().getBoolean(p.getUniqueId()+".scoreboard")) {return;}
+
+
+
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
+                if (PattyEventV2.sittingOut.contains(p.getUniqueId())) {
                     Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
                     Objective objective = scoreboard.registerNewObjective("scoreboard", "dummy");
 
@@ -71,7 +76,7 @@ public class ScoreboardMethods {
                         damageDealtDeltaRound += damageDelta;
                     }
                     if (!damageDeltaPerRound.isEmpty()) {
-                        damageDealtDeltaRound = (double)(damageDealtDeltaRound / damageDeltaPerRound.size());
+                        damageDealtDeltaRound = (double) (damageDealtDeltaRound / damageDeltaPerRound.size());
                     }
                     Score first = objective.getScore("  " + C.t(" "));
                     Score second = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a"));
@@ -110,6 +115,9 @@ public class ScoreboardMethods {
                     fifteenth.setScore(2);
                     sixteenth.setScore(1);
                     p.setScoreboard(scoreboard);
+                } else {
+                    p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+                }
 
             }
         }.runTaskTimer(C.plugin,1,80);
@@ -123,6 +131,7 @@ public class ScoreboardMethods {
             activeBoard.remove(p);
         }
         if (p.getScoreboard().equals(p.getServer().getScoreboardManager().getMainScoreboard())) {p.setScoreboard(getServer().getScoreboardManager().getNewScoreboard());} //Per-player scoreboard, not necessary if all the same data, but we're personalizing the displayname and all
+        p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         Scoreboard scoreboard = p.getScoreboard(); //Personalized scoreboard
         Party party = C.partyManager.findPartyForMember(p.getUniqueId());
 

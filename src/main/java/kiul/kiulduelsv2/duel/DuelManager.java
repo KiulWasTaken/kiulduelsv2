@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class DuelManager {
 
-    private static List<Duel> duels;
+    private List<Duel> duels;
 
     public DuelManager() {
         this.duels = new ArrayList<>();
@@ -18,6 +18,10 @@ public class DuelManager {
         Duel duel = new Duel(redTeam,blueTeam,rated,ffa,arena,kitType);
         duels.add(duel);
         return duel;
+    }
+
+    public List<Duel> getDuels() {
+        return duels;
     }
 
     public void disbandDuel(Duel duel) {
